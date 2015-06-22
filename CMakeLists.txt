@@ -38,7 +38,6 @@ if(TOP_LEVEL)
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake)
 endif()
 
-
 #==============================================================================#
 # Boost.Numpy library will be built as an external project
 include(ExternalProject)
@@ -51,8 +50,7 @@ ExternalProject_add(Boost.Numpy
                 -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
                 -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
                 -DBOOST_INCLUDEDIR=${Boost_INCLUDE_DIR}
-                -DBoost_USE_STATIC_LIBS=${Boost_USE_STATIC_LIBS}
-                -DBoost_USE_MULTITHREADED=${Boost_USE_MULTITHREADED}
+                -DBoost_USE_STATIC_LIBS=ON
     UPDATE_COMMAND ""
 )
 add_library(boost_numpy STATIC IMPORTED)
@@ -61,7 +59,10 @@ set_property(TARGET boost_numpy
              PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libboost_numpy.a)
 #==============================================================================#
 
-find_package(Boost REQUIRED COMPONENTS python)
+if(NOT TARGET Boost)
+  # Build boost from sources if needed
+  add_subdirectory(external)
+endif()
 find_package(PythonLibsNew REQUIRED)
 
 include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
@@ -70,6 +71,7 @@ file(GLOB python_sources src/*.cpp)
 
 PYTHON_ADD_MODULE(chemharp_python ${python_sources})
 add_dependencies(chemharp_python Boost.Numpy)
+add_dependencies(Boost.Numpy Boost)
 
 target_link_libraries(chemharp_python boost_numpy ${Boost_LIBRARIES})
 
