@@ -19,41 +19,41 @@ void register_unit_cell() {
         .def(py::init<UnitCell::CellType, double>())
         .def(py::init<UnitCell::CellType, double, double, double>())
         .def("matricial", &UnitCell::matricial, py::return_value_policy<Matrix3D_convertor>())
-        .add_property("type",
-            static_cast<UnitCell::CellType (UnitCell::*)(void) const>(&UnitCell::type),
-            static_cast<void (UnitCell::*)(UnitCell::CellType)>(&UnitCell::type))
-        .add_property("a",
-            static_cast<double (UnitCell::*)(void) const>(&UnitCell::a),
-            static_cast<void (UnitCell::*)(double)>(&UnitCell::a))
-        .add_property("b",
-            static_cast<double (UnitCell::*)(void) const>(&UnitCell::b),
-            static_cast<void (UnitCell::*)(double)>(&UnitCell::b))
-        .add_property("c",
-            static_cast<double (UnitCell::*)(void) const>(&UnitCell::c),
-            static_cast<void (UnitCell::*)(double)>(&UnitCell::c))
-        .add_property("alpha",
-            static_cast<double (UnitCell::*)(void) const>(&UnitCell::alpha),
-            static_cast<void (UnitCell::*)(double)>(&UnitCell::alpha))
-        .add_property("beta",
-            static_cast<double (UnitCell::*)(void) const>(&UnitCell::beta),
-            static_cast<void (UnitCell::*)(double)>(&UnitCell::beta))
-        .add_property("gamma",
-            static_cast<double (UnitCell::*)(void) const>(&UnitCell::gamma),
-            static_cast<void (UnitCell::*)(double)>(&UnitCell::gamma))
-        .add_property("volume",
-            static_cast<double (UnitCell::*)(void) const>(&UnitCell::volume))
-        .add_property("periodic_x",
-            static_cast<bool (UnitCell::*)(void) const>(&UnitCell::periodic_x),
-            static_cast<void (UnitCell::*)(bool)>(&UnitCell::periodic_x))
-        .add_property("periodic_y",
-            static_cast<bool (UnitCell::*)(void) const>(&UnitCell::periodic_y),
-            static_cast<void (UnitCell::*)(bool)>(&UnitCell::periodic_y))
-        .add_property("periodic_z",
-            static_cast<bool (UnitCell::*)(void) const>(&UnitCell::periodic_z),
-            static_cast<void (UnitCell::*)(bool)>(&UnitCell::periodic_z))
-        .add_property("full_periodic",
-            static_cast<bool (UnitCell::*)(void) const>(&UnitCell::full_periodic),
-            static_cast<void (UnitCell::*)(bool)>(&UnitCell::full_periodic))
+
+        .def("type", static_cast<UnitCell::CellType (UnitCell::*)(void) const>(&UnitCell::type))
+        .def("type", static_cast<void (UnitCell::*)(UnitCell::CellType)>(&UnitCell::type))
+
+        .def("a", static_cast<double (UnitCell::*)(void) const>(&UnitCell::a))
+        .def("a", static_cast<void (UnitCell::*)(double)>(&UnitCell::a))
+
+        .def("b", static_cast<double (UnitCell::*)(void) const>(&UnitCell::b))
+        .def("b", static_cast<void (UnitCell::*)(double)>(&UnitCell::b))
+
+        .def("c", static_cast<double (UnitCell::*)(void) const>(&UnitCell::c))
+        .def("c",static_cast<void (UnitCell::*)(double)>(&UnitCell::c))
+
+        .def("alpha", static_cast<double (UnitCell::*)(void) const>(&UnitCell::alpha))
+        .def("alpha", static_cast<void (UnitCell::*)(double)>(&UnitCell::alpha))
+
+        .def("beta", static_cast<double (UnitCell::*)(void) const>(&UnitCell::beta))
+        .def("beta", static_cast<void (UnitCell::*)(double)>(&UnitCell::beta))
+
+        .def("gamma", static_cast<double (UnitCell::*)(void) const>(&UnitCell::gamma))
+        .def("gamma", static_cast<void (UnitCell::*)(double)>(&UnitCell::gamma))
+
+        .def("volume", static_cast<double (UnitCell::*)(void) const>(&UnitCell::volume))
+
+        .def("periodic_x", static_cast<bool (UnitCell::*)(void) const>(&UnitCell::periodic_x))
+        .def("periodic_x", static_cast<void (UnitCell::*)(bool)>(&UnitCell::periodic_x))
+
+        .def("periodic_y", static_cast<bool (UnitCell::*)(void) const>(&UnitCell::periodic_y))
+        .def("periodic_y", static_cast<void (UnitCell::*)(bool)>(&UnitCell::periodic_y))
+
+        .def("periodic_z", static_cast<bool (UnitCell::*)(void) const>(&UnitCell::periodic_z))
+        .def("periodic_z", static_cast<void (UnitCell::*)(bool)>(&UnitCell::periodic_z))
+
+        .def("full_periodic", static_cast<bool (UnitCell::*)(void) const>(&UnitCell::full_periodic))
+        .def("full_periodic", static_cast<void (UnitCell::*)(bool)>(&UnitCell::full_periodic))
     ;
 
     /* CellType enum **********************************************************/

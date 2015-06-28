@@ -22,8 +22,8 @@ void register_topology() {
         .def("remove_bond", &Topology::remove_bond)
 
         .def("__len__", &Topology::natoms)
-        .add_property("natoms", &Topology::natoms)
-        .add_property("natom_types", &Topology::natom_types)
+        .def("natoms", &Topology::natoms)
+        .def("natom_types", &Topology::natom_types)
 
         .def("clear", &Topology::clear)
         .def("resize", &Topology::resize)

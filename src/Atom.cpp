@@ -12,26 +12,22 @@
 void register_atom() {
     /* Atom class *************************************************************/
     py::scope atom_scope = py::class_<Atom>("Atom", py::init<string>())
-        .add_property("name",
-            py::make_function(
-                static_cast<const string& (Atom::*)(void) const>(&Atom::name),
-                py::return_value_policy<py::copy_const_reference>()),
-            static_cast<void (Atom::*)(const string&)>(&Atom::name))
-        .add_property("mass",
-            py::make_function(
-                static_cast<const float& (Atom::*)(void) const>(&Atom::mass),
-                py::return_value_policy<py::copy_const_reference>()),
-            static_cast<void (Atom::*)(float)>(&Atom::mass))
-        .add_property("charge",
-            py::make_function(
-                static_cast<const float& (Atom::*)(void) const>(&Atom::charge),
-                py::return_value_policy<py::copy_const_reference>()),
-            static_cast<void (Atom::*)(float)>(&Atom::charge))
-        .add_property("type",
-            py::make_function(
-                static_cast<const Atom::AtomType& (Atom::*)(void) const>(&Atom::type),
-                py::return_value_policy<py::copy_const_reference>()),
-            static_cast<void (Atom::*)(Atom::AtomType)>(&Atom::type))
+        .def("name", py::make_function(
+            static_cast<const string& (Atom::*)(void) const>(&Atom::name),
+            py::return_value_policy<py::copy_const_reference>()))
+        .def("name", static_cast<void (Atom::*)(const string&)>(&Atom::name))
+        .def("mass", py::make_function(
+            static_cast<const float& (Atom::*)(void) const>(&Atom::mass),
+            py::return_value_policy<py::copy_const_reference>()))
+        .def("mass", static_cast<void (Atom::*)(float)>(&Atom::mass))
+        .def("charge", py::make_function(
+            static_cast<const float& (Atom::*)(void) const>(&Atom::charge),
+            py::return_value_policy<py::copy_const_reference>()))
+        .def("charge", static_cast<void (Atom::*)(float)>(&Atom::charge))
+        .def("type", py::make_function(
+            static_cast<const Atom::AtomType& (Atom::*)(void) const>(&Atom::type),
+            py::return_value_policy<py::copy_const_reference>()))
+        .def("type", static_cast<void (Atom::*)(Atom::AtomType)>(&Atom::type))
         .def("full_name", &Atom::full_name)
         .def("vdw_radius", &Atom::vdw_radius)
         .def("covalent_radius", &Atom::covalent_radius)
