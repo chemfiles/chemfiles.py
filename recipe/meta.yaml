@@ -11,12 +11,10 @@ requirements:
     - python
     - numpy
     - libnetcdf
-    - boost
   run:
     - python
     - numpy
     - libnetcdf
-    - boost
 
 about:
   home: https://github.com/Luthaf/Chemharp
