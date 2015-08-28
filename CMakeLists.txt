@@ -38,31 +38,16 @@ if(TOP_LEVEL)
         COMMAND ${CMAKE_COMMAND} -P ${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake)
 endif()
 
-#==============================================================================#
-# Boost.Numpy library will be built as an external project
-include(ExternalProject)
-ExternalProject_add(Boost.Numpy
-    PREFIX external/Boost.Numpy
-    GIT_REPOSITORY https://github.com/ndarray/Boost.NumPy
-    CMAKE_ARGS  -DBUILD_EXAMPLES=OFF
-                -DBUILD_TESTS=OFF
-                -DLIBRARY_TYPE=STATIC
-                -DCMAKE_INSTALL_PREFIX=${CMAKE_BINARY_DIR}
-                -DCMAKE_CXX_COMPILER=${CMAKE_CXX_COMPILER}
-                -DBOOST_INCLUDEDIR=${Boost_INCLUDE_DIR}
-                -DBoost_USE_STATIC_LIBS=ON
-    UPDATE_COMMAND ""
-)
-add_library(boost_numpy STATIC IMPORTED)
-include_directories(${CMAKE_CURRENT_BINARY_DIR}/include)
-set_property(TARGET boost_numpy
-             PROPERTY IMPORTED_LOCATION ${CMAKE_BINARY_DIR}/lib/libboost_numpy.a)
-#==============================================================================#
-
-if(NOT TARGET Boost)
-  # Build boost from sources if needed
-  add_subdirectory(external)
+if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/external/boost/CMakeLists.txt")
+    message(STATUS "Unpacking Boost sources")
+    execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xf ${CMAKE_CURRENT_SOURCE_DIR}/external/boost.tar.gz
+        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/external
+    )
 endif()
+add_subdirectory(external)
+include_directories(BEFORE SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/external/boost)
+
 find_package(PythonLibsNew REQUIRED)
 
 include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
@@ -70,10 +55,7 @@ include_directories(SYSTEM ${PYTHON_INCLUDE_DIRS})
 file(GLOB python_sources src/*.cpp)
 
 PYTHON_ADD_MODULE(chemharp_python ${python_sources})
-add_dependencies(chemharp_python Boost.Numpy)
-add_dependencies(Boost.Numpy Boost)
-
-target_link_libraries(chemharp_python boost_numpy ${Boost_LIBRARIES})
+target_link_libraries(chemharp_python boost_numpy boost_python)
 
 if(TOP_LEVEL)
     target_link_libraries(chemharp_python ${CHEMHARP_LIBRARIES})

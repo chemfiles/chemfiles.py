@@ -1,10 +1,2 @@
-set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
-set(BOOST_VERSION 1.58.0)
-set(BOOST_MD5 b0605a9323f1e960f7434dbbd95a7a5c)
-set(BOOST_PREFIX ${CMAKE_BINARY_DIR})
-set(BOOST_LIBS python)
-include(BuildBoost)
-include_directories(SYSTEM ${Boost_INCLUDE_DIR})
-
-set(Boost_LIBRARIES ${Boost_LIBRARIES} PARENT_SCOPE)
+add_subdirectory(boost)
