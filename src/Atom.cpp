@@ -32,7 +32,7 @@ void register_atom() {
         .def("vdw_radius", &Atom::vdw_radius)
         .def("covalent_radius", &Atom::covalent_radius)
         .def("atomic_number", &Atom::atomic_number)
-        .def("__cmp__", &Atom::operator==)
+        .def("__cmp__", static_cast<bool(*)(const Atom&, const Atom&)>(operator==))
     ;
 
     /* AtomType enum **********************************************************/
