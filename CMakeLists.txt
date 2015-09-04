@@ -79,10 +79,23 @@ function(chrp_python_test _file_)
         PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}")
 endfunction()
 
+function(chrp_python_import_test _file_)
+    get_filename_component(_name_ ${_file_} NAME_WE)
+    add_test(NAME python-example-${_name_} COMMAND ${PYTHON_EXECUTABLE} -c "import ${_name_}")
+    set_tests_properties(python-example-${_name_}
+    PROPERTIES ENVIRONMENT "PYTHONPATH=${CMAKE_CURRENT_BINARY_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/examples")
+endfunction()
+
 if(BUILD_TESTS)
     file(GLOB python_test_files ${CMAKE_CURRENT_SOURCE_DIR}/tests/*.py)
 
     foreach(test_file IN LISTS python_test_files)
         chrp_python_test(${test_file})
+    endforeach(test_file)
+
+    file(GLOB python_example_files ${CMAKE_CURRENT_SOURCE_DIR}/examples/*.py)
+
+    foreach(test_file IN LISTS python_example_files)
+        chrp_python_import_test(${test_file})
     endforeach(test_file)
 endif()
