@@ -9,7 +9,7 @@ from chemharp.logging import LogLevel
 
 class TestLogging(unittest.TestCase):
     def test_level(self):
-        self.assertEqual(logging.log_level(), LogLevel.ERROR)
+        self.assertEqual(logging.log_level(), LogLevel.WARNING)
         logging.set_log_level(LogLevel.DEBUG)
         self.assertEqual(logging.log_level(), LogLevel.DEBUG)
         logging.set_log_level(LogLevel.ERROR)

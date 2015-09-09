@@ -22,19 +22,6 @@ class CellType(IntEnum):
     Triclinic = CHRP_CELL_TYPES.CHRP_CELL_TRICLINIC
     Infinite = CHRP_CELL_TYPES.CHRP_CELL_INFINITE
 
-    @classmethod
-    def _from_int(cls, value):
-        if value == CHRP_CELL_TYPES.CHRP_CELL_ORTHOROMBIC:
-            return CellType.Orthorombic
-        elif value == CHRP_CELL_TYPES.CHRP_CELL_TRICLINIC:
-            return CellType.Triclinic
-        elif value == CHRP_CELL_TYPES.CHRP_CELL_INFINITE:
-            return CellType.Infinite
-        else:
-            raise ValueError(
-                "Invalid CHRP_CELL_TYPES enum variant: {}".format(value)
-            )
-
 
 class UnitCell(object):
     '''
@@ -116,7 +103,7 @@ class UnitCell(object):
         '''Get the type of the unit cell'''
         res = CHRP_CELL_TYPES()
         self.c_lib.chrp_cell_type(self._handle_, byref(res))
-        return CellType._from_int(res.value)
+        return CellType(res.value)
 
     def set_type(self, celltype):
         '''Set the type of the unit cell'''
