@@ -6,6 +6,6 @@ __version__ = "0.3.1"
 from .errors import ChemharpException, ArgumentError
 from .atom import Atom
 from .topology import Topology
-from .cell import UnitCell, OrthorombicCell, TriclinicCell, InfiniteCell
+from .cell import UnitCell, CellType
 from .frame import Frame
 from .trajectory import Trajectory

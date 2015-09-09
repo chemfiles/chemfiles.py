@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import numpy as np
 
-from chemharp import UnitCell, OrthorombicCell, InfiniteCell, TriclinicCell
+from chemharp import UnitCell, CellType
 from chemharp import ChemharpException
 from chemharp import logging
 
@@ -23,7 +23,7 @@ class TestUnitCell(unittest.TestCase):
         self.assertRaises(ChemharpException, cell.set_angles, 80, 89, 110)
         logging.set_log_level(logging.LogLevel.ERROR)
 
-        cell.set_type(TriclinicCell())
+        cell.set_type(CellType.Triclinic)
         cell.set_angles(80, 89, 110)
         self.assertEqual(cell.angles(), (80.0, 89.0, 110.0))
 
@@ -38,12 +38,12 @@ class TestUnitCell(unittest.TestCase):
 
     def test_type(self):
         cell = UnitCell(3, 4, 5)
-        self.assertEqual(cell.type(), OrthorombicCell())
-        cell.set_type(InfiniteCell())
-        self.assertEqual(cell.type(), InfiniteCell())
+        self.assertEqual(cell.type(), CellType.Orthorombic)
+        cell.set_type(CellType.Infinite)
+        self.assertEqual(cell.type(), CellType.Infinite)
 
         cell = UnitCell(3, 4, 5, 100, 120, 130)
-        self.assertEqual(cell.type(), TriclinicCell())
+        self.assertEqual(cell.type(), CellType.Triclinic)
 
     def test_periodicity(self):
         cell = UnitCell(3, 4, 5)

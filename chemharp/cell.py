@@ -1,57 +1,39 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
-from ctypes import c_double, c_bool, byref, POINTER
+from ctypes import c_double, c_bool, c_int, byref, POINTER
+from enum import IntEnum
 
 from .ffi import get_c_library, CHRP_CELL_TYPES
 from .errors import _check_handle
 
 
-class CellType(object):
-    '''Base class for UnitCell cell types'''
+class CellType(IntEnum):
+    '''
+    Possibles values for the cell type:
+        - NONE: Do not log anything
+        - ERROR: Only log errors
+        - WARNING: Log errors and warnings
+        - INFO: Log errors, warnings and informations
+        - DEBUG: Log everything, from errors to debug informations
+    '''
+
+    Orthorombic = CHRP_CELL_TYPES.CHRP_CELL_ORTHOROMBIC
+    Triclinic = CHRP_CELL_TYPES.CHRP_CELL_TRICLINIC
+    Infinite = CHRP_CELL_TYPES.CHRP_CELL_INFINITE
 
     @classmethod
-    def from_int(cls, value):
+    def _from_int(cls, value):
         if value == CHRP_CELL_TYPES.CHRP_CELL_ORTHOROMBIC:
-            return OrthorombicCell()
+            return CellType.Orthorombic
         elif value == CHRP_CELL_TYPES.CHRP_CELL_TRICLINIC:
-            return TriclinicCell()
+            return CellType.Triclinic
         elif value == CHRP_CELL_TYPES.CHRP_CELL_INFINITE:
-            return InfiniteCell()
+            return CellType.Infinite
         else:
             raise ValueError(
                 "Invalid CHRP_CELL_TYPES enum variant: {}".format(value)
             )
-
-    def __eq__(self, other):
-        return self._as_parameter_ == other._as_parameter_
-
-
-class OrthorombicCell(CellType):
-    '''Orthorombic cell, with the three angles equals to 90°'''
-    def __init__(self):
-        self._as_parameter_ = CHRP_CELL_TYPES.CHRP_CELL_ORTHOROMBIC
-
-    def __repr__(self):
-        return "Orthorombic cell"
-
-
-class TriclinicCell(CellType):
-    '''Triclinic cell, with any values for the angles.'''
-    def __init__(self):
-        self._as_parameter_ = CHRP_CELL_TYPES.CHRP_CELL_TRICLINIC
-
-    def __repr__(self):
-        return "Triclinic cell"
-
-
-class InfiniteCell(CellType):
-    '''Infinite cell, to use when there is no cell.'''
-    def __init__(self):
-        self._as_parameter_ = CHRP_CELL_TYPES.CHRP_CELL_INFINITE
-
-    def __repr__(self):
-        return "Infinite cell"
 
 
 class UnitCell(object):
@@ -94,7 +76,9 @@ class UnitCell(object):
     def lengths(self):
         '''Get the three lenghts of an ``UnitCell``, in Angstroms.'''
         a, b, c = c_double(), c_double(), c_double()
-        self.c_lib.chrp_cell_lengths(self._handle_, byref(a), byref(b), byref(c))
+        self.c_lib.chrp_cell_lengths(
+            self._handle_, byref(a), byref(b), byref(c)
+        )
         return a.value, b.value, c.value
 
     def set_lengths(self, a, b, c):
@@ -132,11 +116,11 @@ class UnitCell(object):
         '''Get the type of the unit cell'''
         res = CHRP_CELL_TYPES()
         self.c_lib.chrp_cell_type(self._handle_, byref(res))
-        return CellType.from_int(res.value)
+        return CellType._from_int(res.value)
 
     def set_type(self, celltype):
         '''Set the type of the unit cell'''
-        self.c_lib.chrp_cell_set_type(self._handle_, celltype)
+        self.c_lib.chrp_cell_set_type(self._handle_, c_int(celltype))
 
     def periodicity(self):
         '''Get the cell periodic boundary conditions along the three axis'''

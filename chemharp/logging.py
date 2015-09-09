@@ -1,12 +1,12 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from enum import Enum
+from enum import IntEnum
 from ctypes import c_int, byref
 
 from .ffi import get_c_library, CHRP_LOG_LEVEL
 
 
-class LogLevel(Enum):
+class LogLevel(IntEnum):
     '''
     Available log levels:
         - NONE: Do not log anything
@@ -48,7 +48,7 @@ def log_level():
 def set_log_level(level):
     ''' Set the logging level to ``level``'''
     c_lib = get_c_library()
-    c_lib.chrp_set_loglevel(c_int(level.value))
+    c_lib.chrp_set_loglevel(c_int(level))
 
 
 def log_to_file(path):
