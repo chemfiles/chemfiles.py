@@ -18,3 +18,5 @@ class TestLogging(unittest.TestCase):
         logging.log_to_file("test.log")
         self.assertTrue(os.path.isfile("test.log"))
         logging.log_to_stderr()
+
+        os.unlink("test.log")
