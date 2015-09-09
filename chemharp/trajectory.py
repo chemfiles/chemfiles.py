@@ -2,7 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_size_t, byref
 
-from .ffi import c_lib
+from .ffi import get_c_library
 from .errors import _check_handle
 from .frame import Frame
 
@@ -18,13 +18,14 @@ class Trajectory(object):
         Open a trajectory file at ``path`` with mode ``mode``. Supported modes
         are "r" for read (this is the default) or "w" for write.
         '''
-        self._handle_ = c_lib.chrp_open(
+        self.c_lib = get_c_library()
+        self._handle_ = self.c_lib.chrp_open(
             path.encode("utf8"), mode.encode("utf8")
         )
         _check_handle(self._handle_)
 
     def __del__(self):
-        c_lib.chrp_trajectory_close(self._handle_)
+        self.c_lib.chrp_trajectory_close(self._handle_)
 
     def __enter__(self):
         return self
@@ -39,7 +40,7 @@ class Trajectory(object):
         Read the next step of the trajectory and return the corresponding frame
         '''
         frame = Frame()
-        c_lib.chrp_trajectory_read(self._handle_, frame._handle_)
+        self.c_lib.chrp_trajectory_read(self._handle_, frame._handle_)
         return frame
 
     def read_step(self, step):
@@ -48,14 +49,14 @@ class Trajectory(object):
         frame
         '''
         frame = Frame()
-        c_lib.chrp_trajectory_read_step(
+        self.c_lib.chrp_trajectory_read_step(
             self._handle_, c_size_t(step), frame._handle_
         )
         return frame
 
     def write(self, frame):
         '''Write a frame to the trajectory'''
-        c_lib.chrp_trajectory_write(self._handle_, frame._handle_)
+        self.c_lib.chrp_trajectory_write(self._handle_, frame._handle_)
 
     def set_topology(self, topology):
         '''
@@ -63,14 +64,14 @@ class Trajectory(object):
         used when reading and writing the files, replacing any topology in the
         frames or files.
         '''
-        c_lib.chrp_trajectory_set_topology(self._handle_, topology._handle_)
+        self.c_lib.chrp_trajectory_set_topology(self._handle_, topology._handle_)
 
     def set_topology_file(self, filename):
         '''
         Set the topology associated with a trajectory by reading the first
         frame of ``filename``; and extracting the topology of this frame.
         '''
-        c_lib.chrp_trajectory_set_topology_file(
+        self.c_lib.chrp_trajectory_set_topology_file(
             self._handle_, filename.encode("utf8")
         )
 
@@ -80,15 +81,15 @@ class Trajectory(object):
         when reading and writing the files, replacing any unit cell in the
         frames or files.
         '''
-        c_lib.chrp_trajectory_set_cell(self._handle_, cell._handle_)
+        self.c_lib.chrp_trajectory_set_cell(self._handle_, cell._handle_)
 
     def nsteps(self):
         '''
         Get the number of steps (the number of frames) in a trajectory.
         '''
         res = c_size_t()
-        c_lib.chrp_trajectory_nsteps(self._handle_, byref(res))
+        self.c_lib.chrp_trajectory_nsteps(self._handle_, byref(res))
         return res.value
 
     def close(self):
-        c_lib.chrp_trajectory_close(self._handle_)
+        self.c_lib.chrp_trajectory_close(self._handle_)

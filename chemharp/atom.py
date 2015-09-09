@@ -2,7 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_float, c_double, c_int, byref, create_string_buffer
 
-from .ffi import c_lib
+from .ffi import get_c_library
 from .errors import _check_handle
 
 
@@ -15,41 +15,42 @@ class Atom(object):
 
     def __init__(self, name):
         '''Create a new ``Atom`` from a ``name``.'''
-        self._handle_ = c_lib.chrp_atom(name.encode("utf8"))
+        self.c_lib = get_c_library()
+        self._handle_ = self.c_lib.chrp_atom(name.encode("utf8"))
         _check_handle(self._handle_)
 
     def __del__(self):
-        c_lib.chrp_atom_free(self._handle_)
+        self.c_lib.chrp_atom_free(self._handle_)
 
     def mass(self):
         '''Get the ``Atom`` mass, in atomic mass units'''
         res = c_float()
-        c_lib.chrp_atom_mass(self._handle_, byref(res))
+        self.c_lib.chrp_atom_mass(self._handle_, byref(res))
         return res.value
 
     def set_mass(self, mass):
         '''Set the ``Atom`` mass, in atomic mass units'''
-        c_lib.chrp_atom_set_mass(self._handle_, c_float(mass))
+        self.c_lib.chrp_atom_set_mass(self._handle_, c_float(mass))
 
     def charge(self):
         '''Get the ``Atom`` charge, in number of the electron charge *e*'''
         res = c_float()
-        c_lib.chrp_atom_charge(self._handle_, byref(res))
+        self.c_lib.chrp_atom_charge(self._handle_, byref(res))
         return res.value
 
     def set_charge(self, charge):
         '''Set the ``Atom`` charge, in number of the electron charge *e*'''
-        c_lib.chrp_atom_set_charge(self._handle_, c_float(charge))
+        self.c_lib.chrp_atom_set_charge(self._handle_, c_float(charge))
 
     def name(self):
         '''Get the ``Atom`` name'''
         res = create_string_buffer(10)
-        c_lib.chrp_atom_name(self._handle_, res, 10)
+        self.c_lib.chrp_atom_name(self._handle_, res, 10)
         return res.value.decode("utf8")
 
     def set_name(self, name):
         '''Set the ``Atom`` name'''
-        c_lib.chrp_atom_set_name(self._handle_, name.encode("utf8"))
+        self.c_lib.chrp_atom_set_name(self._handle_, name.encode("utf8"))
 
     def full_name(self):
         '''
@@ -58,7 +59,7 @@ class Atom(object):
         string.
         '''
         res = create_string_buffer(100)
-        c_lib.chrp_atom_full_name(self._handle_, res, 100)
+        self.c_lib.chrp_atom_full_name(self._handle_, res, 100)
         return res.value.decode("utf8")
 
     def vdw_radius(self):
@@ -67,7 +68,7 @@ class Atom(object):
         not be found, returns -1.
         '''
         res = c_double()
-        c_lib.chrp_atom_vdw_radius(self._handle_, byref(res))
+        self.c_lib.chrp_atom_vdw_radius(self._handle_, byref(res))
         return res.value
 
     def covalent_radius(self):
@@ -76,7 +77,7 @@ class Atom(object):
         found, returns -1.
         '''
         res = c_double()
-        c_lib.chrp_atom_covalent_radius(self._handle_, byref(res))
+        self.c_lib.chrp_atom_covalent_radius(self._handle_, byref(res))
         return res.value
 
     def atomic_number(self):
@@ -85,5 +86,5 @@ class Atom(object):
         found, returns -1.
         '''
         res = c_int()
-        c_lib.chrp_atom_atomic_number(self._handle_, byref(res))
+        self.c_lib.chrp_atom_atomic_number(self._handle_, byref(res))
         return res.value

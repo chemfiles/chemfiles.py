@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_size_t, c_bool, byref, POINTER
 import numpy as np
 
-from .ffi import c_lib
+from .ffi import get_c_library
 from .errors import _check_handle, ChemharpException
 from .atom import Atom
 
@@ -19,17 +19,18 @@ class Topology(object):
 
     def __init__(self):
         '''Create a new empty ``Topology``.'''
-        self._handle_ = c_lib.chrp_topology()
+        self.c_lib = get_c_library()
+        self._handle_ = self.c_lib.chrp_topology()
         _check_handle(self._handle_)
 
     def __del__(self):
-        c_lib.chrp_topology_free(self._handle_)
+        self.c_lib.chrp_topology_free(self._handle_)
 
     def atom(self, index):
         '''Get the ``Atom`` at ``index`` from a topology.'''
         atom = Atom("")
-        c_lib.chrp_atom_free(atom._handle_)
-        atom._handle_ = c_lib.chrp_atom_from_topology(
+        self.c_lib.chrp_atom_free(atom._handle_)
+        atom._handle_ = self.c_lib.chrp_atom_from_topology(
             self._handle_, c_size_t(index)
         )
         try:
@@ -41,7 +42,7 @@ class Topology(object):
     def natoms(self):
         '''Get the current number of atoms in the ``Topology``.'''
         res = c_size_t()
-        c_lib.chrp_topology_atoms_count(self._handle_, res)
+        self.c_lib.chrp_topology_atoms_count(self._handle_, res)
         return res.value
 
     def __len__(self):
@@ -50,19 +51,19 @@ class Topology(object):
 
     def append(self, atom):
         '''Add an ``Atom`` at the end of the ``Topology``'''
-        c_lib.chrp_topology_append(self._handle_, atom._handle_)
+        self.c_lib.chrp_topology_append(self._handle_, atom._handle_)
 
     def remove(self, index):
         '''
         Remove an ``Atom`` from the ``Topology`` by index. This modify all the
         other atoms indexes.
         '''
-        c_lib.chrp_topology_remove(self._handle_, c_size_t(index))
+        self.c_lib.chrp_topology_remove(self._handle_, c_size_t(index))
 
     def isbond(self, i, j):
         '''Tell if the atoms at indexes ``i`` and ``j`` are bonded together'''
         res = c_bool()
-        c_lib.chrp_topology_isbond(
+        self.c_lib.chrp_topology_isbond(
             self._handle_, c_size_t(i), c_size_t(j), byref(res)
         )
         return res.value
@@ -72,7 +73,7 @@ class Topology(object):
         Tell if the atoms at indexes ``i``, ``j`` and ``k`` constitues an angle
         '''
         res = c_bool()
-        c_lib.chrp_topology_isangle(
+        self.c_lib.chrp_topology_isangle(
             self._handle_, c_size_t(i), c_size_t(j), c_size_t(k), byref(res)
         )
         return res.value
@@ -83,7 +84,7 @@ class Topology(object):
         dihedral angle
         '''
         res = c_bool()
-        c_lib.chrp_topology_isdihedral(
+        self.c_lib.chrp_topology_isdihedral(
             self._handle_,
             c_size_t(i), c_size_t(j), c_size_t(k), c_size_t(m),
             byref(res)
@@ -93,53 +94,53 @@ class Topology(object):
     def bonds_count(self):
         '''Get the number of bonds in the system'''
         res = c_size_t()
-        c_lib.chrp_topology_bonds_count(self._handle_, byref(res))
+        self.c_lib.chrp_topology_bonds_count(self._handle_, byref(res))
         return res.value
 
     def angles_count(self):
         '''Get the number of angles in the system'''
         res = c_size_t()
-        c_lib.chrp_topology_angles_count(self._handle_, byref(res))
+        self.c_lib.chrp_topology_angles_count(self._handle_, byref(res))
         return res.value
 
     def dihedrals_count(self):
         '''Get the number of dihedral angles in the system'''
         res = c_size_t()
-        c_lib.chrp_topology_dihedrals_count(self._handle_, byref(res))
+        self.c_lib.chrp_topology_dihedrals_count(self._handle_, byref(res))
         return res.value
 
     def bonds(self):
         '''Get the list of bonds in the system'''
         nbonds = self.bonds_count()
         res = np.zeros((nbonds, 2), np.uintp)
-        c_lib.chrp_topology_bonds(self._handle_, res, c_size_t(nbonds))
+        self.c_lib.chrp_topology_bonds(self._handle_, res, c_size_t(nbonds))
         return res
 
     def angles(self):
         '''Get the list of angles in the system'''
         nangles = self.angles_count()
         res = np.zeros((nangles, 3), np.uintp)
-        c_lib.chrp_topology_angles(self._handle_, res, c_size_t(nangles))
+        self.c_lib.chrp_topology_angles(self._handle_, res, c_size_t(nangles))
         return res
 
     def dihedrals(self):
         '''Get the list of dihedral angles in the system'''
         ndihedrals = self.dihedrals_count()
         res = np.zeros((ndihedrals, 4), np.uintp)
-        c_lib.chrp_topology_dihedrals(self._handle_, res, c_size_t(ndihedrals))
+        self.c_lib.chrp_topology_dihedrals(self._handle_, res, c_size_t(ndihedrals))
         return res
 
     def add_bond(self, i, j):
         '''
         Add a bond between the atoms at indexes ``i`` and ``j`` in the system
         '''
-        c_lib.chrp_topology_add_bond(self._handle_, c_size_t(i), c_size_t(j))
+        self.c_lib.chrp_topology_add_bond(self._handle_, c_size_t(i), c_size_t(j))
 
     def remove_bond(self, i, j):
         '''
         Remove any existing bond between the atoms at indexes ``i`` and ``j``
         in the system
         '''
-        c_lib.chrp_topology_remove_bond(
+        self.c_lib.chrp_topology_remove_bond(
             self._handle_, c_size_t(i), c_size_t(j)
         )

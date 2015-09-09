@@ -38,13 +38,13 @@ class CPPException(ChemharpException):
                 status == CPPException.CHEMHARP_CPP_ERROR):
             message = last_error()
         else:
-            message = chemharp.ffi.c_lib.chrp_strerror(c_int(status))
+            message = chemharp.ffi.get_c_library().chrp_strerror(c_int(status))
             message = message.decode("utf8")
         super(CPPException, self).__init__(message)
 
 
 def last_error():
-    return chemharp.ffi.c_lib.chrp_last_error().decode("utf8")
+    return chemharp.ffi.get_c_library().chrp_last_error().decode("utf8")
 
 
 def _check(result, func, arguments):
