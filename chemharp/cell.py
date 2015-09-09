@@ -58,7 +58,8 @@ class UnitCell(object):
         _check_handle(self._handle_)
 
     def __del__(self):
-        self.c_lib.chrp_cell_free(self._handle_)
+        c_lib = get_c_library()
+        c_lib.chrp_cell_free(self._handle_)
 
     def lengths(self):
         '''Get the three lenghts of an ``UnitCell``, in Angstroms.'''
