@@ -2,7 +2,7 @@
 # main CMakeLists.txt. It provides tests for the Python binding as CTest targets, and
 # install the Python module
 
-find_package(PythonLibs REQUIRED)
+find_package(PythonLibsNew REQUIRED)
 
 set(CHRP_PYTHONPATH ${CMAKE_CURRENT_SOURCE_DIR}:${CMAKE_CURRENT_SOURCE_DIR}/examples:${CMAKE_BINARY_DIR})
 
