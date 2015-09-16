@@ -10,12 +10,10 @@ from .errors import _check_handle
 
 class CellType(IntEnum):
     '''
-    Possibles values for the cell type:
-        - NONE: Do not log anything
-        - ERROR: Only log errors
-        - WARNING: Log errors and warnings
-        - INFO: Log errors, warnings and informations
-        - DEBUG: Log everything, from errors to debug informations
+    Available cell types in Chemharp:
+        - Orthorombic: The three angles are 90°
+        - Triclinic: The three angles may not be 90°
+        - Infinite: Cell type when there is no periodic boundary conditions
     '''
 
     Orthorombic = CHRP_CELL_TYPES.CHRP_CELL_ORTHOROMBIC
