@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
-from chemharp import Atom
+from chemharp import Atom, AtomType
 
 
 class TestAtom(unittest.TestCase):
@@ -34,3 +34,9 @@ class TestAtom(unittest.TestCase):
     def test_atomic_number(self):
         a = Atom("He")
         self.assertEqual(a.atomic_number(), 2)
+
+    def test_type(self):
+        a = Atom("He")
+        self.assertEqual(a.type(), AtomType.Element)
+        a.set_type(AtomType.Dummy)
+        self.assertEqual(a.type(), AtomType.Dummy)

@@ -13,14 +13,14 @@ class Trajectory(object):
     point of Chemharp.
     '''
 
-    def __init__(self, path, mode="r"):
+    def __init__(self, path, mode="r", fformat=""):
         '''
         Open a trajectory file at ``path`` with mode ``mode``. Supported modes
         are "r" for read (this is the default) or "w" for write.
         '''
         self.c_lib = get_c_library()
-        self._handle_ = self.c_lib.chrp_open(
-            path.encode("utf8"), mode.encode("utf8")
+        self._handle_ = self.c_lib.chrp_trajectory_with_format(
+            path.encode("utf8"), mode.encode("utf8"), fformat.encode("utf8")
         )
         _check_handle(self._handle_)
 

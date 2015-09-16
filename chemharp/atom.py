@@ -1,9 +1,25 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_float, c_double, c_int, byref, create_string_buffer
+from enum import IntEnum
 
-from .ffi import get_c_library
+from .ffi import get_c_library, CHRP_ATOM_TYPES
 from .errors import _check_handle
+
+
+class AtomType(IntEnum):
+    '''
+    Available types of atoms:
+        - Element: Element from the periodic table of elements
+        - CorseGrain: Corse-grained atom are composed of more than one element:
+                      CH3 groups, amino-acids are corse-grained atoms.
+        - Dummy: Dummy site, with no physical reality
+        - Undefined: Undefined atom type
+    '''
+    Element = CHRP_ATOM_TYPES.CHRP_ATOM_ELEMENT
+    CorseGrain = CHRP_ATOM_TYPES.CHRP_ATOM_CORSE_GRAIN
+    Dummy = CHRP_ATOM_TYPES.CHRP_ATOM_DUMMY
+    Undefined = CHRP_ATOM_TYPES.CHRP_ATOM_UNDEFINED
 
 
 class Atom(object):
@@ -88,3 +104,13 @@ class Atom(object):
         res = c_int()
         self.c_lib.chrp_atom_atomic_number(self._handle_, byref(res))
         return res.value
+
+    def type(self):
+        '''Get the type of the atom'''
+        res = CHRP_ATOM_TYPES()
+        self.c_lib.chrp_atom_type(self._handle_, byref(res))
+        return AtomType(res.value)
+
+    def set_type(self, atomtype):
+        '''Set the type of the atom'''
+        self.c_lib.chrp_atom_set_type(self._handle_, c_int(atomtype))
