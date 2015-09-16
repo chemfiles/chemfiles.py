@@ -19,7 +19,7 @@ class TestTrajectory(unittest.TestCase):
         self.assertRaises(
             ChemharpException, Trajectory, os.path.join(DATA, "empty.unknown")
         )
-        logging.set_log_level(logging.LogLevel.ERROR)
+        logging.set_log_level(logging.LogLevel.WARNING)
 
     def test_read(self):
         trajectory = Trajectory(os.path.join(DATA, "water.xyz"))

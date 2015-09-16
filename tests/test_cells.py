@@ -21,7 +21,7 @@ class TestUnitCell(unittest.TestCase):
 
         logging.set_log_level(logging.LogLevel.NONE)
         self.assertRaises(ChemharpException, cell.set_angles, 80, 89, 110)
-        logging.set_log_level(logging.LogLevel.ERROR)
+        logging.set_log_level(logging.LogLevel.WARNING)
 
         cell.set_type(CellType.Triclinic)
         cell.set_angles(80, 89, 110)
