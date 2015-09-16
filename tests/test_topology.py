@@ -65,3 +65,7 @@ class TestTopology(unittest.TestCase):
 
         topology.remove(3)
         self.assertEqual(len(topology), 3)
+
+
+if __name__ == '__main__':
+    unittest.main()

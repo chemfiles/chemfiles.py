@@ -125,3 +125,7 @@ class TestTrajectory(unittest.TestCase):
             self.assertEqual(fd.read(), expected_content)
 
         os.unlink("test-tmp.xyz")
+
+
+if __name__ == '__main__':
+    unittest.main()

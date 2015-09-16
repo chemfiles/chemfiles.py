@@ -20,3 +20,7 @@ class TestLogging(unittest.TestCase):
         logging.log_to_stderr()
 
         os.unlink("test.log")
+
+
+if __name__ == '__main__':
+    unittest.main()

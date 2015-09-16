@@ -40,3 +40,7 @@ class TestAtom(unittest.TestCase):
         self.assertEqual(a.type(), AtomType.Element)
         a.set_type(AtomType.Dummy)
         self.assertEqual(a.type(), AtomType.Dummy)
+
+
+if __name__ == '__main__':
+    unittest.main()

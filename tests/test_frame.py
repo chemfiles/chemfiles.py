@@ -81,3 +81,7 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(frame.step(), 0)
         frame.set_step(42)
         self.assertEqual(frame.step(), 42)
+
+
+if __name__ == '__main__':
+    unittest.main()
