@@ -8,21 +8,32 @@ from setuptools import setup
 from distutils.command.build import build as _build
 from subprocess import Popen, PIPE, call
 
-from chemharp import __version__
-
 CMAKE_OPTS = [("BUILD_SHARED_LIBS", "ON"), ("BUILD_FRONTEND", "OFF")]
 CHRP_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "native")
+VERSION = open(os.path.join(CHRP_DIR, "VERSION")).read().strip()
+VERSION = VERSION.replace("-", "_")
 
-try:
-    cmd = Popen(["cmake"], stdout=PIPE, stderr=PIPE)
-    cmd.wait()
-except OSError:
-    raise EnvironmentError("CMake is not available!")
+
+def check_cmake():
+    try:
+        cmd = Popen(["cmake"], stdout=PIPE, stderr=PIPE)
+        cmd.wait()
+    except OSError:
+        raise EnvironmentError("CMake is not available!")
+
+
+def write_version():
+    ROOT = os.path.dirname(os.path.realpath(__file__))
+    with open(os.path.join(ROOT, "chemharp", "_version.py"), "w") as fd:
+        fd.write('__version__ = "{}"\n'.format(VERSION))
 
 
 class BuildCmake(_build):
     '''Build binary package using cmake'''
+
     def run(self):
+        check_cmake()
+        write_version()
         BUILD_DIR = os.path.join(os.path.dirname(self.build_lib), "native")
         try:
             os.makedirs(BUILD_DIR)
@@ -60,7 +71,7 @@ consistent interface for loading and saving data to these files."""
 
 setup(
     name="chemharp",
-    version=__version__,
+    version=VERSION,
     author="Guillaume Fraux",
     author_email="luthaf@luthaf.fr",
     description=("An efficient library for chemistry files IO"),
@@ -69,7 +80,7 @@ setup(
     url="http://github.com/Luthaf/Chemharp-python",
     packages=['chemharp'],
     long_description=LONG_DESCRIPTION,
-    install_requires=["enum34"],
+    install_requires=["enum34", "numpy"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
