@@ -1,15 +1,19 @@
 # -*- coding=utf-8 -*-
 import os
-import sys
 import glob
 import shutil
+import inspect
 
 from setuptools import setup
 from distutils.command.build import build as _build
 from subprocess import Popen, PIPE, call
 
 CMAKE_OPTS = [("BUILD_SHARED_LIBS", "ON"), ("BUILD_FRONTEND", "OFF")]
+
+# Get current file even when using execfile
+__file__ = inspect.getfile(inspect.currentframe())
 CHRP_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "native")
+
 VERSION = open(os.path.join(CHRP_DIR, "VERSION")).read().strip()
 VERSION = VERSION.replace("-", "_")
 
