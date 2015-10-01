@@ -22,7 +22,7 @@ import numpy as np
 from ctypes import *
 
 from .errors import _check
-from .find_chemharp import find_chemharp
+from .find_chemharp import load_clib
 
 
 class ChemharpLibrary(object):
@@ -31,7 +31,7 @@ class ChemharpLibrary(object):
 
     def __call__(self):
         if self._cache is None:
-            self._cache = find_chemharp()
+            self._cache = load_clib()
             set_interface(self._cache)
         return self._cache
 
@@ -83,12 +83,12 @@ def set_interface(c_lib):
     # Function "chrp_strerror", at chemharp.h:60
     c_lib.chrp_strerror.argtypes = [c_int]
     c_lib.chrp_strerror.restype = c_char_p
-    
+
 
     # Function "chrp_last_error", at chemharp.h:66
     c_lib.chrp_last_error.argtypes = []
     c_lib.chrp_last_error.restype = c_char_p
-    
+
 
     # Function "chrp_loglevel", at chemharp.h:87
     c_lib.chrp_loglevel.argtypes = [POINTER(c_int)]
@@ -113,12 +113,12 @@ def set_interface(c_lib):
     # Function "chrp_trajectory_open", at chemharp.h:116
     c_lib.chrp_trajectory_open.argtypes = [c_char_p, c_char_p]
     c_lib.chrp_trajectory_open.restype = POINTER(CHRP_TRAJECTORY)
-    
+
 
     # Function "chrp_trajectory_with_format", at chemharp.h:125
     c_lib.chrp_trajectory_with_format.argtypes = [c_char_p, c_char_p, c_char_p]
     c_lib.chrp_trajectory_with_format.restype = POINTER(CHRP_TRAJECTORY)
-    
+
 
     # Function "chrp_trajectory_read", at chemharp.h:133
     c_lib.chrp_trajectory_read.argtypes = [POINTER(CHRP_TRAJECTORY), POINTER(CHRP_FRAME)]
@@ -163,7 +163,7 @@ def set_interface(c_lib):
     # Function "chrp_frame", at chemharp.h:204
     c_lib.chrp_frame.argtypes = [c_size_t]
     c_lib.chrp_frame.restype = POINTER(CHRP_FRAME)
-    
+
 
     # Function "chrp_frame_atoms_count", at chemharp.h:212
     c_lib.chrp_frame_atoms_count.argtypes = [POINTER(CHRP_FRAME), POINTER(c_size_t)]
@@ -228,17 +228,17 @@ def set_interface(c_lib):
     # Function "chrp_cell", at chemharp.h:313
     c_lib.chrp_cell.argtypes = [c_double, c_double, c_double]
     c_lib.chrp_cell.restype = POINTER(CHRP_CELL)
-    
+
 
     # Function "chrp_cell_triclinic", at chemharp.h:321
     c_lib.chrp_cell_triclinic.argtypes = [c_double, c_double, c_double, c_double, c_double, c_double]
     c_lib.chrp_cell_triclinic.restype = POINTER(CHRP_CELL)
-    
+
 
     # Function "chrp_cell_from_frame", at chemharp.h:328
     c_lib.chrp_cell_from_frame.argtypes = [POINTER(CHRP_FRAME)]
     c_lib.chrp_cell_from_frame.restype = POINTER(CHRP_CELL)
-    
+
 
     # Function "chrp_cell_volume", at chemharp.h:336
     c_lib.chrp_cell_volume.argtypes = [POINTER(CHRP_CELL), POINTER(c_double)]
@@ -298,12 +298,12 @@ def set_interface(c_lib):
     # Function "chrp_topology", at chemharp.h:433
     c_lib.chrp_topology.argtypes = []
     c_lib.chrp_topology.restype = POINTER(CHRP_TOPOLOGY)
-    
+
 
     # Function "chrp_topology_from_frame", at chemharp.h:440
     c_lib.chrp_topology_from_frame.argtypes = [POINTER(CHRP_FRAME)]
     c_lib.chrp_topology_from_frame.restype = POINTER(CHRP_TOPOLOGY)
-    
+
 
     # Function "chrp_topology_atoms_count", at chemharp.h:448
     c_lib.chrp_topology_atoms_count.argtypes = [POINTER(CHRP_TOPOLOGY), POINTER(c_size_t)]
@@ -383,17 +383,17 @@ def set_interface(c_lib):
     # Function "chrp_atom", at chemharp.h:577
     c_lib.chrp_atom.argtypes = [c_char_p]
     c_lib.chrp_atom.restype = POINTER(CHRP_ATOM)
-    
+
 
     # Function "chrp_atom_from_frame", at chemharp.h:585
     c_lib.chrp_atom_from_frame.argtypes = [POINTER(CHRP_FRAME), c_size_t]
     c_lib.chrp_atom_from_frame.restype = POINTER(CHRP_ATOM)
-    
+
 
     # Function "chrp_atom_from_topology", at chemharp.h:593
     c_lib.chrp_atom_from_topology.argtypes = [POINTER(CHRP_TOPOLOGY), c_size_t]
     c_lib.chrp_atom_from_topology.restype = POINTER(CHRP_ATOM)
-    
+
 
     # Function "chrp_atom_mass", at chemharp.h:601
     c_lib.chrp_atom_mass.argtypes = [POINTER(CHRP_ATOM), POINTER(c_float)]

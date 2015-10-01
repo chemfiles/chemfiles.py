@@ -2,27 +2,17 @@
 import sys
 import os
 from ctypes import cdll
-from ctypes.util import find_library
 
 
-def find_chemharp():
-    libpath = find_library("chemharp")
-    if libpath:
-        # chemharp was found in system path
-        return cdll.LoadLibrary(libpath)
-
-    libname = "libchemharp." + dl_ext()
-
-    # Try looking in PYTHONPATH
-    for path in sys.path:
-        libpath = os.path.join(path, libname)
-        if os.path.isfile(libpath):
-            return cdll.LoadLibrary(libpath)
-
-    # We could not find chemharp ...
-    raise ImportError(
-        "Could not find the Chemharp library. Are you sure it is installed?"
-    )
+def load_clib():
+    libname = os.path.join(os.path.dirname(__file__), "libchemharp.")
+    libname += dl_ext()
+    try:
+        return cdll.LoadLibrary(libname)
+    except OSError:
+        # We could not find chemharp ...
+        raise ImportError("Could not find the Chemharp library. " +
+                          "Are you sure it is installed?")
 
 
 def dl_ext():

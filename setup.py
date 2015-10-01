@@ -1,25 +1,80 @@
 # -*- coding=utf-8 -*-
+import os
+import sys
+import glob
+import shutil
+
 from setuptools import setup
+from distutils.command.build import build as _build
+from subprocess import Popen, PIPE, call
+
 from chemharp import __version__
+
+CMAKE_OPTS = [("BUILD_SHARED_LIBS", "ON"), ("BUILD_FRONTEND", "OFF")]
+CHRP_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "native")
+
+try:
+    cmd = Popen(["cmake"], stdout=PIPE, stderr=PIPE)
+    cmd.wait()
+except OSError:
+    raise EnvironmentError("CMake is not available!")
+
+
+class BuildCmake(_build):
+    '''Build binary package using cmake'''
+    def run(self):
+        BUILD_DIR = os.path.join(os.path.dirname(self.build_lib), "native")
+        try:
+            os.makedirs(BUILD_DIR)
+        except OSError:
+            pass
+        cwd = os.getcwd()
+        os.chdir(BUILD_DIR)
+
+        configure = ["cmake", CHRP_DIR]
+        cmake_opts = ['-D' + '='.join(opt) for opt in CMAKE_OPTS]
+        configure.extend(cmake_opts)
+        if call(configure) != 0:
+            raise EnvironmentError("Error in CMake configuration")
+
+        build = ["cmake", "--build", "."]
+        if call(build) != 0:
+            raise EnvironmentError("Error while building Chemharp")
+        os.chdir(cwd)
+        # can't use super() here because _build is an old style class in 2.7
+        _build.run(self)
+
+        CHEMHARP_PATH = os.path.join(self.build_lib, "chemharp")
+        for path in glob.iglob(os.path.join(BUILD_DIR, "*chemharp*")):
+            filename = os.path.basename(path)
+            dest = os.path.join(CHEMHARP_PATH, filename)
+            print("copying {} -> {}".format(path, dest))
+            shutil.copy(path, dest)
+
+
+LONG_DESCRIPTION = """Chemharp is a library for reading and writing molecular
+trajectory files. These files are created by your favorite theoretical
+chemistry program, and contains informations about atomic or residues names
+and positions. Chemharp offers abstraction on top of these formats, and a
+consistent interface for loading and saving data to these files."""
 
 setup(
     name="chemharp",
     version=__version__,
     author="Guillaume Fraux",
     author_email="luthaf@luthaf.fr",
-    description=("A cross-platform library for chemistry files IO"),
+    description=("An efficient library for chemistry files IO"),
     license="MPL-v2.0",
     keywords="chemistry computational cheminformatics files formats",
     url="http://github.com/Luthaf/Chemharp-python",
     packages=['chemharp'],
-    long_description='TODO',
+    long_description=LONG_DESCRIPTION,
     install_requires=["enum34"],
     classifiers=[
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
-        "Topic :: Utilities",
         "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows",
@@ -31,4 +86,5 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities"
     ],
+    cmdclass={'build': BuildCmake}
 )
