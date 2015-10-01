@@ -1,0 +1,50 @@
+language: python
+sudo: required
+python:
+  - "2.7"
+  #- "3.5"
+os:
+  - linux
+  #- osx
+env:
+  global:
+    secure: vemv2pi+y10L/3QkiDTdgbsug2Qv97OUiMjyRw9pYIjDoNhws1jzuKMFJt1YvUNZcROUA1hEkDYDDCmGTXAo7zr+pk+ru9e8h6q9LH+uPZWKgWHUzEyFlLB3wve3fCzeTIqvvSC+87bxYhJg53TrrCyRXBu3jnHoqJKr2RhWwOQ=
+addons:
+  apt:
+    sources:
+    - ubuntu-toolchain-r-test
+    packages:
+    - g++-4.9
+    - libnetcdf-dev
+
+install:
+  - |
+    if [ ${TRAVIS_OS_NAME} == "linux" ]
+    then
+        sudo add-apt-repository --yes ppa:yjwong/cmake
+        sudo apt-get update
+        sudo apt-cache search cmake
+        sudo apt-get remove --yes cmake
+        sudo apt-get install --yes cmake
+
+        export CC=gcc-4.9
+        export CXX=g++-4.9
+    fi
+  - |
+    if [ ${TRAVIS_OS_NAME} == "osx" ]
+    then
+        brew tap homebrew/science
+        brew update
+        brew install netcdf numpy
+    fi
+
+script:
+  - cd ${TRAVIS_BUILD_DIR}
+  - python setup.py install
+  - python -m unittest discover
+
+deploy:
+  provider: script
+  script: bash ${TRAVIS_BUILD_DIR}/recipe/deploy.sh
+  on:
+    tags: true
