@@ -1,5 +1,6 @@
 # -*- coding=utf-8 -*-
 import os
+import sys
 import glob
 import shutil
 import inspect
@@ -81,19 +82,19 @@ chemistry program, and contains informations about atomic or residues names
 and positions. Chemharp offers abstraction on top of these formats, and a
 consistent interface for loading and saving data to these files."""
 
-setup(
-    name="chemharp",
-    version=VERSION,
-    author="Guillaume Fraux",
-    author_email="luthaf@luthaf.fr",
-    description=("An efficient library for chemistry files IO"),
-    license="MPL-v2.0",
-    keywords="chemistry computational cheminformatics files formats",
-    url="http://github.com/Luthaf/Chemharp-python",
-    packages=['chemharp'],
-    long_description=LONG_DESCRIPTION,
-    install_requires=["enum34", "numpy"],
-    classifiers=[
+options = {
+    "name": "chemharp",
+    "version": VERSION,
+    "author": "Guillaume Fraux",
+    "author_email": "luthaf@luthaf.fr",
+    "description": ("An efficient library for chemistry files IO"),
+    "license": "MPL-v2.0",
+    "keywords": "chemistry computational cheminformatics files formats",
+    "url": "http://github.com/Luthaf/Chemharp-python",
+    "packages": ['chemharp'],
+    "long_description": LONG_DESCRIPTION,
+    "install_requires": ["numpy"],
+    "classifiers": [
         "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
@@ -109,5 +110,10 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities"
     ],
-    cmdclass={'build': BuildCmake, 'install': InstallCmake}
-)
+    "cmdclass": {'build': BuildCmake, 'install': InstallCmake}
+}
+
+if sys.hexversion < 0x03040000:
+    options["install_requires"].append("enum34")
+
+setup(**options)
