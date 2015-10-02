@@ -2,10 +2,9 @@ language: python
 sudo: required
 python:
   - "2.7"
-  #- "3.5"
+  - "3.5"
 os:
   - linux
-  #- osx
 env:
   global:
     secure: vemv2pi+y10L/3QkiDTdgbsug2Qv97OUiMjyRw9pYIjDoNhws1jzuKMFJt1YvUNZcROUA1hEkDYDDCmGTXAo7zr+pk+ru9e8h6q9LH+uPZWKgWHUzEyFlLB3wve3fCzeTIqvvSC+87bxYhJg53TrrCyRXBu3jnHoqJKr2RhWwOQ=
@@ -29,13 +28,6 @@ install:
 
         export CC=gcc-4.9
         export CXX=g++-4.9
-    fi
-  - |
-    if [ ${TRAVIS_OS_NAME} == "osx" ]
-    then
-        brew tap homebrew/science
-        brew update
-        brew install netcdf numpy
     fi
 
 script:
