@@ -10,10 +10,8 @@ package:
 build:
   script:  # [not win]
       - export MACOSX_DEPLOYMENT_TARGET=""  # [osx]
-      - python setup.py build  # [not win]
       - python setup.py install  # [not win]
   script:  # [win]
-      - "%PYTHON%" setup.py build  # [win]
       - "%PYTHON%" setup.py install  # [win]
       - if errorlevel 1 exit 1  # [win]
 source:

@@ -6,6 +6,7 @@ import inspect
 
 from setuptools import setup
 from distutils.command.build import build as _build
+from setuptools.command.install import install as _install
 from subprocess import Popen, PIPE, call
 
 CMAKE_OPTS = [("BUILD_SHARED_LIBS", "ON"), ("BUILD_FRONTEND", "OFF")]
@@ -67,6 +68,13 @@ class BuildCmake(_build):
             shutil.copy(path, dest)
 
 
+class InstallCmake(_install):
+    '''Install binary package built with cmake by calling build'''
+    def run(self):
+        self.run_command('build')
+        _install.run(self)
+
+
 LONG_DESCRIPTION = """Chemharp is a library for reading and writing molecular
 trajectory files. These files are created by your favorite theoretical
 chemistry program, and contains informations about atomic or residues names
@@ -101,5 +109,5 @@ setup(
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities"
     ],
-    cmdclass={'build': BuildCmake}
+    cmdclass={'build': BuildCmake, 'install': InstallCmake}
 )
