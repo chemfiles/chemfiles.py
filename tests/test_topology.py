@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import numpy as np
 
-from chemharp import Topology, Atom
+from chemfiles import Topology, Atom
 
 
 class TestTopology(unittest.TestCase):

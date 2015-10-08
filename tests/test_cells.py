@@ -3,9 +3,9 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import numpy as np
 
-from chemharp import UnitCell, CellType
-from chemharp import ChemharpException
-from chemharp import logging
+from chemfiles import UnitCell, CellType
+from chemfiles import ChemfilesException
+from chemfiles import logging
 
 
 class TestUnitCell(unittest.TestCase):
@@ -20,7 +20,7 @@ class TestUnitCell(unittest.TestCase):
         self.assertEqual(cell.angles(), (90.0, 90.0, 90.0))
 
         logging.set_log_level(logging.LogLevel.NONE)
-        self.assertRaises(ChemharpException, cell.set_angles, 80, 89, 110)
+        self.assertRaises(ChemfilesException, cell.set_angles, 80, 89, 110)
         logging.set_log_level(logging.LogLevel.WARNING)
 
         cell.set_type(CellType.Triclinic)

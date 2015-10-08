@@ -3,8 +3,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import os
 
-from chemharp import logging
-from chemharp.logging import LogLevel
+from chemfiles import logging
+from chemfiles.logging import LogLevel
 
 
 class TestLogging(unittest.TestCase):

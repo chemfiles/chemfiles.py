@@ -4,8 +4,8 @@ import unittest
 import numpy as np
 import os
 
-from chemharp import Trajectory, Topology, Frame, UnitCell, Atom
-from chemharp import ChemharpException, logging
+from chemfiles import Trajectory, Topology, Frame, UnitCell, Atom
+from chemfiles import ChemfilesException, logging
 
 DATA = os.path.join(os.path.dirname(__file__), "data")
 
@@ -14,10 +14,10 @@ class TestTrajectory(unittest.TestCase):
     def test_errors(self):
         logging.set_log_level(logging.LogLevel.NONE)
         self.assertRaises(
-            ChemharpException, Trajectory, os.path.join(DATA, "not-here.xyz")
+            ChemfilesException, Trajectory, os.path.join(DATA, "not-here.xyz")
         )
         self.assertRaises(
-            ChemharpException, Trajectory, os.path.join(DATA, "empty.unknown")
+            ChemfilesException, Trajectory, os.path.join(DATA, "empty.unknown")
         )
         logging.set_log_level(logging.LogLevel.WARNING)
 
@@ -106,13 +106,13 @@ class TestTrajectory(unittest.TestCase):
             fd.write(frame_2)
 
         expected_content = "\n".join(["4",
-                                      "Written by Chemharp",
+                                      "Written by the chemfiles library",
                                       "X 1 2 3",
                                       "X 1 2 3",
                                       "X 1 2 3",
                                       "X 1 2 3",
                                       "6",
-                                      "Written by Chemharp",
+                                      "Written by the chemfiles library",
                                       "X 4 5 6",
                                       "X 4 5 6",
                                       "X 4 5 6",

@@ -5,13 +5,13 @@ from ctypes import cdll
 
 
 def load_clib():
-    libname = os.path.join(os.path.dirname(__file__), "libchemharp.")
+    libname = os.path.join(os.path.dirname(__file__), "libchemfiles.")
     libname += dl_ext()
     try:
         return cdll.LoadLibrary(libname)
     except OSError:
-        # We could not find chemharp ...
-        raise ImportError("Could not find the Chemharp library. " +
+        # We could not find chemfiles ...
+        raise ImportError("Could not find the chemfiles library. " +
                           "Are you sure it is installed?")
 
 

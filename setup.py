@@ -14,9 +14,9 @@ CMAKE_OPTS = [("BUILD_SHARED_LIBS", "ON"), ("BUILD_FRONTEND", "OFF")]
 
 # Get current file even when using execfile
 __file__ = inspect.getfile(inspect.currentframe())
-CHRP_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "native")
+CHEMFILES_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "native")
 
-VERSION = open(os.path.join(CHRP_DIR, "VERSION")).read().strip()
+VERSION = open(os.path.join(CHEMFILES_DIR, "VERSION")).read().strip()
 VERSION = VERSION.replace("-", "_")
 
 
@@ -30,7 +30,7 @@ def check_cmake():
 
 def write_version():
     ROOT = os.path.dirname(os.path.realpath(__file__))
-    with open(os.path.join(ROOT, "chemharp", "_version.py"), "w") as fd:
+    with open(os.path.join(ROOT, "chemfiles", "_version.py"), "w") as fd:
         fd.write('__version__ = "{}"\n'.format(VERSION))
 
 
@@ -48,7 +48,7 @@ class BuildCmake(_build):
         cwd = os.getcwd()
         os.chdir(BUILD_DIR)
 
-        configure = ["cmake", CHRP_DIR]
+        configure = ["cmake", CHEMFILES_DIR]
         cmake_opts = ['-D' + '='.join(opt) for opt in CMAKE_OPTS]
         configure.extend(cmake_opts)
         if call(configure) != 0:
@@ -56,15 +56,15 @@ class BuildCmake(_build):
 
         build = ["cmake", "--build", "."]
         if call(build) != 0:
-            raise EnvironmentError("Error while building Chemharp")
+            raise EnvironmentError("Error while building chemfiles")
         os.chdir(cwd)
         # can't use super() here because _build is an old style class in 2.7
         _build.run(self)
 
-        CHEMHARP_PATH = os.path.join(self.build_lib, "chemharp")
-        for path in glob.iglob(os.path.join(BUILD_DIR, "*chemharp*")):
+        CHEMFILES_PATH = os.path.join(self.build_lib, "chemfiles")
+        for path in glob.iglob(os.path.join(BUILD_DIR, "*chemfiles*")):
             filename = os.path.basename(path)
-            dest = os.path.join(CHEMHARP_PATH, filename)
+            dest = os.path.join(CHEMFILES_PATH, filename)
             print("copying {} -> {}".format(path, dest))
             shutil.copy(path, dest)
 
@@ -76,22 +76,22 @@ class InstallCmake(_install):
         _install.run(self)
 
 
-LONG_DESCRIPTION = """Chemharp is a library for reading and writing molecular
+LONG_DESCRIPTION = """Chemfiles is a library for reading and writing molecular
 trajectory files. These files are created by your favorite theoretical
 chemistry program, and contains informations about atomic or residues names
-and positions. Chemharp offers abstraction on top of these formats, and a
+and positions. Chemfiles offers abstraction on top of these formats, and a
 consistent interface for loading and saving data to these files."""
 
 options = {
-    "name": "chemharp",
+    "name": "chemfiles",
     "version": VERSION,
     "author": "Guillaume Fraux",
     "author_email": "luthaf@luthaf.fr",
     "description": ("An efficient library for chemistry files IO"),
     "license": "MPL-v2.0",
     "keywords": "chemistry computational cheminformatics files formats",
-    "url": "http://github.com/Luthaf/Chemharp-python",
-    "packages": ['chemharp'],
+    "url": "http://github.com/chemfiles/chemfiles.py",
+    "packages": ['chemfiles'],
     "long_description": LONG_DESCRIPTION,
     "install_requires": ["numpy"],
     "classifiers": [

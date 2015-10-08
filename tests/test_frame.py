@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import numpy as np
 
-from chemharp import Frame, UnitCell, Topology, Atom, ArgumentError
+from chemfiles import Frame, UnitCell, Topology, Atom, ArgumentError
 
 
 class TestFrame(unittest.TestCase):

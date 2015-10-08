@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_float, c_double, c_int, byref, create_string_buffer
 from enum import IntEnum
 
-from .ffi import get_c_library, CHRP_ATOM_TYPES
+from .ffi import get_c_library, CHFL_ATOM_TYPES
 from .errors import _check_handle
 
 
@@ -16,10 +16,10 @@ class AtomType(IntEnum):
         - Dummy: Dummy site, with no physical reality
         - Undefined: Undefined atom type
     '''
-    Element = CHRP_ATOM_TYPES.CHRP_ATOM_ELEMENT
-    CorseGrain = CHRP_ATOM_TYPES.CHRP_ATOM_CORSE_GRAIN
-    Dummy = CHRP_ATOM_TYPES.CHRP_ATOM_DUMMY
-    Undefined = CHRP_ATOM_TYPES.CHRP_ATOM_UNDEFINED
+    Element = CHFL_ATOM_TYPES.CHFL_ATOM_ELEMENT
+    CorseGrain = CHFL_ATOM_TYPES.CHFL_ATOM_CORSE_GRAIN
+    Dummy = CHFL_ATOM_TYPES.CHFL_ATOM_DUMMY
+    Undefined = CHFL_ATOM_TYPES.CHFL_ATOM_UNDEFINED
 
 
 class Atom(object):
@@ -32,41 +32,41 @@ class Atom(object):
     def __init__(self, name):
         '''Create a new ``Atom`` from a ``name``.'''
         self.c_lib = get_c_library()
-        self._handle_ = self.c_lib.chrp_atom(name.encode("utf8"))
+        self._handle_ = self.c_lib.chfl_atom(name.encode("utf8"))
         _check_handle(self._handle_)
 
     def __del__(self):
-        self.c_lib.chrp_atom_free(self._handle_)
+        self.c_lib.chfl_atom_free(self._handle_)
 
     def mass(self):
         '''Get the ``Atom`` mass, in atomic mass units'''
         res = c_float()
-        self.c_lib.chrp_atom_mass(self._handle_, byref(res))
+        self.c_lib.chfl_atom_mass(self._handle_, byref(res))
         return res.value
 
     def set_mass(self, mass):
         '''Set the ``Atom`` mass, in atomic mass units'''
-        self.c_lib.chrp_atom_set_mass(self._handle_, c_float(mass))
+        self.c_lib.chfl_atom_set_mass(self._handle_, c_float(mass))
 
     def charge(self):
         '''Get the ``Atom`` charge, in number of the electron charge *e*'''
         res = c_float()
-        self.c_lib.chrp_atom_charge(self._handle_, byref(res))
+        self.c_lib.chfl_atom_charge(self._handle_, byref(res))
         return res.value
 
     def set_charge(self, charge):
         '''Set the ``Atom`` charge, in number of the electron charge *e*'''
-        self.c_lib.chrp_atom_set_charge(self._handle_, c_float(charge))
+        self.c_lib.chfl_atom_set_charge(self._handle_, c_float(charge))
 
     def name(self):
         '''Get the ``Atom`` name'''
         res = create_string_buffer(10)
-        self.c_lib.chrp_atom_name(self._handle_, res, 10)
+        self.c_lib.chfl_atom_name(self._handle_, res, 10)
         return res.value.decode("utf8")
 
     def set_name(self, name):
         '''Set the ``Atom`` name'''
-        self.c_lib.chrp_atom_set_name(self._handle_, name.encode("utf8"))
+        self.c_lib.chfl_atom_set_name(self._handle_, name.encode("utf8"))
 
     def full_name(self):
         '''
@@ -75,7 +75,7 @@ class Atom(object):
         string.
         '''
         res = create_string_buffer(100)
-        self.c_lib.chrp_atom_full_name(self._handle_, res, 100)
+        self.c_lib.chfl_atom_full_name(self._handle_, res, 100)
         return res.value.decode("utf8")
 
     def vdw_radius(self):
@@ -84,7 +84,7 @@ class Atom(object):
         not be found, returns -1.
         '''
         res = c_double()
-        self.c_lib.chrp_atom_vdw_radius(self._handle_, byref(res))
+        self.c_lib.chfl_atom_vdw_radius(self._handle_, byref(res))
         return res.value
 
     def covalent_radius(self):
@@ -93,7 +93,7 @@ class Atom(object):
         found, returns -1.
         '''
         res = c_double()
-        self.c_lib.chrp_atom_covalent_radius(self._handle_, byref(res))
+        self.c_lib.chfl_atom_covalent_radius(self._handle_, byref(res))
         return res.value
 
     def atomic_number(self):
@@ -102,15 +102,15 @@ class Atom(object):
         found, returns -1.
         '''
         res = c_int()
-        self.c_lib.chrp_atom_atomic_number(self._handle_, byref(res))
+        self.c_lib.chfl_atom_atomic_number(self._handle_, byref(res))
         return res.value
 
     def type(self):
         '''Get the type of the atom'''
-        res = CHRP_ATOM_TYPES()
-        self.c_lib.chrp_atom_type(self._handle_, byref(res))
+        res = CHFL_ATOM_TYPES()
+        self.c_lib.chfl_atom_type(self._handle_, byref(res))
         return AtomType(res.value)
 
     def set_type(self, atomtype):
         '''Set the type of the atom'''
-        self.c_lib.chrp_atom_set_type(self._handle_, c_int(atomtype))
+        self.c_lib.chfl_atom_set_type(self._handle_, c_int(atomtype))

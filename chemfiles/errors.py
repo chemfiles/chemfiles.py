@@ -2,20 +2,20 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_int
 
-import chemharp
+import chemfiles
 
 
-class ChemharpException(BaseException):
-    '''Base class for all Chemharp exceptions'''
+class ChemfilesException(BaseException):
+    '''Base class for all Chemfiles exceptions'''
     pass
 
 
-class ArgumentError(ChemharpException):
+class ArgumentError(ChemfilesException):
     '''Error in argument type'''
     pass
 
 
-class NullPointerError(ChemharpException):
+class NullPointerError(ChemfilesException):
     '''Got a NULL pointer from C!'''
     def __init__(self, message=""):
         m = "Got a NULL pointer from C! Today is a bad day."
@@ -24,7 +24,7 @@ class NullPointerError(ChemharpException):
         super(NullPointerError, self).__init__(m)
 
 
-class CPPException(ChemharpException):
+class CPPException(ChemfilesException):
     '''Error in C++ runtime'''
     CPP_STD_ERROR = 1
     CHEMHARP_CPP_ERROR = 2
@@ -38,13 +38,13 @@ class CPPException(ChemharpException):
                 status == CPPException.CHEMHARP_CPP_ERROR):
             message = last_error()
         else:
-            message = chemharp.ffi.get_c_library().chrp_strerror(c_int(status))
+            message = chemfiles.ffi.get_c_library().chfl_strerror(c_int(status))
             message = message.decode("utf8")
         super(CPPException, self).__init__(message)
 
 
 def last_error():
-    return chemharp.ffi.get_c_library().chrp_last_error().decode("utf8")
+    return chemfiles.ffi.get_c_library().chfl_last_error().decode("utf8")
 
 
 def _check(result, func, arguments):
