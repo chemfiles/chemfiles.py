@@ -19,6 +19,8 @@ CHEMFILES_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "nativ
 VERSION = open(os.path.join(CHEMFILES_DIR, "VERSION")).read().strip()
 VERSION = VERSION.replace("-", "_")
 
+READ_THE_DOCS_BUILD = os.environ.get('READTHEDOCS', None) == 'True'
+
 
 def check_cmake():
     try:
@@ -38,8 +40,11 @@ class BuildCmake(_build):
     '''Build binary package using cmake'''
 
     def run(self):
-        check_cmake()
         write_version()
+        if READ_THE_DOCS_BUILD:
+            # Do not try to install at readthedocs.
+            return
+        check_cmake()
         BUILD_DIR = os.path.join(os.path.dirname(self.build_lib), "native")
         try:
             os.makedirs(BUILD_DIR)
