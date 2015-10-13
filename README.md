@@ -46,6 +46,11 @@ positions = frame.positions()
 # Do awesome things with the positions here !
 ```
 
+## Building the documentation
+
+In order to build the HTML documentation, run `make html` from the `doc` folder. The
+documentation will be placed into the `doc/_build/html` folder.
+
 ## Bug reports, feature requests
 
 Please report any bug you find and any feature you may want as a [github issue](https://github.com/chemfiles/chemfiles.py/issues/new).
