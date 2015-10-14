@@ -20,24 +20,29 @@ addons:
 
 before_install:
   - |
-    if [ ${TRAVIS_OS_NAME} == "linux" ]
-    then
+    if test "${TRAVIS_OS_NAME}" == "linux"; then
         export CC=gcc-4.9
         export CXX=g++-4.9
     fi
+  - |
+    if test "${TRAVIS_PYTHON_VERSION}" == "2.7"; then
+        pip install enum34
+    fi
+  - pip install numpy
   - pip install codecov
 
 install:
   - cd ${TRAVIS_BUILD_DIR}
-  - pip install .
+  - python setup.py build
+  - mv build/lib/chemfiles/*chemfiles.* chemfiles/
 script:
-  - cd ${TRAVIS_BUILD_DIR}/tests
+  - cd ${TRAVIS_BUILD_DIR}
   - coverage run -m unittest discover
 
 after_success:
   - coverage report
   - |
-    if test "${TRAVIS_OS_NAME}" == "linux" && test "$TRAVIS_PYTHON_VERSION" == "2.7"; then
+    if test "${TRAVIS_OS_NAME}" == "linux" && test "${TRAVIS_PYTHON_VERSION}" == "2.7"; then
         codecov
     fi
 
