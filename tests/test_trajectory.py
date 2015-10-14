@@ -101,9 +101,10 @@ class TestTrajectory(unittest.TestCase):
         frame_2.set_positions(positions)
         frame_2.set_topology(topology)
 
-        with Trajectory("test-tmp.xyz", "w") as fd:
-            fd.write(frame_1)
-            fd.write(frame_2)
+        fd = Trajectory("test-tmp.xyz", "w")
+        fd.write(frame_1)
+        fd.write(frame_2)
+        fd.sync()
 
         expected_content = "\n".join(["4",
                                       "Written by the chemfiles library",

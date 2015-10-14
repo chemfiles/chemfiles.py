@@ -91,5 +91,8 @@ class Trajectory(object):
         self.c_lib.chfl_trajectory_nsteps(self._handle_, byref(res))
         return res.value
 
-    def close(self):
-        self.c_lib.chfl_trajectory_close(self._handle_)
+    def sync(self):
+        '''
+        Synchronize any buffered content to the hard drive.
+        '''
+        self.c_lib.chfl_trajectory_sync(self._handle_)
