@@ -16,7 +16,7 @@ addons:
     - g++-4.9
     - libnetcdf-dev
 
-install:
+before_install:
   - |
     if [ ${TRAVIS_OS_NAME} == "linux" ]
     then
@@ -29,12 +29,17 @@ install:
         export CC=gcc-4.9
         export CXX=g++-4.9
     fi
+  - pip install codecov
 
-script:
+install:
   - cd ${TRAVIS_BUILD_DIR}
   - pip install .
-  - cd tests
-  - python -m unittest discover
+script:
+  - cd ${TRAVIS_BUILD_DIR}/tests
+  - coverage run --include="*chemfiles*" --omit="test*" -m unittest discover
+
+after_success:
+  - codecov
 
 deploy:
   provider: script
