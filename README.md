@@ -1,5 +1,9 @@
 # Python binding for the chemfiles library
 
+[![Build Status](https://travis-ci.org/chemfiles/chemfiles.py.svg?branch=master)](https://travis-ci.org/chemfiles/chemfiles.py)
+[![codecov.io](http://codecov.io/github/chemfiles/chemfiles.py/coverage.svg?branch=master)](http://codecov.io/github/chemfiles/chemfiles.py?branch=master)
+
+
 This repository contains the Python binding for the chemfiles library. This binding is
 created with the ctypes module, calling directly the C interface of chemfiles, and thus
 is compatible with Python 2 and 3, and with all versions of Numpy.
