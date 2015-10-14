@@ -1,5 +1,5 @@
 language: python
-sudo: required
+sudo: false
 python:
   - "2.7"
   - "3.5"
@@ -12,20 +12,16 @@ addons:
   apt:
     sources:
     - ubuntu-toolchain-r-test
+    - kalakris-cmake
     packages:
     - g++-4.9
     - libnetcdf-dev
+    - cmake
 
 before_install:
   - |
     if [ ${TRAVIS_OS_NAME} == "linux" ]
     then
-        sudo add-apt-repository --yes ppa:yjwong/cmake
-        sudo apt-get update
-        sudo apt-cache search cmake
-        sudo apt-get remove --yes cmake
-        sudo apt-get install --yes cmake
-
         export CC=gcc-4.9
         export CXX=g++-4.9
     fi
