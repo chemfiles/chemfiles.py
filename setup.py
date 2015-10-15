@@ -5,16 +5,20 @@ import glob
 import shutil
 import inspect
 
-from setuptools import setup
-from distutils.command.build import build as _build
-from setuptools.command.install import install as _install
+from setuptools import setup, Extension
+# from distutils.command.build import build
+from setuptools.command.build_ext import build_ext
+from setuptools.command.install_lib import install_lib
 from subprocess import Popen, PIPE, call
 
-CMAKE_OPTS = [("BUILD_SHARED_LIBS", "ON"), ("BUILD_FRONTEND", "OFF")]
+CMAKE_OPTS = [("BUILD_SHARED_LIBS", "ON")]
 
 # Get current file even when using execfile
 __file__ = inspect.getfile(inspect.currentframe())
-CHEMFILES_DIR = os.path.join(os.path.dirname(os.path.realpath(__file__)), "native")
+CHEMFILES_DIR = os.path.join(
+    os.path.dirname(os.path.realpath(__file__)),
+    "native"
+)
 
 VERSION = open(os.path.join(CHEMFILES_DIR, "VERSION")).read().strip()
 VERSION = VERSION.replace("-", "_")
@@ -36,50 +40,49 @@ def write_version():
         fd.write('__version__ = "{}"\n'.format(VERSION))
 
 
-class BuildCmake(_build):
-    '''Build binary package using cmake'''
-
-    def run(self):
+class custom_build_ext(build_ext):
+    def build_extension(self, ext):
+        if ext.name != 'chemfiles':
+            return build_ext.build_extension(self, ext)
         write_version()
         if READ_THE_DOCS_BUILD:
             # Do not try to install at readthedocs.
             return
         check_cmake()
-        BUILD_DIR = os.path.join(os.path.dirname(self.build_lib), "native")
         try:
-            os.makedirs(BUILD_DIR)
+            os.makedirs(self.build_temp)
         except OSError:
             pass
         cwd = os.getcwd()
-        os.chdir(BUILD_DIR)
+        os.chdir(self.build_temp)
 
         configure = ["cmake", CHEMFILES_DIR]
         cmake_opts = ['-D' + '='.join(opt) for opt in CMAKE_OPTS]
         configure.extend(cmake_opts)
+        print("running {}".format(" ".join(configure)))
         if call(configure) != 0:
             raise EnvironmentError("Error in CMake configuration")
 
         build = ["cmake", "--build", "."]
         if call(build) != 0:
             raise EnvironmentError("Error while building chemfiles")
+
+        filename = glob.glob(os.path.join("*chemfiles*.*.*"))[0]
+        shutil.copy(filename, "_chemfiles.so")
         os.chdir(cwd)
-        # can't use super() here because _build is an old style class in 2.7
-        _build.run(self)
 
-        CHEMFILES_PATH = os.path.join(self.build_lib, "chemfiles")
-        for path in glob.iglob(os.path.join(BUILD_DIR, "*chemfiles*")):
-            filename = os.path.basename(path)
-            dest = os.path.join(CHEMFILES_PATH, filename)
-            print("copying {} -> {}".format(path, dest))
-            shutil.copy(path, dest)
+    def get_ext_filename(self, ext_name):
+        return os.path.join(self.build_temp, "_chemfiles.so")
 
 
-class InstallCmake(_install):
-    '''Install binary package built with cmake by calling build'''
+class custom_install_lib(install_lib):
     def run(self):
-        self.run_command('build')
-        _install.run(self)
-
+        TEMP_DIR = self.distribution.get_command_obj('build_ext').build_temp
+        install_lib.run(self)
+        self.copy_file(
+            os.path.join(TEMP_DIR, "_chemfiles.so"),
+            os.path.join(self.install_dir, "chemfiles", "_chemfiles.so")
+        )
 
 LONG_DESCRIPTION = """Chemfiles is a library for reading and writing molecular
 trajectory files. These files are created by your favorite theoretical
@@ -97,6 +100,7 @@ options = {
     "keywords": "chemistry computational cheminformatics files formats",
     "url": "http://github.com/chemfiles/chemfiles.py",
     "packages": ['chemfiles'],
+    "ext_modules": [Extension('chemfiles', [])],
     "long_description": LONG_DESCRIPTION,
     "install_requires": ["numpy"],
     "classifiers": [
@@ -115,7 +119,10 @@ options = {
         "Topic :: Software Development :: Libraries :: Python Modules",
         "Topic :: Utilities"
     ],
-    "cmdclass": {'build': BuildCmake, 'install': InstallCmake}
+    "cmdclass": {
+        'build_ext': custom_build_ext,
+        'install_lib': custom_install_lib
+    }
 }
 
 if sys.hexversion < 0x03040000:
