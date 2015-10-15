@@ -6,7 +6,6 @@ import shutil
 import inspect
 
 from setuptools import setup, Extension
-# from distutils.command.build import build
 from setuptools.command.build_ext import build_ext
 from setuptools.command.install_lib import install_lib
 from subprocess import Popen, PIPE, call
@@ -46,7 +45,7 @@ class custom_build_ext(build_ext):
             return build_ext.build_extension(self, ext)
         write_version()
         if READ_THE_DOCS_BUILD:
-            # Do not try to install at readthedocs.
+            # Do not try to build at readthedocs.
             return
         check_cmake()
         try:
@@ -77,6 +76,9 @@ class custom_build_ext(build_ext):
 
 class custom_install_lib(install_lib):
     def run(self):
+        if READ_THE_DOCS_BUILD:
+            # Do not try to install at readthedocs.
+            return
         TEMP_DIR = self.distribution.get_command_obj('build_ext').build_temp
         install_lib.run(self)
         self.copy_file(
