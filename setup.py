@@ -5,6 +5,8 @@ import glob
 import shutil
 import inspect
 
+from ctypes.util import find_library
+
 from setuptools import setup, Extension
 from setuptools.command.build_ext import build_ext
 from setuptools.command.install_lib import install_lib
@@ -47,6 +49,12 @@ class custom_build_ext(build_ext):
         if READ_THE_DOCS_BUILD:
             # Do not try to build at readthedocs.
             return
+        if find_library("chemfiles"):
+            print("Found library at {}. Not building the integrated one"
+                  .format(find_library("chemfiles")))
+            return
+        else:
+            print("Chemfiles library not found. Building it with CMake")
         check_cmake()
         try:
             os.makedirs(self.build_temp)
