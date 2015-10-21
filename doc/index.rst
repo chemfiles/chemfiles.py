@@ -1,62 +1,49 @@
-.. _python-api:
+Python interface to chemfiles
+=============================
 
-Python interface
-================
+This is the documentation for the Python interface to the `chemfiles`_ library. This
+interface uses Numpy, and is compatible with Python 2.7 and 3.4+, and Numpy 1.8 to
+1.10.
 
-The Python interface is built on top of the C interface, using the `ctypes`_
-standard module.
+.. _chemfiles: https://github.com/chemfiles/chemfiles
 
-.. _ctypes: https://docs.python.org/3/library/ctypes.html
+Installation
+^^^^^^^^^^^^
 
-This interface is contained in the :py:mod:`chemfiles` module, and this page list all
-the classes and methods in this module.
+Pre-built binaries
+------------------
 
-Error and logging functions
----------------------------
+The easiest way to install this interface is to use the the
+[``conda``](http://conda.pydata.org/docs/) package manager. It is part of the
+Anaconda Python distribution, and can be installed separatly using the Miniconda
+distribution. The command to install the chemfiles Python module with conda is:
 
-.. automodule:: chemfiles.logging
-    :members:
+.. code-block:: bash
 
-.. automodule:: chemfiles.errors
-    :members:
+    conda install -c https://conda.anaconda.org/luthaf chemfiles
 
-Trajectory class
-----------------
+Build from sources
+------------------
 
-.. set current module to chemfiles
+You can also install this python module from sources if you have all the
+[dependencies](http://chemfiles.readthedocs.org/en/latest/installation.html) of the
+C++ library installed on your computer.
 
-.. automodule:: chemfiles
+.. code-block:: bash
 
+    git clone https://github.com/chemfiles/chemfiles.py
+    cd chemfiles.py
+    git submodule update --init
+    pip install .
 
-.. autoclass:: Trajectory
-    :members:
+User documentation
+^^^^^^^^^^^^^^^^^^
 
-Frame class
------------
+This section contains example of how to use ``chemfiles``, and the complete interface
+reference for all the types and subroutines in chemfiles.
 
-.. autoclass:: Frame
-    :members:
+.. toctree::
+   :maxdepth: 2
 
-UnitCell class
---------------
-
-.. autoclass:: CellType
-    :members:
-
-.. autoclass:: UnitCell
-    :members:
-
-Topology class
---------------
-
-.. autoclass:: Topology
-    :members:
-
-Atom class
-----------
-
-.. autoclass:: AtomType
-    :members:
-
-.. autoclass:: Atom
-    :members:
+   examples
+   reference
