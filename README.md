@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/chemfiles/chemfiles.py.svg?branch=master)](https://travis-ci.org/chemfiles/chemfiles.py)
 [![codecov.io](http://codecov.io/github/chemfiles/chemfiles.py/coverage.svg?branch=master)](http://codecov.io/github/chemfiles/chemfiles.py?branch=master)
+[![Documentation Status](https://readthedocs.org/projects/chemfiles-python/badge/?version=latest)](http://chemfiles.readthedocs.org/projects/chemfiles-python/en/latest/)
 
 
 This repository contains the Python binding for the chemfiles library. This binding is
