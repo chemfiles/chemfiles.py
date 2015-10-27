@@ -94,6 +94,14 @@ class custom_install_lib(install_lib):
             os.path.join(self.install_dir, "chemfiles", "_chemfiles.so")
         )
 
+        MOLFILES_ROOT = os.path.join(self.install_dir, "chemfiles", "molfiles")
+        os.mkdir(MOLFILES_ROOT)
+        for path in glob.iglob(os.path.join(TEMP_DIR, "lib", "*plugin.so")):
+            self.copy_file(
+                os.path.join(path),
+                os.path.join(MOLFILES_ROOT, os.path.basename(path))
+            )
+
 LONG_DESCRIPTION = """Chemfiles is a library for reading and writing molecular
 trajectory files. These files are created by your favorite theoretical
 chemistry program, and contains informations about atomic or residues names
