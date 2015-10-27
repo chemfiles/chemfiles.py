@@ -127,6 +127,10 @@ class TestTrajectory(unittest.TestCase):
 
         os.unlink("test-tmp.xyz")
 
+    def test_molfiles(self):
+        trajectory = Trajectory(os.path.join(DATA, "water.trr"))
+        self.assertEqual(trajectory.nsteps(), 100)
+
 
 if __name__ == '__main__':
     unittest.main()
