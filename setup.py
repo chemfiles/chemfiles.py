@@ -47,8 +47,7 @@ class custom_build_ext(build_ext):
             return build_ext.build_extension(self, ext)
         write_version()
         if READ_THE_DOCS_BUILD:
-            # Do not try to build at readthedocs.
-            return
+            return  # Do not try to build at readthedocs.
         if find_library("chemfiles"):
             print("Found library at {}. Not building the integrated one"
                   .format(find_library("chemfiles")))
@@ -85,8 +84,8 @@ class custom_build_ext(build_ext):
 class custom_install_lib(install_lib):
     def run(self):
         if READ_THE_DOCS_BUILD:
-            # Do not try to install at readthedocs.
-            return
+            write_version()
+            return  # Do not try to install at readthedocs.
         TEMP_DIR = self.distribution.get_command_obj('build_ext').build_temp
         install_lib.run(self)
         self.copy_file(
