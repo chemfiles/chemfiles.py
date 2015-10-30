@@ -39,16 +39,9 @@ script:
   - cd ${TRAVIS_BUILD_DIR}/tests
   - coverage run -m unittest discover
 
-
 after_success:
   - coverage report
   - |
     if test "${TRAVIS_OS_NAME}" == "linux" && test "${TRAVIS_PYTHON_VERSION}" == "2.7"; then
         codecov
     fi
-
-deploy:
-  provider: script
-  script: bash ${TRAVIS_BUILD_DIR}/recipe/deploy.sh
-  on:
-    tags: true
