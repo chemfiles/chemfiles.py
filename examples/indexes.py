@@ -14,7 +14,6 @@ def main():
     positions = frame.positions()
 
     indexes = []
-
     for i in range(len(frame)):
         # positions is a numpy ndarray
         if positions[i, 0] < 5:
