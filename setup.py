@@ -8,6 +8,7 @@ import inspect
 from ctypes.util import find_library
 
 from setuptools import setup, Extension
+from setuptools.command.build_py import build_py
 from setuptools.command.build_ext import build_ext
 from setuptools.command.install_lib import install_lib
 from subprocess import Popen, PIPE, call
@@ -35,17 +36,24 @@ def check_cmake():
         raise EnvironmentError("CMake is not available!")
 
 
-def write_version():
-    ROOT = os.path.dirname(os.path.realpath(__file__))
-    with open(os.path.join(ROOT, "chemfiles", "_version.py"), "w") as fd:
+def write_version(path):
+    with open(os.path.join(path, "_version.py"), "w") as fd:
         fd.write('__version__ = "{}"\n'.format(VERSION))
+
+
+class custom_build_py(build_py):
+    def run(self):
+        build_py.run(self)
+        # honor the --dry-run flag
+        if not self.dry_run:
+            ROOT = os.path.join(self.build_lib, 'chemfiles')
+            write_version(ROOT)
 
 
 class custom_build_ext(build_ext):
     def build_extension(self, ext):
         if ext.name != 'chemfiles':
             return build_ext.build_extension(self, ext)
-        write_version()
         if READ_THE_DOCS_BUILD:
             return  # Do not try to build at readthedocs.
         if find_library("chemfiles"):
@@ -84,7 +92,9 @@ class custom_build_ext(build_ext):
 class custom_install_lib(install_lib):
     def run(self):
         if READ_THE_DOCS_BUILD:
-            write_version()
+            ROOT = os.path.dirname(os.path.realpath(__file__))
+            # readthedocs needs the version of the code
+            write_version(ROOT)
             return  # Do not try to install at readthedocs.
         TEMP_DIR = self.distribution.get_command_obj('build_ext').build_temp
         install_lib.run(self)
@@ -138,7 +148,8 @@ options = {
     ],
     "cmdclass": {
         'build_ext': custom_build_ext,
-        'install_lib': custom_install_lib
+        'install_lib': custom_install_lib,
+        'build_py': custom_build_py,
     }
 }
 
