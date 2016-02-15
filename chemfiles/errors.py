@@ -38,16 +38,16 @@ class CPPException(ChemfilesException):
                 status == CPPException.CHEMHARP_CPP_ERROR):
             message = last_error()
         else:
-            message = chemfiles.ffi.get_c_library().chfl_strerror(c_int(status))
+            message = chemfiles.get_c_library().chfl_strerror(c_int(status))
             message = message.decode("utf8")
         super(CPPException, self).__init__(message)
 
 
 def last_error():
-    return chemfiles.ffi.get_c_library().chfl_last_error().decode("utf8")
+    return chemfiles.get_c_library().chfl_last_error().decode("utf8")
 
 
-def _check(result, func, arguments):
+def _check_return_code(result, func, arguments):
     '''Check that the function call was OK, and raise an exception if needed'''
     if result != 0:
         raise CPPException(result)

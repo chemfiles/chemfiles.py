@@ -3,8 +3,9 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_float, c_double, c_int, byref, create_string_buffer
 from enum import IntEnum
 
-from .ffi import get_c_library, CHFL_ATOM_TYPES
-from .errors import _check_handle
+from chemfiles import get_c_library
+from chemfiles.ffi import CHFL_ATOM_TYPES
+from chemfiles.errors import _check_handle
 
 
 class AtomType(IntEnum):
@@ -17,7 +18,7 @@ class AtomType(IntEnum):
         - Undefined: Undefined atom type
     '''
     Element = CHFL_ATOM_TYPES.CHFL_ATOM_ELEMENT
-    CorseGrain = CHFL_ATOM_TYPES.CHFL_ATOM_CORSE_GRAIN
+    CoarseGrained = CHFL_ATOM_TYPES.CHFL_ATOM_COARSE_GRAINED
     Dummy = CHFL_ATOM_TYPES.CHFL_ATOM_DUMMY
     Undefined = CHFL_ATOM_TYPES.CHFL_ATOM_UNDEFINED
 

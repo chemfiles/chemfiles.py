@@ -1,11 +1,12 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
-from ctypes import c_double, c_bool, c_int, byref, POINTER
+from ctypes import c_double, c_bool, c_int, byref
 from enum import IntEnum
 
-from .ffi import get_c_library, CHFL_CELL_TYPES
-from .errors import _check_handle
+from chemfiles import get_c_library
+from chemfiles.ffi import CHFL_CELL_TYPES
+from chemfiles.errors import _check_handle
 
 
 class CellType(IntEnum):

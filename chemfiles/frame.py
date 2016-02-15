@@ -1,13 +1,13 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
-from ctypes import c_size_t, c_float, c_bool, POINTER, byref
+from ctypes import c_size_t, c_bool, c_float, byref, POINTER, addressof
 
-from .ffi import get_c_library
-from .errors import _check_handle, ChemfilesException, ArgumentError
-from .cell import UnitCell
-from .atom import Atom
-from .topology import Topology
+from chemfiles import get_c_library
+from chemfiles.errors import _check_handle, ChemfilesException
+from chemfiles.cell import UnitCell
+from chemfiles.atom import Atom
+from chemfiles.topology import Topology
 
 
 class Frame(object):
@@ -53,45 +53,31 @@ class Frame(object):
         '''Get the current number of atoms in the ``Frame``.'''
         return self.natoms()
 
-    def positions(self):
+    def resize(self, size):
         '''Get the positions from the ``Frame``.'''
-        natoms = self.natoms()
-        res = np.zeros((natoms, 3), np.float32)
-        self.c_lib.chfl_frame_positions(self._handle_, res, c_size_t(natoms))
-        return res
+        self.c_lib.chfl_frame_resize(self._handle_, c_size_t(size))
 
-    def set_positions(self, positions):
-        '''Set the positions in the ``Frame``.'''
-        shape = positions.shape
-        if shape[1] != 3:
-            raise ArgumentError("The positions array should have a Nx3 shape")
-        if positions.dtype != np.float32:
-            raise ArgumentError("The positions array should contain float32")
-        self.c_lib.chfl_frame_set_positions(
-            self._handle_,
-            positions,
-            c_size_t(shape[0])
+    def positions(self):
+        '''Get a view into the positions of the ``Frame``.'''
+        natoms = c_size_t()
+        data = POINTER(c_float)()
+        self.c_lib.chfl_frame_positions(
+            self._handle_, byref(data), byref(natoms)
         )
+        return np.ctypeslib.as_array(data, shape=(natoms.value, 3))
 
     def velocities(self):
-        '''Get the velocities from the ``Frame``.'''
-        natoms = self.natoms()
-        res = np.zeros((natoms, 3), np.float32)
-        self.c_lib.chfl_frame_velocities(self._handle_, res, c_size_t(natoms))
-        return res
-
-    def set_velocities(self, velocities):
-        '''Set the velocities in the ``Frame``.'''
-        shape = velocities.shape
-        if shape[1] != 3:
-            raise ArgumentError("The velocities array should have a Nx3 shape")
-        if velocities.dtype != np.float32:
-            raise ArgumentError("The velocities array should contain float32")
-        self.c_lib.chfl_frame_set_velocities(
-            self._handle_,
-            velocities,
-            c_size_t(shape[0])
+        '''Get a view into the velocities of the ``Frame``.'''
+        natoms = c_size_t()
+        data = POINTER(c_float)()
+        self.c_lib.chfl_frame_velocities(
+            self._handle_, byref(data), byref(natoms)
         )
+        return np.ctypeslib.as_array(data, shape=(natoms.value, 3))
+
+    def add_velocities(self):
+        '''Add velocity information to this ``Frame``'''
+        self.c_lib.chfl_frame_add_velocities(self._handle_)
 
     def has_velocities(self):
         '''Check if the ``Frame`` has velocity information.'''

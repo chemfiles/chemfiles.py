@@ -12,14 +12,14 @@ DATA = os.path.join(os.path.dirname(__file__), "data")
 
 class TestTrajectory(unittest.TestCase):
     def test_errors(self):
-        logging.set_log_level(logging.LogLevel.NONE)
+        logging.silent()
         self.assertRaises(
             ChemfilesException, Trajectory, os.path.join(DATA, "not-here.xyz")
         )
         self.assertRaises(
             ChemfilesException, Trajectory, os.path.join(DATA, "empty.unknown")
         )
-        logging.set_log_level(logging.LogLevel.WARNING)
+        logging.log_to_stderr()
 
     def test_read(self):
         trajectory = Trajectory(os.path.join(DATA, "water.xyz"))
@@ -87,9 +87,12 @@ class TestTrajectory(unittest.TestCase):
             positions[i] = [1, 2, 3]
             topology.append(Atom("X"))
 
-        frame_1 = Frame()
-        frame_1.set_positions(positions)
-        frame_1.set_topology(topology)
+        frame = Frame(4)
+        np.copyto(frame.positions(), positions)
+        frame.set_topology(topology)
+
+        fd = Trajectory("test-tmp.xyz", "w")
+        fd.write(frame)
 
         positions = np.zeros((6, 3), np.float32)
         topology = Topology()
@@ -97,13 +100,11 @@ class TestTrajectory(unittest.TestCase):
             positions[i] = [4, 5, 6]
             topology.append(Atom("X"))
 
-        frame_2 = Frame()
-        frame_2.set_positions(positions)
-        frame_2.set_topology(topology)
+        frame = Frame(6)
+        np.copyto(frame.positions(), positions)
+        frame.set_topology(topology)
 
-        fd = Trajectory("test-tmp.xyz", "w")
-        fd.write(frame_1)
-        fd.write(frame_2)
+        fd.write(frame)
         fd.sync()
 
         expected_content = "\n".join(["4",

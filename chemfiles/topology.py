@@ -1,11 +1,11 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_size_t, c_bool, byref, POINTER
+from ctypes import c_size_t, c_bool, byref
 import numpy as np
 
-from .ffi import get_c_library
-from .errors import _check_handle, ChemfilesException
-from .atom import Atom
+from chemfiles import get_c_library
+from chemfiles.errors import _check_handle, ChemfilesException
+from chemfiles.atom import Atom
 
 
 class Topology(object):

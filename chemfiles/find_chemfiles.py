@@ -3,6 +3,8 @@ import os
 from ctypes import cdll
 from ctypes.util import find_library
 
+from chemfiles import ffi
+
 ROOT = os.path.dirname(__file__)
 
 
@@ -21,3 +23,14 @@ def load_clib():
         # We could not find chemfiles ...
         raise ImportError("Could not find the chemfiles library. " +
                           "Are you sure it is installed?")
+
+
+class ChemfilesLibrary(object):
+    def __init__(self):
+        self._cache = None
+
+    def __call__(self):
+        if self._cache is None:
+            self._cache = load_clib()
+            ffi.set_interface(self._cache)
+        return self._cache

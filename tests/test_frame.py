@@ -12,43 +12,38 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(frame.natoms(), 0)
         self.assertEqual(len(frame), 0)
 
+        frame.resize(4)
+        self.assertEqual(frame.natoms(), 4)
+        self.assertEqual(len(frame), 4)
+
         frame = Frame(4)
         self.assertEqual(frame.natoms(), 4)
         self.assertEqual(len(frame), 4)
 
     def test_positions(self):
         frame = Frame(4)
-        positions = np.array([[1.0, 2.0, 3.0],
+
+        expected = np.array([[1.0, 2.0, 3.0],
                              [4.0, 5.0, 6.0],
                              [7.0, 8.0, 9.0],
                              [10.0, 11.0, 12.0]], np.float32)
-        frame.set_positions(positions)
-        self.assertEqual(frame.positions().all(), positions.all())
+        positions = frame.positions()
+        np.copyto(positions, expected)
+        self.assertEqual(positions.all(), expected.all())
 
-        self.assertRaises(
-            ArgumentError, frame.set_positions,
-            np.array([[1.0, 2.0, 3.0],
-                      [4.0, 5.0, 6.0],
-                      [7.0, 8.0, 9.0],
-                      [10.0, 11.0, 12.0]])
-        )
-
-        self.assertRaises(
-            ArgumentError, frame.set_positions,
-            np.array([[1.0, 2.0],
-                      [4.0, 5.0],
-                      [7.0, 8.0],
-                      [10.0, 11.0]], np.float32)
-        )
+        positions[3, 2] = 42
+        self.assertEqual(frame.positions()[3, 2], 42)
 
     def test_velocities(self):
         frame = Frame(4)
-        velocities = np.array([[1.0, 2.0, 3.0],
+        frame.add_velocities()
+        expected = np.array([[1.0, 2.0, 3.0],
                               [4.0, 5.0, 6.0],
                               [7.0, 8.0, 9.0],
                               [10.0, 11.0, 12.0]], np.float32)
-        frame.set_velocities(velocities)
-        self.assertEqual(frame.velocities().all(), velocities.all())
+        velocities = frame.velocities()
+        np.copyto(velocities, expected)
+        self.assertEqual(frame.velocities().all(), expected.all())
 
     def test_cell(self):
         frame = Frame(0)

@@ -19,9 +19,9 @@ class TestUnitCell(unittest.TestCase):
         cell = UnitCell(3, 4, 5)
         self.assertEqual(cell.angles(), (90.0, 90.0, 90.0))
 
-        logging.set_log_level(logging.LogLevel.NONE)
+        logging.silent()
         self.assertRaises(ChemfilesException, cell.set_angles, 80, 89, 110)
-        logging.set_log_level(logging.LogLevel.WARNING)
+        logging.log_to_stdout()
 
         cell.set_type(CellType.Triclinic)
         cell.set_angles(80, 89, 110)
@@ -44,12 +44,6 @@ class TestUnitCell(unittest.TestCase):
 
         cell = UnitCell(3, 4, 5, 100, 120, 130)
         self.assertEqual(cell.type(), CellType.Triclinic)
-
-    def test_periodicity(self):
-        cell = UnitCell(3, 4, 5)
-        self.assertEqual(cell.periodicity(), (True, True, True))
-        cell.set_periodicity(False, True, False)
-        self.assertEqual(cell.periodicity(), (False, True, False))
 
 
 if __name__ == '__main__':

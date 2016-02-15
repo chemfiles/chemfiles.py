@@ -2,9 +2,9 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_size_t, byref
 
-from .ffi import get_c_library
-from .errors import _check_handle
-from .frame import Frame
+from chemfiles import get_c_library
+from chemfiles.errors import _check_handle
+from chemfiles.frame import Frame
 
 
 class Trajectory(object):
