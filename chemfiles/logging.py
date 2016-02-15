@@ -65,7 +65,7 @@ _CURRENT_CALLBACK = None
 
 def _wrap_callback(function):
     def callback(level, message):
-        function(LogLevel(level.value), message)
+        function(LogLevel(level.value), message.decode("utf8"))
 
     global _CURRENT_CALLBACK
     _CURRENT_CALLBACK = chfl_logging_callback_t(callback)
