@@ -54,8 +54,17 @@ class custom_build_ext(build_ext):
     def build_extension(self, ext):
         if ext.name != 'chemfiles':
             return build_ext.build_extension(self, ext)
+
+        # Create the temporary build directory
+        try:
+            os.makedirs(self.build_temp)
+        except OSError:
+            pass
+
         if READ_THE_DOCS_BUILD:
-            return  # Do not try to build at readthedocs.
+            # Create a dummy shared library
+            open(os.path.join(self.build_temp, "_chemfiles.so"), 'a').close()
+            return
         if find_library("chemfiles"):
             print("Found library at {}. Not building the integrated one"
                   .format(find_library("chemfiles")))
@@ -63,10 +72,7 @@ class custom_build_ext(build_ext):
         else:
             print("Chemfiles library not found. Building it with CMake")
         check_cmake()
-        try:
-            os.makedirs(self.build_temp)
-        except OSError:
-            pass
+
         cwd = os.getcwd()
         os.chdir(self.build_temp)
 
@@ -91,11 +97,6 @@ class custom_build_ext(build_ext):
 
 class custom_install_lib(install_lib):
     def run(self):
-        if READ_THE_DOCS_BUILD:
-            ROOT = os.path.dirname(os.path.realpath(__file__))
-            # readthedocs needs the version of the code
-            write_version(ROOT)
-            return  # Do not try to install at readthedocs.
         TEMP_DIR = self.distribution.get_command_obj('build_ext').build_temp
         install_lib.run(self)
         self.copy_file(
