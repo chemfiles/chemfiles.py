@@ -17,11 +17,9 @@ class ArgumentError(ChemfilesException):
 
 class NullPointerError(ChemfilesException):
     '''Got a NULL pointer from C!'''
-    def __init__(self, message=""):
-        m = "Got a NULL pointer from C! Today is a bad day."
-        if message:
-            m += " " + message
-        super(NullPointerError, self).__init__(m)
+    def __init__(self):
+        message = "Got a NULL pointer from C! Today is a bad day."
+        super(NullPointerError, self).__init__(message)
 
 
 class CPPException(ChemfilesException):

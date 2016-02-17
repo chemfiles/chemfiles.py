@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import numpy as np
 
-from chemfiles import Frame, UnitCell, Topology, Atom, ArgumentError
+from chemfiles import Frame, UnitCell, Topology, Atom
 
 
 class TestFrame(unittest.TestCase):
@@ -36,11 +36,15 @@ class TestFrame(unittest.TestCase):
 
     def test_velocities(self):
         frame = Frame(4)
+
+        self.assertFalse(frame.has_velocities())
         frame.add_velocities()
+        self.assertTrue(frame.has_velocities())
+
         expected = np.array([[1.0, 2.0, 3.0],
-                              [4.0, 5.0, 6.0],
-                              [7.0, 8.0, 9.0],
-                              [10.0, 11.0, 12.0]], np.float32)
+                             [4.0, 5.0, 6.0],
+                             [7.0, 8.0, 9.0],
+                             [10.0, 11.0, 12.0]], np.float32)
         velocities = frame.velocities()
         np.copyto(velocities, expected)
         self.assertEqual(frame.velocities().all(), expected.all())

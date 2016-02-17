@@ -87,12 +87,9 @@ class TestTrajectory(unittest.TestCase):
             positions[i] = [1, 2, 3]
             topology.append(Atom("X"))
 
-        frame = Frame(4)
-        np.copyto(frame.positions(), positions)
-        frame.set_topology(topology)
-
-        fd = Trajectory("test-tmp.xyz", "w")
-        fd.write(frame)
+        frame1 = Frame(4)
+        np.copyto(frame1.positions(), positions)
+        frame1.set_topology(topology)
 
         positions = np.zeros((6, 3), np.float32)
         topology = Topology()
@@ -100,12 +97,14 @@ class TestTrajectory(unittest.TestCase):
             positions[i] = [4, 5, 6]
             topology.append(Atom("X"))
 
-        frame = Frame(6)
-        np.copyto(frame.positions(), positions)
-        frame.set_topology(topology)
+        frame2 = Frame(6)
+        np.copyto(frame2.positions(), positions)
+        frame2.set_topology(topology)
 
-        fd.write(frame)
-        fd.sync()
+        with Trajectory("test-tmp.xyz", "w") as fd:
+            fd.write(frame1)
+            fd.write(frame2)
+            fd.sync()
 
         expected_content = "\n".join(["4",
                                       "Written by the chemfiles library",
