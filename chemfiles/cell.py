@@ -109,20 +109,6 @@ class UnitCell(object):
         '''Set the type of the unit cell'''
         self.c_lib.chfl_cell_set_type(self._handle_, c_int(celltype))
 
-    def periodicity(self):
-        '''Get the cell periodic boundary conditions along the three axis'''
-        x, y, z = c_bool(), c_bool(), c_bool()
-        self.c_lib.chfl_cell_periodicity(
-            self._handle_, byref(x), byref(y), byref(z)
-        )
-        return x.value, y.value, z.value
-
-    def set_periodicity(self, x, y, z):
-        '''Set the cell periodic boundary conditions along the three axis'''
-        self.c_lib.chfl_cell_set_periodicity(
-            self._handle_, c_bool(x), c_bool(y), c_bool(z)
-        )
-
     def volume(self):
         '''Get the volume of the unit cell'''
         V = c_double()
