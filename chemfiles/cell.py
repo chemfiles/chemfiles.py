@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
-from ctypes import c_double, c_bool, c_int, byref
+from ctypes import c_double, c_int, byref
 from enum import IntEnum
 
 from chemfiles import get_c_library
@@ -12,9 +12,11 @@ from chemfiles.errors import _check_handle
 class CellType(IntEnum):
     '''
     Available cell types in Chemfiles:
-        - Orthorombic: The three angles are 90°
-        - Triclinic: The three angles may not be 90°
-        - Infinite: Cell type when there is no periodic boundary conditions
+
+    - ``CellType.Orthorombic``: The three angles are 90°
+    - ``CellType.Triclinic``: The three angles may not be 90°
+    - ``CellType.Infinite``: Cell type when there is no periodic boundary
+      conditions
     '''
 
     Orthorombic = CHFL_CELL_TYPES.CHFL_CELL_ORTHOROMBIC
@@ -24,26 +26,27 @@ class CellType(IntEnum):
 
 class UnitCell(object):
     '''
-    An ``UnitCell`` represent the box containing the atoms in the system, and
-    its periodicity.
+    An :py:class:`UnitCell` represent the box containing the atoms in the
+    system, and its periodicity.
 
     A unit cell is fully represented by three lenghts (a, b, c); and three
     angles (alpha, beta, gamma). The angles are stored in degrees, and the
     lenghts in Angstroms. A cell also has a matricial representation, by
     projecting the three base vector into an orthonormal base. We choose to
-    represent such matrix as an upper triangular matrix:
+    represent such matrix as an upper triangular matrix::
 
                 | a_x   b_x   c_x |
                 |  0    b_y   c_y |
                 |  0     0    c_z |
 
-    An unit cell also have a cell type, represented by the `CellType` class.
+    An unit cell also have a cell type, represented by the :py:class:`CellType`
+    class.
     '''
 
     def __init__(self, a, b, c, alpha=90.0, beta=90.0, gamma=90.0):
         '''
-        Create a new ``UnitCell`` with cell lenghts of ``a``, ``b`` and ``c``,
-        and cell angles ``alpha``, ``beta`` and ``gamma``.
+        Create a new :py:class:`UnitCell` with cell lenghts of ``a``, ``b`` and
+        ``c``, and cell angles ``alpha``, ``beta`` and ``gamma``.
         '''
         self.c_lib = get_c_library()
         if alpha == 90.0 and beta == 90.0 and gamma == 90.0:
@@ -61,7 +64,7 @@ class UnitCell(object):
         c_lib.chfl_cell_free(self._handle_)
 
     def lengths(self):
-        '''Get the three lenghts of an ``UnitCell``, in Angstroms.'''
+        '''Get the three lenghts of an :py:class:`UnitCell`, in Angstroms.'''
         a, b, c = c_double(), c_double(), c_double()
         self.c_lib.chfl_cell_lengths(
             self._handle_, byref(a), byref(b), byref(c)
@@ -69,13 +72,13 @@ class UnitCell(object):
         return a.value, b.value, c.value
 
     def set_lengths(self, a, b, c):
-        '''Set the three lenghts of an ``UnitCell``, in Angstroms.'''
+        '''Set the three lenghts of an :py:class:`UnitCell`, in Angstroms.'''
         self.c_lib.chfl_cell_set_lengths(
             self._handle_, c_double(a), c_double(b), c_double(c)
         )
 
     def angles(self):
-        '''Get the three angles of an ``UnitCell``, in degrees.'''
+        '''Get the three angles of an :py:class:`UnitCell`, in degrees.'''
         alpha, beta, gamma = c_double(), c_double(), c_double()
         self.c_lib.chfl_cell_angles(
             self._handle_, byref(alpha), byref(beta), byref(gamma)
@@ -84,8 +87,8 @@ class UnitCell(object):
 
     def set_angles(self, alpha, beta, gamma):
         '''
-        Set the three angles of an ``UnitCell``, in degrees. This is only
-        possible with ``TRICLINIC`` cells.
+        Set the three angles of an :py:class:`UnitCell`, in degrees. This is
+        only possible for ``CellType.Triclinic`` cells.
         '''
         self.c_lib.chfl_cell_set_angles(
             self._handle_, c_double(alpha), c_double(beta), c_double(gamma)
@@ -94,9 +97,7 @@ class UnitCell(object):
     def matrix(self):
         '''Get the unit cell matricial representation.'''
         res = np.zeros((3, 3), np.float64)
-        self.c_lib.chfl_cell_matrix(
-            self._handle_, res
-        )
+        self.c_lib.chfl_cell_matrix(self._handle_, res)
         return res
 
     def type(self):

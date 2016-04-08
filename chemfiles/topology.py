@@ -10,15 +10,16 @@ from chemfiles.atom import Atom
 
 class Topology(object):
     '''
-    A `Topology` contains the definition of all the particles in the system,
-    and the liaisons between the particles (bonds, angles, dihedrals, ...).
+    A :py:class:`Topology` contains the definition of all the particles in the
+    system, and the liaisons between the particles (bonds, angles, dihedrals,
+    ...).
 
     Only the atoms and the bonds are stored, the angles and the dihedrals are
     computed automaticaly.
     '''
 
     def __init__(self):
-        '''Create a new empty ``Topology``.'''
+        '''Create a new empty :py:class:`Topology`.'''
         self.c_lib = get_c_library()
         self._handle_ = self.c_lib.chfl_topology()
         _check_handle(self._handle_)
@@ -27,7 +28,7 @@ class Topology(object):
         self.c_lib.chfl_topology_free(self._handle_)
 
     def atom(self, index):
-        '''Get the ``Atom`` at ``index`` from a topology.'''
+        '''Get the :py:class:`Atom` at ``index`` from a topology.'''
         atom = Atom("")
         self.c_lib.chfl_atom_free(atom._handle_)
         atom._handle_ = self.c_lib.chfl_atom_from_topology(
@@ -40,23 +41,23 @@ class Topology(object):
         return atom
 
     def natoms(self):
-        '''Get the current number of atoms in the ``Topology``.'''
+        '''Get the current number of atoms in the :py:class:`Topology`.'''
         res = c_size_t()
         self.c_lib.chfl_topology_atoms_count(self._handle_, res)
         return res.value
 
     def __len__(self):
-        '''Get the current number of atoms in the ``Topology``.'''
+        '''Get the current number of atoms in the :py:class:`Topology`.'''
         return self.natoms()
 
     def append(self, atom):
-        '''Add an ``Atom`` at the end of the ``Topology``'''
+        '''Add an :py:class:`Atom` at the end of the :py:class:`Topology`'''
         self.c_lib.chfl_topology_append(self._handle_, atom._handle_)
 
     def remove(self, index):
         '''
-        Remove an ``Atom`` from the ``Topology`` by index. This modify all the
-        other atoms indexes.
+        Remove an :py:class:`Atom` from the :py:class:`Topology` by index. This
+        can modify all the other atoms indexes.
         '''
         self.c_lib.chfl_topology_remove(self._handle_, c_size_t(index))
 
@@ -127,14 +128,18 @@ class Topology(object):
         '''Get the list of dihedral angles in the system'''
         ndihedrals = self.dihedrals_count()
         res = np.zeros((ndihedrals, 4), np.uintp)
-        self.c_lib.chfl_topology_dihedrals(self._handle_, res, c_size_t(ndihedrals))
+        self.c_lib.chfl_topology_dihedrals(
+            self._handle_, res, c_size_t(ndihedrals)
+        )
         return res
 
     def add_bond(self, i, j):
         '''
         Add a bond between the atoms at indexes ``i`` and ``j`` in the system
         '''
-        self.c_lib.chfl_topology_add_bond(self._handle_, c_size_t(i), c_size_t(j))
+        self.c_lib.chfl_topology_add_bond(
+            self._handle_, c_size_t(i), c_size_t(j)
+        )
 
     def remove_bond(self, i, j):
         '''

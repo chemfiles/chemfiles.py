@@ -48,13 +48,13 @@ def log_to_stderr():
 
 
 def log_to_stdout():
-    '''Write logs to the standard error stream. This is the default.'''
+    '''Write logs to the standard output stream.'''
     c_lib = get_c_library()
     c_lib.chfl_log_stdout()
 
 
 def silent():
-    '''Write logs to the standard error stream. This is the default.'''
+    '''Remove all logging output'''
     c_lib = get_c_library()
     c_lib.chfl_log_silent()
 
@@ -76,10 +76,12 @@ def log_callback(callback):
     '''
     Use a callback for logging, instead of the built-in logging system.
 
-    The ``callback`` function must have the following signature:
+    The ``callback`` function must have the following signature::
+
         def callback(level, message):
             ...
             return None
+
     where ``level`` is a ``LogLevel``, and message a string containing the log
     message.
     '''

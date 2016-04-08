@@ -13,10 +13,12 @@ Installation
 Pre-built binaries
 ------------------
 
-The easiest way to install this interface is to use the the
-[``conda``](http://conda.pydata.org/docs/) package manager. It is part of the
-Anaconda Python distribution, and can be installed separatly using the Miniconda
-distribution. The command to install the chemfiles Python module with conda is:
+The easiest way to install this interface is to use the the `conda`_ package manager.
+It is part of the Anaconda Python distribution, and can be installed separatly using
+the Miniconda distribution. The command to install the chemfiles Python module with
+conda is:
+
+.. _conda: http://conda.pydata.org/docs/
 
 .. code-block:: bash
 
@@ -26,8 +28,9 @@ Build from sources
 ------------------
 
 You can also install this python module from sources if you have all the
-[dependencies](http://chemfiles.readthedocs.org/en/latest/installation.html) of the
-C++ library installed on your computer.
+`dependencies`_ of the C++ library installed on your computer.
+
+.. _dependencies: http://chemfiles.readthedocs.org/en/latest/installation.html
 
 .. code-block:: bash
 

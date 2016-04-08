@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
-from ctypes import c_size_t, c_bool, c_float, byref, POINTER, addressof
+from ctypes import c_size_t, c_bool, c_float, byref, POINTER
 
 from chemfiles import get_c_library
 from chemfiles.errors import _check_handle, ChemfilesException
@@ -12,8 +12,9 @@ from chemfiles.topology import Topology
 
 class Frame(object):
     '''
-    A `Frame` holds data from one step of a simulation: the current `Topology`,
-    the positions, and maybe the velocities of the particles in the system.
+    A :py:class:`Frame` holds data from one step of a simulation: the current
+    :py:class:`Topology`, the positions, and maybe the velocities of the
+    particles in the system.
     '''
 
     def __init__(self, natoms=0):
@@ -30,7 +31,8 @@ class Frame(object):
 
     def atom(self, index):
         '''
-        Get a specific ``Atom`` from a frame, given its `index` in the frame
+        Get a specific :py:class:`Atom` from a frame, given its `index` in the
+        frame
         '''
         atom = Atom("")
         self.c_lib.chfl_atom_free(atom._handle_)
@@ -44,21 +46,21 @@ class Frame(object):
         return atom
 
     def natoms(self):
-        '''Get the current number of atoms in the ``Frame``.'''
+        '''Get the current number of atoms in the :py:class:`Frame`.'''
         res = c_size_t()
         self.c_lib.chfl_frame_atoms_count(self._handle_, res)
         return res.value
 
     def __len__(self):
-        '''Get the current number of atoms in the ``Frame``.'''
+        '''Get the current number of atoms in the :py:class:`Frame`.'''
         return self.natoms()
 
     def resize(self, size):
-        '''Get the positions from the ``Frame``.'''
+        '''Get the positions from the :py:class:`Frame`.'''
         self.c_lib.chfl_frame_resize(self._handle_, c_size_t(size))
 
     def positions(self):
-        '''Get a view into the positions of the ``Frame``.'''
+        '''Get a view into the positions of the :py:class:`Frame`.'''
         natoms = c_size_t()
         data = POINTER(c_float)()
         self.c_lib.chfl_frame_positions(
@@ -67,7 +69,7 @@ class Frame(object):
         return np.ctypeslib.as_array(data, shape=(natoms.value, 3))
 
     def velocities(self):
-        '''Get a view into the velocities of the ``Frame``.'''
+        '''Get a view into the velocities of the :py:class:`Frame`.'''
         natoms = c_size_t()
         data = POINTER(c_float)()
         self.c_lib.chfl_frame_velocities(
@@ -76,17 +78,17 @@ class Frame(object):
         return np.ctypeslib.as_array(data, shape=(natoms.value, 3))
 
     def add_velocities(self):
-        '''Add velocity information to this ``Frame``'''
+        '''Add velocity information to this :py:class:`Frame`'''
         self.c_lib.chfl_frame_add_velocities(self._handle_)
 
     def has_velocities(self):
-        '''Check if the ``Frame`` has velocity information.'''
+        '''Check if the :py:class:`Frame` has velocity information.'''
         res = c_bool()
         self.c_lib.chfl_frame_has_velocities(self._handle_, byref(res))
         return res.value
 
     def cell(self):
-        '''Get the `UnitCell` from the ``Frame``'''
+        '''Get the :py:class:`UnitCell` from the :py:class:`Frame`'''
         cell = UnitCell(0, 0, 0)
         self.c_lib.chfl_cell_free(cell._handle_)
         cell._handle_ = self.c_lib.chfl_cell_from_frame(self._handle_)
@@ -94,11 +96,11 @@ class Frame(object):
         return cell
 
     def set_cell(self, cell):
-        '''Set the `UnitCell` of the `Frame`'''
+        '''Set the :py:class:`UnitCell` of the :py:class:`Frame`'''
         self.c_lib.chfl_frame_set_cell(self._handle_, cell._handle_)
 
     def topology(self):
-        '''Get the ``Topology`` from the ``Frame``'''
+        '''Get the :py:class:`Topology` from the :py:class:`Frame`'''
         topology = Topology()
         self.c_lib.chfl_topology_free(topology._handle_)
         topology._handle_ = self.c_lib.chfl_topology_from_frame(self._handle_)
@@ -106,17 +108,19 @@ class Frame(object):
         return topology
 
     def set_topology(self, topology):
-        '''Set the `Topology` of the `Frame`'''
+        '''Set the :py:class:`Topology` of the :py:class:`Frame`'''
         self.c_lib.chfl_frame_set_topology(self._handle_, topology._handle_)
 
     def step(self):
-        '''Get the ``Frame`` step, i.e. the frame number in the trajectory'''
+        '''
+        Get the :py:class:`Frame` step, i.e. the frame number in the trajectory
+        '''
         res = c_size_t()
         self.c_lib.chfl_frame_step(self._handle_, byref(res))
         return res.value
 
     def set_step(self, step):
-        '''Set the ``Frame`` step'''
+        '''Set the :py:class:`Frame` step'''
         self.c_lib.chfl_frame_set_step(self._handle_, c_size_t(step))
 
     def guess_topology(self, bonds=True):
