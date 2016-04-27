@@ -5,7 +5,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from chemharp import Trajectory, UnitCell, Atom, Topology
+from chemfiles import Trajectory, UnitCell, Atom, Topology
 
 
 def main():

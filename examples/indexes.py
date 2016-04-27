@@ -5,7 +5,7 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-from chemharp import Trajectory
+from chemfiles import Trajectory
 
 
 def main():
