@@ -9,10 +9,7 @@ ROOT = os.path.dirname(__file__)
 
 
 def load_clib():
-    '''
-    Load chemfiles C++ library, and set the environment as needed.
-    '''
-    os.environ['CHEMFILES_PLUGINS'] = os.path.join(ROOT, "molfiles")
+    '''Load chemfiles C++ library'''
     libpath = find_library("chemfiles")
     if not libpath:
         # Rely on the library built by the setup.py function
@@ -20,9 +17,9 @@ def load_clib():
     try:
         return cdll.LoadLibrary(libpath)
     except OSError:
-        # We could not find chemfiles ...
-        raise ImportError("Could not find the chemfiles library. " +
-                          "Are you sure it is installed?")
+        raise ImportError(
+            "Could not find chemfiles library. Are you sure it's installed?"
+        )
 
 
 class ChemfilesLibrary(object):
