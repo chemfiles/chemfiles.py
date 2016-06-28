@@ -59,7 +59,7 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(frame.cell().type(), cell.type())
 
     def test_topology(self):
-        frame = Frame()
+        frame = Frame(2)
         topology = Topology()
 
         topology.append(Atom("Zn"))

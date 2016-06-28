@@ -13,13 +13,13 @@ class CellType(IntEnum):
     '''
     Available cell types in Chemfiles:
 
-    - ``CellType.Orthorombic``: The three angles are 90°
+    - ``CellType.Orthorhombic``: The three angles are 90°
     - ``CellType.Triclinic``: The three angles may not be 90°
     - ``CellType.Infinite``: Cell type when there is no periodic boundary
       conditions
     '''
 
-    Orthorombic = CHFL_CELL_TYPES.CHFL_CELL_ORTHOROMBIC
+    Orthorhombic = CHFL_CELL_TYPES.CHFL_CELL_ORTHORHOMBIC
     Triclinic = CHFL_CELL_TYPES.CHFL_CELL_TRICLINIC
     Infinite = CHFL_CELL_TYPES.CHFL_CELL_INFINITE
 

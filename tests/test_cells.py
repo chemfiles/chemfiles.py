@@ -38,7 +38,7 @@ class TestUnitCell(unittest.TestCase):
 
     def test_type(self):
         cell = UnitCell(3, 4, 5)
-        self.assertEqual(cell.type(), CellType.Orthorombic)
+        self.assertEqual(cell.type(), CellType.Orthorhombic)
         cell.set_type(CellType.Infinite)
         self.assertEqual(cell.type(), CellType.Infinite)
 
