@@ -1,4 +1,4 @@
-# File indexes.py, example for the Chemharp library
+# File indexes.py, example for the chemfiles library
 # Any copyright is dedicated to the Public Domain.
 # http://creativecommons.org/publicdomain/zero/1.0/
 
@@ -7,22 +7,16 @@
 
 from chemfiles import Trajectory
 
+trajectory = Trajectory("filename.xyz")
+frame = trajectory.read()
+positions = frame.positions()
 
-def main():
-    traj = Trajectory("filename.xyz")
-    frame = traj.read_next_step()
-    positions = frame.positions()
+indexes = []
+for i in range(frame.natoms()):
+    # positions is a numpy ndarray
+    if positions[i, 0] < 5:
+        indexes.append(i)
 
-    indexes = []
-    for i in range(len(frame)):
-        # positions is a numpy ndarray
-        if positions[i, 0] < 5:
-            indexes.append(i)
-
-    print("Atoms with x < 5: ")
-    for i in indexes:
-        print("  - {}".format(i))
-
-
-if __name__ == "__main__":
-    main()
+print("Atoms with x < 5:")
+for i in indexes:
+    print("  - {}".format(i))

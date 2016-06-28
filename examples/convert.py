@@ -1,4 +1,4 @@
-# File convert.py, example for the Chemharp library
+# File convert.py, example for the chemfiles library
 # Any copyright is dedicated to the Public Domain.
 # http://creativecommons.org/publicdomain/zero/1.0/
 
@@ -7,33 +7,29 @@
 
 from chemfiles import Trajectory, UnitCell, Atom, Topology
 
+infile = Trajectory("water.xyz")
 
-def main():
-    input_file = Trajectory("water.xyz")
-    water_topology = Topology()
-    # Orthorombic UnitCell with lengths of 20, 15 and 35 A
-    cell = UnitCell(20, 15, 35)
+# Orthorombic UnitCell with lengths of 20, 15 and 35 A
+cell = UnitCell(20, 15, 35)
+infile.set_cell(cell)
 
-    # Create Atoms
-    O = Atom("O")
-    H = Atom("H")
+# Create Atoms
+O = Atom("O")
+H = Atom("H")
 
-    # Fill the topology with one water molecule
-    water_topology.append(O)
-    water_topology.append(H)
-    water_topology.append(H)
-    water_topology.add_bond(0, 1)
-    water_topology.add_bond(0, 2)
+# Create topology with one water molecule
+topology = Topology()
+topology.append(O)
+topology.append(H)
+topology.append(H)
 
-    output = Trajectory("water.pdb", "w")
+topology.add_bond(0, 1)
+topology.add_bond(0, 2)
+infile.set_topology(topology)
 
-    while not input_file.done():
-        frame = input_file.read()
-        # Set the frame cell and topology
-        frame.cell = cell
-        frame.topology = water_topology
-        # Write the frame to the output file, using PDB format
-        output.write(frame)
+# Write an output file using PDB format
+output = Trajectory("water.pdb", "w")
 
-if __name__ == "__main__":
-    main()
+for _ in range(infile.nsteps()):
+    frame = infile.read()
+    output.write(frame)
