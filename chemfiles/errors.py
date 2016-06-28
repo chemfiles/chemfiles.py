@@ -42,7 +42,13 @@ class CPPException(ChemfilesException):
 
 
 def last_error():
+    '''Get the last error from the library'''
     return chemfiles.get_c_library().chfl_last_error().decode("utf8")
+
+
+def clear_errors():
+    '''Clear any error message saved in the library'''
+    return chemfiles.get_c_library().chfl_clear_errors()
 
 
 def _check_return_code(result, func, arguments):

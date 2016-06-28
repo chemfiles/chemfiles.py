@@ -66,6 +66,15 @@ class TestTopology(unittest.TestCase):
         topology.remove(3)
         self.assertEqual(len(topology), 3)
 
+    def test_out_of_bounds(self):
+        topology = Topology()
+        topology.append(Atom("H"))
+        topology.append(Atom("O"))
+        topology.append(Atom("H"))
+
+        topology.atom(2)
+        self.assertRaises(IndexError, topology.atom, 6)
+
 
 if __name__ == '__main__':
     unittest.main()

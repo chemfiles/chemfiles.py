@@ -81,6 +81,11 @@ class TestFrame(unittest.TestCase):
         frame.set_step(42)
         self.assertEqual(frame.step(), 42)
 
+    def test_out_of_bounds(self):
+        frame = Frame(5)
+        frame.atom(2)
+        self.assertRaises(IndexError, frame.atom, 6)
+
 
 if __name__ == '__main__':
     unittest.main()

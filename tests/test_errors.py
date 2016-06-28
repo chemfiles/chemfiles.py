@@ -3,11 +3,26 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import os
 
-from chemfiles import logging, Trajectory
+from chemfiles import logging, errors, Trajectory
 from chemfiles.logging import LogLevel
 
 
 class TestLogging(unittest.TestCase):
+    def test_last_error(self):
+        logging.silent()
+        try:
+            Trajectory("nothere")
+        except:
+            pass
+        self.assertEqual(
+            errors.last_error(),
+            "Can not find a format associated with the \"\" extension."
+        )
+
+        errors.clear_errors()
+        self.assertEqual(errors.last_error(), "")
+        logging.log_to_stderr()
+
     def test_level(self):
         self.assertEqual(logging.log_level(), LogLevel.WARNING)
         logging.set_log_level(LogLevel.DEBUG)

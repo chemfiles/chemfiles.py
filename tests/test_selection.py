@@ -35,11 +35,23 @@ class TestSelection(unittest.TestCase):
         res = selection.evaluate(frame)
         self.assertEqual(res, [0, 3])
 
+        selection = Selection("bonds: all")
+        res = selection.evaluate(frame)
+
+        self.assertIn((0, 1), res)
+        self.assertIn((1, 2), res)
+        self.assertIn((2, 3), res)
+
         selection = Selection("angles: all")
         res = selection.evaluate(frame)
 
         self.assertIn((0, 1, 2), res)
         self.assertIn((1, 2, 3), res)
+
+        selection = Selection("dihedrals: all")
+        res = selection.evaluate(frame)
+
+        self.assertEqual([(0, 1, 2, 3)], res)
 
 
 if __name__ == '__main__':
