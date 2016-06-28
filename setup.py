@@ -5,8 +5,6 @@ import glob
 import shutil
 import inspect
 
-from ctypes.util import find_library
-
 from setuptools import setup, Extension
 from setuptools.command.build_py import build_py
 from setuptools.command.build_ext import build_ext
@@ -26,6 +24,10 @@ VERSION = open(os.path.join(CHEMFILES_DIR, "VERSION")).read().strip()
 VERSION = VERSION.replace("-", "_")
 
 READ_THE_DOCS_BUILD = os.environ.get('READTHEDOCS', None) == 'True'
+if bool(int(os.environ.get("CONDA_BUILD", '0'))):
+    BUILD_CHEMFILES = False
+else:
+    BUILD_CHEMFILES = True
 
 
 def check_cmake():
@@ -65,14 +67,8 @@ class custom_build_ext(build_ext):
             # Create a dummy shared library
             open(os.path.join(self.build_temp, "_chemfiles.so"), 'a').close()
             return
-        if find_library("chemfiles"):
-            print("Found library at {}. Not building the integrated one"
-                  .format(find_library("chemfiles")))
-            return
-        else:
-            print("Chemfiles library not found. Building it with CMake")
-        check_cmake()
 
+        check_cmake()
         cwd = os.getcwd()
         os.chdir(self.build_temp)
 
@@ -99,17 +95,11 @@ class custom_install_lib(install_lib):
     def run(self):
         TEMP_DIR = self.distribution.get_command_obj('build_ext').build_temp
         install_lib.run(self)
-        self.copy_file(
-            os.path.join(TEMP_DIR, "_chemfiles.so"),
-            os.path.join(self.install_dir, "chemfiles", "_chemfiles.so")
-        )
 
-        MOLFILES_ROOT = os.path.join(self.install_dir, "chemfiles", "molfiles")
-        os.mkdir(MOLFILES_ROOT)
-        for path in glob.iglob(os.path.join(TEMP_DIR, "lib", "*plugin.so")):
+        if BUILD_CHEMFILES:
             self.copy_file(
-                os.path.join(path),
-                os.path.join(MOLFILES_ROOT, os.path.basename(path))
+                os.path.join(TEMP_DIR, "_chemfiles.so"),
+                os.path.join(self.install_dir, "chemfiles", "_chemfiles.so")
             )
 
 LONG_DESCRIPTION = """Chemfiles is a library for reading and writing molecular
@@ -128,7 +118,6 @@ options = {
     "keywords": "chemistry computational cheminformatics files formats",
     "url": "http://github.com/chemfiles/chemfiles.py",
     "packages": ['chemfiles'],
-    "ext_modules": [Extension('chemfiles', [])],
     "long_description": LONG_DESCRIPTION,
     "install_requires": ["numpy"],
     "classifiers": [
@@ -148,7 +137,6 @@ options = {
         "Topic :: Utilities"
     ],
     "cmdclass": {
-        'build_ext': custom_build_ext,
         'install_lib': custom_install_lib,
         'build_py': custom_build_py,
     }
@@ -156,5 +144,9 @@ options = {
 
 if sys.hexversion < 0x03040000:
     options["install_requires"].append("enum34")
+
+if BUILD_CHEMFILES:
+    options["ext_modules"] = [Extension('chemfiles', [])]
+    options["cmdclass"]["build_ext"] = custom_build_ext
 
 setup(**options)
