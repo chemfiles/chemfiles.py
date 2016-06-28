@@ -22,3 +22,10 @@ Write frames (convert.py)
 .. literalinclude:: ../examples/convert.py
    :language: python
    :lines: 5-
+
+Use selections (select.py)
+--------------------------
+
+.. literalinclude:: ../examples/select.py
+   :language: python
+   :lines: 5-
