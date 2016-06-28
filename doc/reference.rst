@@ -78,3 +78,10 @@ Atom class
 
 .. autoclass:: Atom
     :members:
+
+
+Selection class
+---------------
+
+.. autoclass:: Selection
+    :members:

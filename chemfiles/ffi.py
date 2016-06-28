@@ -69,7 +69,7 @@ class CHFL_SELECTION(Structure):
 
 class chfl_match_t(Structure):
     _fields_ = [
-        ('size', c_char),
+        ('size', c_int8),
         ('atoms', ARRAY(c_size_t, 4))
     ]
 
@@ -484,7 +484,7 @@ def set_interface(c_lib):
     c_lib.chfl_selection_evalutate.errcheck = _check_return_code
 
     # Function "chfl_selection_matches", at chemfiles.h:943
-    c_lib.chfl_selection_matches.argtypes = [POINTER(CHFL_SELECTION), POINTER(chfl_match_t), c_size_t]
+    c_lib.chfl_selection_matches.argtypes = [POINTER(CHFL_SELECTION), ndpointer(chfl_match_t, flags="C_CONTIGUOUS", ndim=1), c_size_t]
     c_lib.chfl_selection_matches.restype = c_int
     c_lib.chfl_selection_matches.errcheck = _check_return_code
 

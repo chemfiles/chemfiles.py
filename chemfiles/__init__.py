@@ -12,3 +12,4 @@ from .topology import Topology
 from .cell import UnitCell, CellType
 from .frame import Frame
 from .trajectory import Trajectory
+from .selection import Selection
