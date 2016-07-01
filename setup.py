@@ -20,14 +20,15 @@ CHEMFILES_DIR = os.path.join(
     "native"
 )
 
-VERSION = open(os.path.join(CHEMFILES_DIR, "VERSION")).read().strip()
-VERSION = VERSION.replace("-", "_")
-
 READ_THE_DOCS_BUILD = os.environ.get('READTHEDOCS', None) == 'True'
 if bool(int(os.environ.get("CONDA_BUILD", '0'))):
     BUILD_CHEMFILES = False
+    import chemfiles
+    VERSION = chemfiles.__version__
 else:
     BUILD_CHEMFILES = True
+    VERSION = open(os.path.join(CHEMFILES_DIR, "VERSION")).read().strip()
+    VERSION = VERSION.replace("-", "_")
 
 
 def check_cmake():
