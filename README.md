@@ -1,8 +1,8 @@
 # Python binding for the chemfiles library
 
 [![Build Status](https://travis-ci.org/chemfiles/chemfiles.py.svg?branch=master)](https://travis-ci.org/chemfiles/chemfiles.py)
-[![codecov.io](http://codecov.io/github/chemfiles/chemfiles.py/coverage.svg?branch=master)](http://codecov.io/github/chemfiles/chemfiles.py?branch=master)
-[![Documentation Status](https://readthedocs.org/projects/chemfiles-python/badge/?version=latest)](http://chemfiles.readthedocs.org/projects/chemfiles-python/en/latest/)
+[![Code coverage](http://codecov.io/github/chemfiles/chemfiles.py/coverage.svg?branch=master)](http://codecov.io/github/chemfiles/chemfiles.py?branch=master)
+[![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://chemfiles.github.io/chemfiles.py/)
 
 
 This repository contains the Python binding for the chemfiles library. This binding is
@@ -17,14 +17,14 @@ Using the [`conda`](http://conda.pydata.org/docs/) package manager is the prefer
 install the chemfiles Python module.
 
 ```
-conda install -c https://conda.anaconda.org/luthaf chemfiles
+conda install -c luthaf chemfiles
 ```
 
 ### Source compilation
 
 You can install this python module from sources if you have all the
-[dependencies](http://chemfiles.readthedocs.org/en/latest/installation.html) of the C++
-library installed on your computer.
+[dependencies](http://chemfiles.readthedocs.org/en/latest/installation.html) of
+the C++ library installed on your computer.
 
 ```bash
 # To get the latest developement version:
@@ -36,8 +36,8 @@ pip install .
 
 ## Usage example
 
-Here is a simple usage example for the `chemfiles` module. Please see the `examples` folder
-for other examples.
+Here is a simple usage example for the `chemfiles` module. Please see the
+`examples` folder for other examples.
 
 ```python
 from chemharp import Trajectory, Frame
@@ -51,11 +51,7 @@ positions = frame.positions()
 # Do awesome things with the positions here !
 ```
 
-## Building the documentation
-
-In order to build the HTML documentation, run `make html` from the `doc` folder. The
-documentation will be placed into the `doc/_build/html` folder.
-
 ## Bug reports, feature requests
 
-Please report any bug you find and any feature you may want as a [github issue](https://github.com/chemfiles/chemfiles.py/issues/new).
+Please report any bug you find and any feature you may want as a [github
+issue](https://github.com/chemfiles/chemfiles.py/issues/new).
