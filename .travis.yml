@@ -5,9 +5,6 @@ python:
   - "3.5"
 os:
   - linux
-env:
-  global:
-    secure: vemv2pi+y10L/3QkiDTdgbsug2Qv97OUiMjyRw9pYIjDoNhws1jzuKMFJt1YvUNZcROUA1hEkDYDDCmGTXAo7zr+pk+ru9e8h6q9LH+uPZWKgWHUzEyFlLB3wve3fCzeTIqvvSC+87bxYhJg53TrrCyRXBu3jnHoqJKr2RhWwOQ=
 addons:
   apt:
     sources:
@@ -18,7 +15,17 @@ addons:
     - libnetcdf-dev
     - cmake
 
+env:
+  global:
+    secure: "AQdl6uAOQgfP5rT/qA8koP/TYqSAfhNcUM03qe0ePteXIhj8FN2cmvXiG5bokOsum9tiJjSZniiIr76rjHOahdtWFMHe+2mSHPZhzeiIBloGtNA4K/itrc7h5Z5vDCwcc3i26hQd3+ZVPSIun/apc7nH+wWMU8S1AdfEH/BsTqVnSGoxnIl6T18vN+qZicxlosmiDwRN0+DAZvwcYNjMkgkRuxauf/dOFHrdxL1HyId+LcQ0lmW/5KwUDfk7UFm06W/aAH4F/DuFkrju8VcP/kxss0KOB+YLzF50T79ekUnwh4+cv13fXIMXwh+bdjGQmTiqSaMenn5cSK5OeDHQ2KKcwe9QC7sMzJ5hSemrvK1+YlbXPTsOvyX5BBfbbs4Z7MfwdoULlNINnmrGyMqcSZSOYwZRjUiJP/edbNCK2rmQmT+e2qLCOum2IWwiRGLot4C5H87ko8LxyPGzxSUpAuL+ctDlILwJhU03saSIhunpq/ztxHUJjHQKG5c7OMeoGsuzQy6y+sFWoR0cgEmB0744zBZYPU1UN1sH2tcra0L95rQpS84Pip1KkfScHPiI5XtN4gtlkYZt4jPx5djqbBCCm3Sqk8GGh1rFJG8debr7+YBHlBciYOGt1b0B5CKtvD7SUMmtZV6vB7Xrb5MuCddBE7WJHa4VXjxLlw7O3iQ="
+
 before_install:
+  - |
+    if [[ "$TRAVIS_OS_NAME" == "linux" && "${TRAVIS_PYTHON_VERSION}" == "2.7" ]]; then
+        export EXTRA_WORK=true
+    else
+        export EXTRA_WORK=false
+    fi
   - |
     if test "${TRAVIS_OS_NAME}" == "linux"; then
         export CC=gcc-4.9
@@ -39,9 +46,12 @@ script:
   - cd ${TRAVIS_BUILD_DIR}/tests
   - coverage run -m unittest discover
 
-after_success:
-  - coverage report
+after_script:
   - |
-    if test "${TRAVIS_OS_NAME}" == "linux" && test "${TRAVIS_PYTHON_VERSION}" == "2.7"; then
+    if ${EXTRA_WORK}; then
+        coverage report
         codecov
+        cd ${TRAVIS_BUILD_DIR}
+        git clone https://${GH_TOKEN}@github.com/chemfiles/chemfiles.py gh-pages
+        ./deploy-docs.sh
     fi
