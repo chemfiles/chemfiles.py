@@ -53,5 +53,5 @@ after_script:
         codecov
         cd ${TRAVIS_BUILD_DIR}
         git clone https://${GH_TOKEN}@github.com/chemfiles/chemfiles.py gh-pages
-        ./deploy-docs.sh
+        ./scripts/deploy-docs.sh
     fi

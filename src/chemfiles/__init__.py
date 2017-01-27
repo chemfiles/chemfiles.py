@@ -1,9 +1,9 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from .find_chemfiles import ChemfilesLibrary
+from .clib import FindChemfilesLibrary
 
-get_c_library = ChemfilesLibrary()
+get_c_library = FindChemfilesLibrary()
 __version__ = get_c_library().chfl_version().decode("utf8")
 
 from .errors import ChemfilesException, ArgumentError

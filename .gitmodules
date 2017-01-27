@@ -1,3 +1,3 @@
 [submodule "C++ library"]
-	path = native
+	path = chemfiles
 	url = https://github.com/chemfiles/chemfiles
