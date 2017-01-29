@@ -1,11 +1,9 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
-import numpy as np
 
-from chemfiles import UnitCell, CellType
+from chemfiles import UnitCell, CellShape
 from chemfiles import ChemfilesException
-from chemfiles import logging
 
 
 class TestUnitCell(unittest.TestCase):
@@ -19,11 +17,10 @@ class TestUnitCell(unittest.TestCase):
         cell = UnitCell(3, 4, 5)
         self.assertEqual(cell.angles(), (90.0, 90.0, 90.0))
 
-        logging.silent()
+        self.assertEqual(cell.shape(), CellShape.Orthorhombic)
         self.assertRaises(ChemfilesException, cell.set_angles, 80, 89, 110)
-        logging.log_to_stdout()
 
-        cell.set_type(CellType.Triclinic)
+        cell.set_shape(CellShape.Triclinic)
         cell.set_angles(80, 89, 110)
         self.assertEqual(cell.angles(), (80.0, 89.0, 110.0))
 
@@ -33,17 +30,20 @@ class TestUnitCell(unittest.TestCase):
 
     def test_matrix(self):
         cell = UnitCell(3, 4, 5)
-        res = np.array([[2.0, 0.0, 0.0], [0.0, 3.0, 0.0], [0.0, 0.0, 4.0]])
-        self.assertEqual(cell.matrix().all(), res.all())
+        expected = [(3, 0, 0), (0, 4, 0), (0, 0, 5)]
+        matrix = cell.matrix()
+        for i in range(3):
+            for j in range(3):
+                self.assertAlmostEqual(matrix[i][j], expected[i][j])
 
-    def test_type(self):
+    def test_shape(self):
         cell = UnitCell(3, 4, 5)
-        self.assertEqual(cell.type(), CellType.Orthorhombic)
-        cell.set_type(CellType.Infinite)
-        self.assertEqual(cell.type(), CellType.Infinite)
+        self.assertEqual(cell.shape(), CellShape.Orthorhombic)
+        cell.set_shape(CellShape.Infinite)
+        self.assertEqual(cell.shape(), CellShape.Infinite)
 
         cell = UnitCell(3, 4, 5, 100, 120, 130)
-        self.assertEqual(cell.type(), CellType.Triclinic)
+        self.assertEqual(cell.shape(), CellShape.Triclinic)
 
 
 if __name__ == '__main__':

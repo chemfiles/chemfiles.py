@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
-from chemfiles import Atom, AtomType
+from chemfiles import Atom
 
 
 class TestAtom(unittest.TestCase):
@@ -12,7 +12,6 @@ class TestAtom(unittest.TestCase):
 
         a.set_name("Zn")
         self.assertEqual(a.name(), 'Zn')
-        self.assertEqual(a.full_name(), 'Zinc')
 
     def test_mass(self):
         a = Atom("He")
@@ -34,12 +33,6 @@ class TestAtom(unittest.TestCase):
     def test_atomic_number(self):
         a = Atom("He")
         self.assertEqual(a.atomic_number(), 2)
-
-    def test_type(self):
-        a = Atom("He")
-        self.assertEqual(a.type(), AtomType.Element)
-        a.set_type(AtomType.Dummy)
-        self.assertEqual(a.type(), AtomType.Dummy)
 
 
 if __name__ == '__main__':

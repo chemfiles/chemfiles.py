@@ -5,21 +5,19 @@ import numpy as np
 import os
 
 from chemfiles import Trajectory, Topology, Frame, UnitCell, Atom
-from chemfiles import ChemfilesException, logging
+from chemfiles import ChemfilesException
 
 DATA = os.path.join(os.path.dirname(__file__), "data")
 
 
 class TestTrajectory(unittest.TestCase):
     def test_errors(self):
-        logging.silent()
         self.assertRaises(
             ChemfilesException, Trajectory, os.path.join(DATA, "not-here.xyz")
         )
         self.assertRaises(
             ChemfilesException, Trajectory, os.path.join(DATA, "empty.unknown")
         )
-        logging.log_to_stderr()
 
     def test_read(self):
         trajectory = Trajectory(os.path.join(DATA, "water.xyz"))
@@ -104,7 +102,6 @@ class TestTrajectory(unittest.TestCase):
         with Trajectory("test-tmp.xyz", "w") as fd:
             fd.write(frame1)
             fd.write(frame2)
-            fd.sync()
 
         expected_content = "\n".join(["4",
                                       "Written by the chemfiles library",

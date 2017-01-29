@@ -18,29 +18,26 @@ Foreign function interface declaration for the Python interface to chemfiles
 '''
 from numpy.ctypeslib import ndpointer
 import numpy as np
-from ctypes import *
+from ctypes import c_int, c_uint64, c_int64, c_double, c_char, c_char_p, c_bool
+from ctypes import CFUNCTYPE, ARRAY, POINTER, Structure
 
 from .errors import _check_return_code
 
 
-class CHFL_LOG_LEVEL(c_int):
-    CHFL_LOG_ERROR = 0
-    CHFL_LOG_WARNING = 1
-    CHFL_LOG_INFO = 2
-    CHFL_LOG_DEBUG = 3
+class chfl_status(c_int):
+    CHFL_SUCCESS = 0
+    CHFL_MEMORY_ERROR = 1
+    CHFL_FILE_ERROR = 2
+    CHFL_FORMAT_ERROR = 3
+    CHFL_SELECTION_ERROR = 4
+    CHFL_GENERIC_ERROR = 5
+    CHFL_CXX_ERROR = 6
 
 
-class CHFL_CELL_TYPES(c_int):
+class chfl_cell_shape_t(c_int):
     CHFL_CELL_ORTHORHOMBIC = 0
     CHFL_CELL_TRICLINIC = 1
     CHFL_CELL_INFINITE = 2
-
-
-class CHFL_ATOM_TYPES(c_int):
-    CHFL_ATOM_ELEMENT = 0
-    CHFL_ATOM_COARSE_GRAINED = 1
-    CHFL_ATOM_DUMMY = 2
-    CHFL_ATOM_UNDEFINED = 3
 
 
 class CHFL_TRAJECTORY(Structure):
@@ -67,428 +64,498 @@ class CHFL_SELECTION(Structure):
     pass
 
 
+class CHFL_RESIDUE(Structure):
+    pass
+
+# Some hand-defined type. Make sure to edit the bindgen code to make this
+# correspond to the current chemfiles.h header
+chfl_vector_t = ARRAY(c_double, 3)
+
+chfl_warning_callback = CFUNCTYPE(None, c_char_p)
+
 class chfl_match_t(Structure):
     _fields_ = [
-        ('size', c_int8),
-        ('atoms', ARRAY(c_size_t, 4))
+        ('size', c_uint64),
+        ('atoms', ARRAY(c_uint64, 4))
     ]
 
-
-chfl_logging_callback_t = CFUNCTYPE(None, CHFL_LOG_LEVEL, c_char_p)
+# end of hand-defined types
 
 
 def set_interface(c_lib):
-    # Function "chfl_version", at chemfiles.h:81
+    # Function "chfl_version", at types.h:134
     c_lib.chfl_version.argtypes = []
     c_lib.chfl_version.restype = c_char_p
 
-    # Function "chfl_strerror", at chemfiles.h:89
-    c_lib.chfl_strerror.argtypes = [c_int]
-    c_lib.chfl_strerror.restype = c_char_p
-
-    # Function "chfl_last_error", at chemfiles.h:96
+    # Function "chfl_last_error", at errors.h:20
     c_lib.chfl_last_error.argtypes = []
     c_lib.chfl_last_error.restype = c_char_p
 
-    # Function "chfl_clear_errors", at chemfiles.h:102
+    # Function "chfl_clear_errors", at errors.h:27
     c_lib.chfl_clear_errors.argtypes = []
-    c_lib.chfl_clear_errors.restype = c_int
+    c_lib.chfl_clear_errors.restype = chfl_status
     c_lib.chfl_clear_errors.errcheck = _check_return_code
 
-    # Function "chfl_loglevel", at chemfiles.h:121
-    c_lib.chfl_loglevel.argtypes = [POINTER(c_int)]
-    c_lib.chfl_loglevel.restype = c_int
-    c_lib.chfl_loglevel.errcheck = _check_return_code
+    # Function "chfl_set_warning_callback", at errors.h:36
+    c_lib.chfl_set_warning_callback.argtypes = [chfl_warning_callback]
+    c_lib.chfl_set_warning_callback.restype = chfl_status
+    c_lib.chfl_set_warning_callback.errcheck = _check_return_code
 
-    # Function "chfl_set_loglevel", at chemfiles.h:128
-    c_lib.chfl_set_loglevel.argtypes = [c_int]
-    c_lib.chfl_set_loglevel.restype = c_int
-    c_lib.chfl_set_loglevel.errcheck = _check_return_code
-
-    # Function "chfl_logfile", at chemfiles.h:135
-    c_lib.chfl_logfile.argtypes = [c_char_p]
-    c_lib.chfl_logfile.restype = c_int
-    c_lib.chfl_logfile.errcheck = _check_return_code
-
-    # Function "chfl_log_stdout", at chemfiles.h:141
-    c_lib.chfl_log_stdout.argtypes = []
-    c_lib.chfl_log_stdout.restype = c_int
-    c_lib.chfl_log_stdout.errcheck = _check_return_code
-
-    # Function "chfl_log_stderr", at chemfiles.h:148
-    c_lib.chfl_log_stderr.argtypes = []
-    c_lib.chfl_log_stderr.restype = c_int
-    c_lib.chfl_log_stderr.errcheck = _check_return_code
-
-    # Function "chfl_log_silent", at chemfiles.h:154
-    c_lib.chfl_log_silent.argtypes = []
-    c_lib.chfl_log_silent.restype = c_int
-    c_lib.chfl_log_silent.errcheck = _check_return_code
-
-    # Function "chfl_log_callback", at chemfiles.h:165
-    c_lib.chfl_log_callback.argtypes = [chfl_logging_callback_t]
-    c_lib.chfl_log_callback.restype = c_int
-    c_lib.chfl_log_callback.errcheck = _check_return_code
-
-    # Function "chfl_trajectory_open", at chemfiles.h:174
-    c_lib.chfl_trajectory_open.argtypes = [c_char_p, c_char]
-    c_lib.chfl_trajectory_open.restype = POINTER(CHFL_TRAJECTORY)
-
-    # Function "chfl_trajectory_with_format", at chemfiles.h:188
-    c_lib.chfl_trajectory_with_format.argtypes = [c_char_p, c_char, c_char_p]
-    c_lib.chfl_trajectory_with_format.restype = POINTER(CHFL_TRAJECTORY)
-
-    # Function "chfl_trajectory_read", at chemfiles.h:198
-    c_lib.chfl_trajectory_read.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(CHFL_FRAME)]
-    c_lib.chfl_trajectory_read.restype = c_int
-    c_lib.chfl_trajectory_read.errcheck = _check_return_code
-
-    # Function "chfl_trajectory_read_step", at chemfiles.h:207
-    c_lib.chfl_trajectory_read_step.argtypes = [POINTER(CHFL_TRAJECTORY), c_size_t, POINTER(CHFL_FRAME)]
-    c_lib.chfl_trajectory_read_step.restype = c_int
-    c_lib.chfl_trajectory_read_step.errcheck = _check_return_code
-
-    # Function "chfl_trajectory_write", at chemfiles.h:217
-    c_lib.chfl_trajectory_write.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(CHFL_FRAME)]
-    c_lib.chfl_trajectory_write.restype = c_int
-    c_lib.chfl_trajectory_write.errcheck = _check_return_code
-
-    # Function "chfl_trajectory_set_topology", at chemfiles.h:228
-    c_lib.chfl_trajectory_set_topology.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(CHFL_TOPOLOGY)]
-    c_lib.chfl_trajectory_set_topology.restype = c_int
-    c_lib.chfl_trajectory_set_topology.errcheck = _check_return_code
-
-    # Function "chfl_trajectory_set_topology_file", at chemfiles.h:238
-    c_lib.chfl_trajectory_set_topology_file.argtypes = [POINTER(CHFL_TRAJECTORY), c_char_p]
-    c_lib.chfl_trajectory_set_topology_file.restype = c_int
-    c_lib.chfl_trajectory_set_topology_file.errcheck = _check_return_code
-
-    # Function "chfl_trajectory_set_topology_with_format", at chemfiles.h:256
-    c_lib.chfl_trajectory_set_topology_with_format.argtypes = [POINTER(CHFL_TRAJECTORY), c_char_p, c_char_p]
-    c_lib.chfl_trajectory_set_topology_with_format.restype = c_int
-    c_lib.chfl_trajectory_set_topology_with_format.errcheck = _check_return_code
-
-    # Function "chfl_trajectory_set_cell", at chemfiles.h:268
-    c_lib.chfl_trajectory_set_cell.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(CHFL_CELL)]
-    c_lib.chfl_trajectory_set_cell.restype = c_int
-    c_lib.chfl_trajectory_set_cell.errcheck = _check_return_code
-
-    # Function "chfl_trajectory_nsteps", at chemfiles.h:277
-    c_lib.chfl_trajectory_nsteps.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(c_size_t)]
-    c_lib.chfl_trajectory_nsteps.restype = c_int
-    c_lib.chfl_trajectory_nsteps.errcheck = _check_return_code
-
-    # Function "chfl_trajectory_sync", at chemfiles.h:284
-    c_lib.chfl_trajectory_sync.argtypes = [POINTER(CHFL_TRAJECTORY)]
-    c_lib.chfl_trajectory_sync.restype = c_int
-    c_lib.chfl_trajectory_sync.errcheck = _check_return_code
-
-    # Function "chfl_trajectory_close", at chemfiles.h:291
-    c_lib.chfl_trajectory_close.argtypes = [POINTER(CHFL_TRAJECTORY)]
-    c_lib.chfl_trajectory_close.restype = c_int
-    c_lib.chfl_trajectory_close.errcheck = _check_return_code
-
-    # Function "chfl_frame", at chemfiles.h:300
-    c_lib.chfl_frame.argtypes = [c_size_t]
-    c_lib.chfl_frame.restype = POINTER(CHFL_FRAME)
-
-    # Function "chfl_frame_atoms_count", at chemfiles.h:308
-    c_lib.chfl_frame_atoms_count.argtypes = [POINTER(CHFL_FRAME), POINTER(c_size_t)]
-    c_lib.chfl_frame_atoms_count.restype = c_int
-    c_lib.chfl_frame_atoms_count.errcheck = _check_return_code
-
-    # Function "chfl_frame_positions", at chemfiles.h:325
-    c_lib.chfl_frame_positions.argtypes = [POINTER(CHFL_FRAME), POINTER(POINTER(c_float)), POINTER(c_size_t)]
-    c_lib.chfl_frame_positions.restype = c_int
-    c_lib.chfl_frame_positions.errcheck = _check_return_code
-
-    # Function "chfl_frame_velocities", at chemfiles.h:346
-    c_lib.chfl_frame_velocities.argtypes = [POINTER(CHFL_FRAME), POINTER(POINTER(c_float)), POINTER(c_size_t)]
-    c_lib.chfl_frame_velocities.restype = c_int
-    c_lib.chfl_frame_velocities.errcheck = _check_return_code
-
-    # Function "chfl_frame_resize", at chemfiles.h:361
-    c_lib.chfl_frame_resize.argtypes = [POINTER(CHFL_FRAME), c_size_t]
-    c_lib.chfl_frame_resize.restype = c_int
-    c_lib.chfl_frame_resize.errcheck = _check_return_code
-
-    # Function "chfl_frame_add_velocities", at chemfiles.h:372
-    c_lib.chfl_frame_add_velocities.argtypes = [POINTER(CHFL_FRAME)]
-    c_lib.chfl_frame_add_velocities.restype = c_int
-    c_lib.chfl_frame_add_velocities.errcheck = _check_return_code
-
-    # Function "chfl_frame_has_velocities", at chemfiles.h:381
-    c_lib.chfl_frame_has_velocities.argtypes = [POINTER(CHFL_FRAME), POINTER(c_bool)]
-    c_lib.chfl_frame_has_velocities.restype = c_int
-    c_lib.chfl_frame_has_velocities.errcheck = _check_return_code
-
-    # Function "chfl_frame_set_cell", at chemfiles.h:390
-    c_lib.chfl_frame_set_cell.argtypes = [POINTER(CHFL_FRAME), POINTER(CHFL_CELL)]
-    c_lib.chfl_frame_set_cell.restype = c_int
-    c_lib.chfl_frame_set_cell.errcheck = _check_return_code
-
-    # Function "chfl_frame_set_topology", at chemfiles.h:398
-    c_lib.chfl_frame_set_topology.argtypes = [POINTER(CHFL_FRAME), POINTER(CHFL_TOPOLOGY)]
-    c_lib.chfl_frame_set_topology.restype = c_int
-    c_lib.chfl_frame_set_topology.errcheck = _check_return_code
-
-    # Function "chfl_frame_step", at chemfiles.h:407
-    c_lib.chfl_frame_step.argtypes = [POINTER(CHFL_FRAME), POINTER(c_size_t)]
-    c_lib.chfl_frame_step.restype = c_int
-    c_lib.chfl_frame_step.errcheck = _check_return_code
-
-    # Function "chfl_frame_set_step", at chemfiles.h:415
-    c_lib.chfl_frame_set_step.argtypes = [POINTER(CHFL_FRAME), c_size_t]
-    c_lib.chfl_frame_set_step.restype = c_int
-    c_lib.chfl_frame_set_step.errcheck = _check_return_code
-
-    # Function "chfl_frame_guess_topology", at chemfiles.h:426
-    c_lib.chfl_frame_guess_topology.argtypes = [POINTER(CHFL_FRAME)]
-    c_lib.chfl_frame_guess_topology.restype = c_int
-    c_lib.chfl_frame_guess_topology.errcheck = _check_return_code
-
-    # Function "chfl_frame_free", at chemfiles.h:433
-    c_lib.chfl_frame_free.argtypes = [POINTER(CHFL_FRAME)]
-    c_lib.chfl_frame_free.restype = c_int
-    c_lib.chfl_frame_free.errcheck = _check_return_code
-
-    # Function "chfl_cell", at chemfiles.h:443
-    c_lib.chfl_cell.argtypes = [c_double, c_double, c_double]
-    c_lib.chfl_cell.restype = POINTER(CHFL_CELL)
-
-    # Function "chfl_cell_triclinic", at chemfiles.h:455
-    c_lib.chfl_cell_triclinic.argtypes = [c_double, c_double, c_double, c_double, c_double, c_double]
-    c_lib.chfl_cell_triclinic.restype = POINTER(CHFL_CELL)
-
-    # Function "chfl_cell_from_frame", at chemfiles.h:463
-    c_lib.chfl_cell_from_frame.argtypes = [POINTER(CHFL_FRAME)]
-    c_lib.chfl_cell_from_frame.restype = POINTER(CHFL_CELL)
-
-    # Function "chfl_cell_volume", at chemfiles.h:471
-    c_lib.chfl_cell_volume.argtypes = [POINTER(CHFL_CELL), POINTER(c_double)]
-    c_lib.chfl_cell_volume.restype = c_int
-    c_lib.chfl_cell_volume.errcheck = _check_return_code
-
-    # Function "chfl_cell_lengths", at chemfiles.h:482
-    c_lib.chfl_cell_lengths.argtypes = [POINTER(CHFL_CELL), POINTER(c_double), POINTER(c_double), POINTER(c_double)]
-    c_lib.chfl_cell_lengths.restype = c_int
-    c_lib.chfl_cell_lengths.errcheck = _check_return_code
-
-    # Function "chfl_cell_set_lengths", at chemfiles.h:493
-    c_lib.chfl_cell_set_lengths.argtypes = [POINTER(CHFL_CELL), c_double, c_double, c_double]
-    c_lib.chfl_cell_set_lengths.restype = c_int
-    c_lib.chfl_cell_set_lengths.errcheck = _check_return_code
-
-    # Function "chfl_cell_angles", at chemfiles.h:503
-    c_lib.chfl_cell_angles.argtypes = [POINTER(CHFL_CELL), POINTER(c_double), POINTER(c_double), POINTER(c_double)]
-    c_lib.chfl_cell_angles.restype = c_int
-    c_lib.chfl_cell_angles.errcheck = _check_return_code
-
-    # Function "chfl_cell_set_angles", at chemfiles.h:518
-    c_lib.chfl_cell_set_angles.argtypes = [POINTER(CHFL_CELL), c_double, c_double, c_double]
-    c_lib.chfl_cell_set_angles.restype = c_int
-    c_lib.chfl_cell_set_angles.errcheck = _check_return_code
-
-    # Function "chfl_cell_matrix", at chemfiles.h:526
-    c_lib.chfl_cell_matrix.argtypes = [POINTER(CHFL_CELL), ndpointer(np.float64, flags="C_CONTIGUOUS", ndim=2)]
-    c_lib.chfl_cell_matrix.restype = c_int
-    c_lib.chfl_cell_matrix.errcheck = _check_return_code
-
-    # Function "chfl_cell_type", at chemfiles.h:544
-    c_lib.chfl_cell_type.argtypes = [POINTER(CHFL_CELL), POINTER(c_int)]
-    c_lib.chfl_cell_type.restype = c_int
-    c_lib.chfl_cell_type.errcheck = _check_return_code
-
-    # Function "chfl_cell_set_type", at chemfiles.h:552
-    c_lib.chfl_cell_set_type.argtypes = [POINTER(CHFL_CELL), c_int]
-    c_lib.chfl_cell_set_type.restype = c_int
-    c_lib.chfl_cell_set_type.errcheck = _check_return_code
-
-    # Function "chfl_cell_free", at chemfiles.h:559
-    c_lib.chfl_cell_free.argtypes = [POINTER(CHFL_CELL)]
-    c_lib.chfl_cell_free.restype = c_int
-    c_lib.chfl_cell_free.errcheck = _check_return_code
-
-    # Function "chfl_topology", at chemfiles.h:567
-    c_lib.chfl_topology.argtypes = []
-    c_lib.chfl_topology.restype = POINTER(CHFL_TOPOLOGY)
-
-    # Function "chfl_topology_from_frame", at chemfiles.h:574
-    c_lib.chfl_topology_from_frame.argtypes = [POINTER(CHFL_FRAME)]
-    c_lib.chfl_topology_from_frame.restype = POINTER(CHFL_TOPOLOGY)
-
-    # Function "chfl_topology_atoms_count", at chemfiles.h:582
-    c_lib.chfl_topology_atoms_count.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(c_size_t)]
-    c_lib.chfl_topology_atoms_count.restype = c_int
-    c_lib.chfl_topology_atoms_count.errcheck = _check_return_code
-
-    # Function "chfl_topology_append", at chemfiles.h:591
-    c_lib.chfl_topology_append.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(CHFL_ATOM)]
-    c_lib.chfl_topology_append.restype = c_int
-    c_lib.chfl_topology_append.errcheck = _check_return_code
-
-    # Function "chfl_topology_remove", at chemfiles.h:601
-    c_lib.chfl_topology_remove.argtypes = [POINTER(CHFL_TOPOLOGY), c_size_t]
-    c_lib.chfl_topology_remove.restype = c_int
-    c_lib.chfl_topology_remove.errcheck = _check_return_code
-
-    # Function "chfl_topology_isbond", at chemfiles.h:611
-    c_lib.chfl_topology_isbond.argtypes = [POINTER(CHFL_TOPOLOGY), c_size_t, c_size_t, POINTER(c_bool)]
-    c_lib.chfl_topology_isbond.restype = c_int
-    c_lib.chfl_topology_isbond.errcheck = _check_return_code
-
-    # Function "chfl_topology_isangle", at chemfiles.h:625
-    c_lib.chfl_topology_isangle.argtypes = [POINTER(CHFL_TOPOLOGY), c_size_t, c_size_t, c_size_t, POINTER(c_bool)]
-    c_lib.chfl_topology_isangle.restype = c_int
-    c_lib.chfl_topology_isangle.errcheck = _check_return_code
-
-    # Function "chfl_topology_isdihedral", at chemfiles.h:638
-    c_lib.chfl_topology_isdihedral.argtypes = [POINTER(CHFL_TOPOLOGY), c_size_t, c_size_t, c_size_t, c_size_t, POINTER(c_bool)]
-    c_lib.chfl_topology_isdihedral.restype = c_int
-    c_lib.chfl_topology_isdihedral.errcheck = _check_return_code
-
-    # Function "chfl_topology_bonds_count", at chemfiles.h:651
-    c_lib.chfl_topology_bonds_count.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(c_size_t)]
-    c_lib.chfl_topology_bonds_count.restype = c_int
-    c_lib.chfl_topology_bonds_count.errcheck = _check_return_code
-
-    # Function "chfl_topology_angles_count", at chemfiles.h:660
-    c_lib.chfl_topology_angles_count.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(c_size_t)]
-    c_lib.chfl_topology_angles_count.restype = c_int
-    c_lib.chfl_topology_angles_count.errcheck = _check_return_code
-
-    # Function "chfl_topology_dihedrals_count", at chemfiles.h:669
-    c_lib.chfl_topology_dihedrals_count.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(c_size_t)]
-    c_lib.chfl_topology_dihedrals_count.restype = c_int
-    c_lib.chfl_topology_dihedrals_count.errcheck = _check_return_code
-
-    # Function "chfl_topology_bonds", at chemfiles.h:680
-    c_lib.chfl_topology_bonds.argtypes = [POINTER(CHFL_TOPOLOGY), ndpointer(np.uintp, flags="C_CONTIGUOUS", ndim=2), c_size_t]
-    c_lib.chfl_topology_bonds.restype = c_int
-    c_lib.chfl_topology_bonds.errcheck = _check_return_code
-
-    # Function "chfl_topology_angles", at chemfiles.h:692
-    c_lib.chfl_topology_angles.argtypes = [POINTER(CHFL_TOPOLOGY), ndpointer(np.uintp, flags="C_CONTIGUOUS", ndim=2), c_size_t]
-    c_lib.chfl_topology_angles.restype = c_int
-    c_lib.chfl_topology_angles.errcheck = _check_return_code
-
-    # Function "chfl_topology_dihedrals", at chemfiles.h:706
-    c_lib.chfl_topology_dihedrals.argtypes = [POINTER(CHFL_TOPOLOGY), ndpointer(np.uintp, flags="C_CONTIGUOUS", ndim=2), c_size_t]
-    c_lib.chfl_topology_dihedrals.restype = c_int
-    c_lib.chfl_topology_dihedrals.errcheck = _check_return_code
-
-    # Function "chfl_topology_add_bond", at chemfiles.h:718
-    c_lib.chfl_topology_add_bond.argtypes = [POINTER(CHFL_TOPOLOGY), c_size_t, c_size_t]
-    c_lib.chfl_topology_add_bond.restype = c_int
-    c_lib.chfl_topology_add_bond.errcheck = _check_return_code
-
-    # Function "chfl_topology_remove_bond", at chemfiles.h:728
-    c_lib.chfl_topology_remove_bond.argtypes = [POINTER(CHFL_TOPOLOGY), c_size_t, c_size_t]
-    c_lib.chfl_topology_remove_bond.restype = c_int
-    c_lib.chfl_topology_remove_bond.errcheck = _check_return_code
-
-    # Function "chfl_topology_free", at chemfiles.h:735
-    c_lib.chfl_topology_free.argtypes = [POINTER(CHFL_TOPOLOGY)]
-    c_lib.chfl_topology_free.restype = c_int
-    c_lib.chfl_topology_free.errcheck = _check_return_code
-
-    # Function "chfl_atom", at chemfiles.h:744
+    # Function "chfl_atom", at atom.h:24
     c_lib.chfl_atom.argtypes = [c_char_p]
     c_lib.chfl_atom.restype = POINTER(CHFL_ATOM)
 
-    # Function "chfl_atom_from_frame", at chemfiles.h:752
-    c_lib.chfl_atom_from_frame.argtypes = [POINTER(CHFL_FRAME), c_size_t]
+    # Function "chfl_atom_copy", at atom.h:34
+    c_lib.chfl_atom_copy.argtypes = [POINTER(CHFL_ATOM)]
+    c_lib.chfl_atom_copy.restype = POINTER(CHFL_ATOM)
+
+    # Function "chfl_atom_from_frame", at atom.h:44
+    c_lib.chfl_atom_from_frame.argtypes = [POINTER(CHFL_FRAME), c_uint64]
     c_lib.chfl_atom_from_frame.restype = POINTER(CHFL_ATOM)
 
-    # Function "chfl_atom_from_topology", at chemfiles.h:761
-    c_lib.chfl_atom_from_topology.argtypes = [POINTER(CHFL_TOPOLOGY), c_size_t]
+    # Function "chfl_atom_from_topology", at atom.h:56
+    c_lib.chfl_atom_from_topology.argtypes = [POINTER(CHFL_TOPOLOGY), c_uint64]
     c_lib.chfl_atom_from_topology.restype = POINTER(CHFL_ATOM)
 
-    # Function "chfl_atom_mass", at chemfiles.h:770
-    c_lib.chfl_atom_mass.argtypes = [POINTER(CHFL_ATOM), POINTER(c_float)]
-    c_lib.chfl_atom_mass.restype = c_int
+    # Function "chfl_atom_mass", at atom.h:67
+    c_lib.chfl_atom_mass.argtypes = [POINTER(CHFL_ATOM), POINTER(c_double)]
+    c_lib.chfl_atom_mass.restype = chfl_status
     c_lib.chfl_atom_mass.errcheck = _check_return_code
 
-    # Function "chfl_atom_set_mass", at chemfiles.h:778
-    c_lib.chfl_atom_set_mass.argtypes = [POINTER(CHFL_ATOM), c_float]
-    c_lib.chfl_atom_set_mass.restype = c_int
+    # Function "chfl_atom_set_mass", at atom.h:78
+    c_lib.chfl_atom_set_mass.argtypes = [POINTER(CHFL_ATOM), c_double]
+    c_lib.chfl_atom_set_mass.restype = chfl_status
     c_lib.chfl_atom_set_mass.errcheck = _check_return_code
 
-    # Function "chfl_atom_charge", at chemfiles.h:786
-    c_lib.chfl_atom_charge.argtypes = [POINTER(CHFL_ATOM), POINTER(c_float)]
-    c_lib.chfl_atom_charge.restype = c_int
+    # Function "chfl_atom_charge", at atom.h:89
+    c_lib.chfl_atom_charge.argtypes = [POINTER(CHFL_ATOM), POINTER(c_double)]
+    c_lib.chfl_atom_charge.restype = chfl_status
     c_lib.chfl_atom_charge.errcheck = _check_return_code
 
-    # Function "chfl_atom_set_charge", at chemfiles.h:794
-    c_lib.chfl_atom_set_charge.argtypes = [POINTER(CHFL_ATOM), c_float]
-    c_lib.chfl_atom_set_charge.restype = c_int
+    # Function "chfl_atom_set_charge", at atom.h:100
+    c_lib.chfl_atom_set_charge.argtypes = [POINTER(CHFL_ATOM), c_double]
+    c_lib.chfl_atom_set_charge.restype = chfl_status
     c_lib.chfl_atom_set_charge.errcheck = _check_return_code
 
-    # Function "chfl_atom_name", at chemfiles.h:804
-    c_lib.chfl_atom_name.argtypes = [POINTER(CHFL_ATOM), c_char_p, c_size_t]
-    c_lib.chfl_atom_name.restype = c_int
-    c_lib.chfl_atom_name.errcheck = _check_return_code
-
-    # Function "chfl_atom_set_name", at chemfiles.h:812
-    c_lib.chfl_atom_set_name.argtypes = [POINTER(CHFL_ATOM), c_char_p]
-    c_lib.chfl_atom_set_name.restype = c_int
-    c_lib.chfl_atom_set_name.errcheck = _check_return_code
-
-    # Function "chfl_atom_full_name", at chemfiles.h:822
-    c_lib.chfl_atom_full_name.argtypes = [POINTER(CHFL_ATOM), c_char_p, c_size_t]
-    c_lib.chfl_atom_full_name.restype = c_int
-    c_lib.chfl_atom_full_name.errcheck = _check_return_code
-
-    # Function "chfl_atom_vdw_radius", at chemfiles.h:831
-    c_lib.chfl_atom_vdw_radius.argtypes = [POINTER(CHFL_ATOM), POINTER(c_double)]
-    c_lib.chfl_atom_vdw_radius.restype = c_int
-    c_lib.chfl_atom_vdw_radius.errcheck = _check_return_code
-
-    # Function "chfl_atom_covalent_radius", at chemfiles.h:840
-    c_lib.chfl_atom_covalent_radius.argtypes = [POINTER(CHFL_ATOM), POINTER(c_double)]
-    c_lib.chfl_atom_covalent_radius.restype = c_int
-    c_lib.chfl_atom_covalent_radius.errcheck = _check_return_code
-
-    # Function "chfl_atom_atomic_number", at chemfiles.h:849
-    c_lib.chfl_atom_atomic_number.argtypes = [POINTER(CHFL_ATOM), POINTER(c_int)]
-    c_lib.chfl_atom_atomic_number.restype = c_int
-    c_lib.chfl_atom_atomic_number.errcheck = _check_return_code
-
-    # Function "chfl_atom_type", at chemfiles.h:870
-    c_lib.chfl_atom_type.argtypes = [POINTER(CHFL_ATOM), POINTER(c_int)]
-    c_lib.chfl_atom_type.restype = c_int
+    # Function "chfl_atom_type", at atom.h:110
+    c_lib.chfl_atom_type.argtypes = [POINTER(CHFL_ATOM), c_char_p, c_uint64]
+    c_lib.chfl_atom_type.restype = chfl_status
     c_lib.chfl_atom_type.errcheck = _check_return_code
 
-    # Function "chfl_atom_set_type", at chemfiles.h:878
-    c_lib.chfl_atom_set_type.argtypes = [POINTER(CHFL_ATOM), c_int]
-    c_lib.chfl_atom_set_type.restype = c_int
+    # Function "chfl_atom_set_type", at atom.h:121
+    c_lib.chfl_atom_set_type.argtypes = [POINTER(CHFL_ATOM), c_char_p]
+    c_lib.chfl_atom_set_type.restype = chfl_status
     c_lib.chfl_atom_set_type.errcheck = _check_return_code
 
-    # Function "chfl_atom_free", at chemfiles.h:885
+    # Function "chfl_atom_name", at atom.h:133
+    c_lib.chfl_atom_name.argtypes = [POINTER(CHFL_ATOM), c_char_p, c_uint64]
+    c_lib.chfl_atom_name.restype = chfl_status
+    c_lib.chfl_atom_name.errcheck = _check_return_code
+
+    # Function "chfl_atom_set_name", at atom.h:144
+    c_lib.chfl_atom_set_name.argtypes = [POINTER(CHFL_ATOM), c_char_p]
+    c_lib.chfl_atom_set_name.restype = chfl_status
+    c_lib.chfl_atom_set_name.errcheck = _check_return_code
+
+    # Function "chfl_atom_full_name", at atom.h:156
+    c_lib.chfl_atom_full_name.argtypes = [POINTER(CHFL_ATOM), c_char_p, c_uint64]
+    c_lib.chfl_atom_full_name.restype = chfl_status
+    c_lib.chfl_atom_full_name.errcheck = _check_return_code
+
+    # Function "chfl_atom_vdw_radius", at atom.h:168
+    c_lib.chfl_atom_vdw_radius.argtypes = [POINTER(CHFL_ATOM), POINTER(c_double)]
+    c_lib.chfl_atom_vdw_radius.restype = chfl_status
+    c_lib.chfl_atom_vdw_radius.errcheck = _check_return_code
+
+    # Function "chfl_atom_covalent_radius", at atom.h:180
+    c_lib.chfl_atom_covalent_radius.argtypes = [POINTER(CHFL_ATOM), POINTER(c_double)]
+    c_lib.chfl_atom_covalent_radius.restype = chfl_status
+    c_lib.chfl_atom_covalent_radius.errcheck = _check_return_code
+
+    # Function "chfl_atom_atomic_number", at atom.h:192
+    c_lib.chfl_atom_atomic_number.argtypes = [POINTER(CHFL_ATOM), POINTER(c_int64)]
+    c_lib.chfl_atom_atomic_number.restype = chfl_status
+    c_lib.chfl_atom_atomic_number.errcheck = _check_return_code
+
+    # Function "chfl_atom_free", at atom.h:200
     c_lib.chfl_atom_free.argtypes = [POINTER(CHFL_ATOM)]
-    c_lib.chfl_atom_free.restype = c_int
+    c_lib.chfl_atom_free.restype = chfl_status
     c_lib.chfl_atom_free.errcheck = _check_return_code
 
-    # Function "chfl_selection", at chemfiles.h:893
+    # Function "chfl_residue", at residue.h:23
+    c_lib.chfl_residue.argtypes = [c_char_p, c_uint64]
+    c_lib.chfl_residue.restype = POINTER(CHFL_RESIDUE)
+
+    # Function "chfl_residue_from_topology", at residue.h:36
+    c_lib.chfl_residue_from_topology.argtypes = [POINTER(CHFL_TOPOLOGY), c_uint64]
+    c_lib.chfl_residue_from_topology.restype = POINTER(CHFL_RESIDUE)
+
+    # Function "chfl_residue_for_atom", at residue.h:49
+    c_lib.chfl_residue_for_atom.argtypes = [POINTER(CHFL_TOPOLOGY), c_uint64]
+    c_lib.chfl_residue_for_atom.restype = POINTER(CHFL_RESIDUE)
+
+    # Function "chfl_residue_copy", at residue.h:61
+    c_lib.chfl_residue_copy.argtypes = [POINTER(CHFL_RESIDUE)]
+    c_lib.chfl_residue_copy.restype = POINTER(CHFL_RESIDUE)
+
+    # Function "chfl_residue_atoms_count", at residue.h:68
+    c_lib.chfl_residue_atoms_count.argtypes = [POINTER(CHFL_RESIDUE), POINTER(c_uint64)]
+    c_lib.chfl_residue_atoms_count.restype = chfl_status
+    c_lib.chfl_residue_atoms_count.errcheck = _check_return_code
+
+    # Function "chfl_residue_id", at residue.h:78
+    c_lib.chfl_residue_id.argtypes = [POINTER(CHFL_RESIDUE), POINTER(c_uint64)]
+    c_lib.chfl_residue_id.restype = chfl_status
+    c_lib.chfl_residue_id.errcheck = _check_return_code
+
+    # Function "chfl_residue_name", at residue.h:90
+    c_lib.chfl_residue_name.argtypes = [POINTER(CHFL_RESIDUE), c_char_p, c_uint64]
+    c_lib.chfl_residue_name.restype = chfl_status
+    c_lib.chfl_residue_name.errcheck = _check_return_code
+
+    # Function "chfl_residue_add_atom", at residue.h:99
+    c_lib.chfl_residue_add_atom.argtypes = [POINTER(CHFL_RESIDUE), c_uint64]
+    c_lib.chfl_residue_add_atom.restype = chfl_status
+    c_lib.chfl_residue_add_atom.errcheck = _check_return_code
+
+    # Function "chfl_residue_contains", at residue.h:109
+    c_lib.chfl_residue_contains.argtypes = [POINTER(CHFL_RESIDUE), c_uint64, POINTER(c_bool)]
+    c_lib.chfl_residue_contains.restype = chfl_status
+    c_lib.chfl_residue_contains.errcheck = _check_return_code
+
+    # Function "chfl_residue_free", at residue.h:117
+    c_lib.chfl_residue_free.argtypes = [POINTER(CHFL_RESIDUE)]
+    c_lib.chfl_residue_free.restype = chfl_status
+    c_lib.chfl_residue_free.errcheck = _check_return_code
+
+    # Function "chfl_topology", at topology.h:21
+    c_lib.chfl_topology.argtypes = []
+    c_lib.chfl_topology.restype = POINTER(CHFL_TOPOLOGY)
+
+    # Function "chfl_topology_from_frame", at topology.h:28
+    c_lib.chfl_topology_from_frame.argtypes = [POINTER(CHFL_FRAME)]
+    c_lib.chfl_topology_from_frame.restype = POINTER(CHFL_TOPOLOGY)
+
+    # Function "chfl_topology_copy", at topology.h:40
+    c_lib.chfl_topology_copy.argtypes = [POINTER(CHFL_TOPOLOGY)]
+    c_lib.chfl_topology_copy.restype = POINTER(CHFL_TOPOLOGY)
+
+    # Function "chfl_topology_atoms_count", at topology.h:48
+    c_lib.chfl_topology_atoms_count.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(c_uint64)]
+    c_lib.chfl_topology_atoms_count.restype = chfl_status
+    c_lib.chfl_topology_atoms_count.errcheck = _check_return_code
+
+    # Function "chfl_topology_resize", at topology.h:59
+    c_lib.chfl_topology_resize.argtypes = [POINTER(CHFL_TOPOLOGY), c_uint64]
+    c_lib.chfl_topology_resize.restype = chfl_status
+    c_lib.chfl_topology_resize.errcheck = _check_return_code
+
+    # Function "chfl_topology_add_atom", at topology.h:68
+    c_lib.chfl_topology_add_atom.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(CHFL_ATOM)]
+    c_lib.chfl_topology_add_atom.restype = chfl_status
+    c_lib.chfl_topology_add_atom.errcheck = _check_return_code
+
+    # Function "chfl_topology_remove", at topology.h:79
+    c_lib.chfl_topology_remove.argtypes = [POINTER(CHFL_TOPOLOGY), c_uint64]
+    c_lib.chfl_topology_remove.restype = chfl_status
+    c_lib.chfl_topology_remove.errcheck = _check_return_code
+
+    # Function "chfl_topology_isbond", at topology.h:89
+    c_lib.chfl_topology_isbond.argtypes = [POINTER(CHFL_TOPOLOGY), c_uint64, c_uint64, POINTER(c_bool)]
+    c_lib.chfl_topology_isbond.restype = chfl_status
+    c_lib.chfl_topology_isbond.errcheck = _check_return_code
+
+    # Function "chfl_topology_isangle", at topology.h:99
+    c_lib.chfl_topology_isangle.argtypes = [POINTER(CHFL_TOPOLOGY), c_uint64, c_uint64, c_uint64, POINTER(c_bool)]
+    c_lib.chfl_topology_isangle.restype = chfl_status
+    c_lib.chfl_topology_isangle.errcheck = _check_return_code
+
+    # Function "chfl_topology_isdihedral", at topology.h:113
+    c_lib.chfl_topology_isdihedral.argtypes = [POINTER(CHFL_TOPOLOGY), c_uint64, c_uint64, c_uint64, c_uint64, POINTER(c_bool)]
+    c_lib.chfl_topology_isdihedral.restype = chfl_status
+    c_lib.chfl_topology_isdihedral.errcheck = _check_return_code
+
+    # Function "chfl_topology_bonds_count", at topology.h:127
+    c_lib.chfl_topology_bonds_count.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(c_uint64)]
+    c_lib.chfl_topology_bonds_count.restype = chfl_status
+    c_lib.chfl_topology_bonds_count.errcheck = _check_return_code
+
+    # Function "chfl_topology_angles_count", at topology.h:136
+    c_lib.chfl_topology_angles_count.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(c_uint64)]
+    c_lib.chfl_topology_angles_count.restype = chfl_status
+    c_lib.chfl_topology_angles_count.errcheck = _check_return_code
+
+    # Function "chfl_topology_dihedrals_count", at topology.h:145
+    c_lib.chfl_topology_dihedrals_count.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(c_uint64)]
+    c_lib.chfl_topology_dihedrals_count.restype = chfl_status
+    c_lib.chfl_topology_dihedrals_count.errcheck = _check_return_code
+
+    # Function "chfl_topology_bonds", at topology.h:158
+    c_lib.chfl_topology_bonds.argtypes = [POINTER(CHFL_TOPOLOGY), ndpointer(np.uint64, flags="C_CONTIGUOUS", ndim=2), c_uint64]
+    c_lib.chfl_topology_bonds.restype = chfl_status
+    c_lib.chfl_topology_bonds.errcheck = _check_return_code
+
+    # Function "chfl_topology_angles", at topology.h:171
+    c_lib.chfl_topology_angles.argtypes = [POINTER(CHFL_TOPOLOGY), ndpointer(np.uint64, flags="C_CONTIGUOUS", ndim=2), c_uint64]
+    c_lib.chfl_topology_angles.restype = chfl_status
+    c_lib.chfl_topology_angles.errcheck = _check_return_code
+
+    # Function "chfl_topology_dihedrals", at topology.h:184
+    c_lib.chfl_topology_dihedrals.argtypes = [POINTER(CHFL_TOPOLOGY), ndpointer(np.uint64, flags="C_CONTIGUOUS", ndim=2), c_uint64]
+    c_lib.chfl_topology_dihedrals.restype = chfl_status
+    c_lib.chfl_topology_dihedrals.errcheck = _check_return_code
+
+    # Function "chfl_topology_add_bond", at topology.h:193
+    c_lib.chfl_topology_add_bond.argtypes = [POINTER(CHFL_TOPOLOGY), c_uint64, c_uint64]
+    c_lib.chfl_topology_add_bond.restype = chfl_status
+    c_lib.chfl_topology_add_bond.errcheck = _check_return_code
+
+    # Function "chfl_topology_remove_bond", at topology.h:204
+    c_lib.chfl_topology_remove_bond.argtypes = [POINTER(CHFL_TOPOLOGY), c_uint64, c_uint64]
+    c_lib.chfl_topology_remove_bond.restype = chfl_status
+    c_lib.chfl_topology_remove_bond.errcheck = _check_return_code
+
+    # Function "chfl_topology_residues_count", at topology.h:214
+    c_lib.chfl_topology_residues_count.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(c_uint64)]
+    c_lib.chfl_topology_residues_count.restype = chfl_status
+    c_lib.chfl_topology_residues_count.errcheck = _check_return_code
+
+    # Function "chfl_topology_add_residue", at topology.h:226
+    c_lib.chfl_topology_add_residue.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(CHFL_RESIDUE)]
+    c_lib.chfl_topology_add_residue.restype = chfl_status
+    c_lib.chfl_topology_add_residue.errcheck = _check_return_code
+
+    # Function "chfl_topology_residues_linked", at topology.h:237
+    c_lib.chfl_topology_residues_linked.argtypes = [POINTER(CHFL_TOPOLOGY), POINTER(CHFL_RESIDUE), POINTER(CHFL_RESIDUE), POINTER(c_bool)]
+    c_lib.chfl_topology_residues_linked.restype = chfl_status
+    c_lib.chfl_topology_residues_linked.errcheck = _check_return_code
+
+    # Function "chfl_topology_free", at topology.h:248
+    c_lib.chfl_topology_free.argtypes = [POINTER(CHFL_TOPOLOGY)]
+    c_lib.chfl_topology_free.restype = chfl_status
+    c_lib.chfl_topology_free.errcheck = _check_return_code
+
+    # Function "chfl_cell", at cell.h:34
+    c_lib.chfl_cell.argtypes = [chfl_vector_t]
+    c_lib.chfl_cell.restype = POINTER(CHFL_CELL)
+
+    # Function "chfl_cell_triclinic", at cell.h:48
+    c_lib.chfl_cell_triclinic.argtypes = [chfl_vector_t, chfl_vector_t]
+    c_lib.chfl_cell_triclinic.restype = POINTER(CHFL_CELL)
+
+    # Function "chfl_cell_from_frame", at cell.h:57
+    c_lib.chfl_cell_from_frame.argtypes = [POINTER(CHFL_FRAME)]
+    c_lib.chfl_cell_from_frame.restype = POINTER(CHFL_CELL)
+
+    # Function "chfl_cell_copy", at cell.h:67
+    c_lib.chfl_cell_copy.argtypes = [POINTER(CHFL_CELL)]
+    c_lib.chfl_cell_copy.restype = POINTER(CHFL_CELL)
+
+    # Function "chfl_cell_volume", at cell.h:74
+    c_lib.chfl_cell_volume.argtypes = [POINTER(CHFL_CELL), POINTER(c_double)]
+    c_lib.chfl_cell_volume.restype = chfl_status
+    c_lib.chfl_cell_volume.errcheck = _check_return_code
+
+    # Function "chfl_cell_lengths", at cell.h:83
+    c_lib.chfl_cell_lengths.argtypes = [POINTER(CHFL_CELL), chfl_vector_t]
+    c_lib.chfl_cell_lengths.restype = chfl_status
+    c_lib.chfl_cell_lengths.errcheck = _check_return_code
+
+    # Function "chfl_cell_set_lengths", at cell.h:94
+    c_lib.chfl_cell_set_lengths.argtypes = [POINTER(CHFL_CELL), chfl_vector_t]
+    c_lib.chfl_cell_set_lengths.restype = chfl_status
+    c_lib.chfl_cell_set_lengths.errcheck = _check_return_code
+
+    # Function "chfl_cell_angles", at cell.h:103
+    c_lib.chfl_cell_angles.argtypes = [POINTER(CHFL_CELL), chfl_vector_t]
+    c_lib.chfl_cell_angles.restype = chfl_status
+    c_lib.chfl_cell_angles.errcheck = _check_return_code
+
+    # Function "chfl_cell_set_angles", at cell.h:116
+    c_lib.chfl_cell_set_angles.argtypes = [POINTER(CHFL_CELL), chfl_vector_t]
+    c_lib.chfl_cell_set_angles.restype = chfl_status
+    c_lib.chfl_cell_set_angles.errcheck = _check_return_code
+
+    # Function "chfl_cell_matrix", at cell.h:134
+    c_lib.chfl_cell_matrix.argtypes = [POINTER(CHFL_CELL), ARRAY(chfl_vector_t, (3))]
+    c_lib.chfl_cell_matrix.restype = chfl_status
+    c_lib.chfl_cell_matrix.errcheck = _check_return_code
+
+    # Function "chfl_cell_shape", at cell.h:143
+    c_lib.chfl_cell_shape.argtypes = [POINTER(CHFL_CELL), POINTER(chfl_cell_shape_t)]
+    c_lib.chfl_cell_shape.restype = chfl_status
+    c_lib.chfl_cell_shape.errcheck = _check_return_code
+
+    # Function "chfl_cell_set_shape", at cell.h:152
+    c_lib.chfl_cell_set_shape.argtypes = [POINTER(CHFL_CELL), chfl_cell_shape_t]
+    c_lib.chfl_cell_set_shape.restype = chfl_status
+    c_lib.chfl_cell_set_shape.errcheck = _check_return_code
+
+    # Function "chfl_cell_free", at cell.h:160
+    c_lib.chfl_cell_free.argtypes = [POINTER(CHFL_CELL)]
+    c_lib.chfl_cell_free.restype = chfl_status
+    c_lib.chfl_cell_free.errcheck = _check_return_code
+
+    # Function "chfl_frame", at frame.h:24
+    c_lib.chfl_frame.argtypes = [c_uint64]
+    c_lib.chfl_frame.restype = POINTER(CHFL_FRAME)
+
+    # Function "chfl_frame_copy", at frame.h:34
+    c_lib.chfl_frame_copy.argtypes = [POINTER(CHFL_FRAME)]
+    c_lib.chfl_frame_copy.restype = POINTER(CHFL_FRAME)
+
+    # Function "chfl_frame_atoms_count", at frame.h:42
+    c_lib.chfl_frame_atoms_count.argtypes = [POINTER(CHFL_FRAME), POINTER(c_uint64)]
+    c_lib.chfl_frame_atoms_count.restype = chfl_status
+    c_lib.chfl_frame_atoms_count.errcheck = _check_return_code
+
+    # Function "chfl_frame_positions", at frame.h:60
+    c_lib.chfl_frame_positions.argtypes = [POINTER(CHFL_FRAME), POINTER(POINTER(chfl_vector_t)), POINTER(c_uint64)]
+    c_lib.chfl_frame_positions.restype = chfl_status
+    c_lib.chfl_frame_positions.errcheck = _check_return_code
+
+    # Function "chfl_frame_velocities", at frame.h:82
+    c_lib.chfl_frame_velocities.argtypes = [POINTER(CHFL_FRAME), POINTER(POINTER(chfl_vector_t)), POINTER(c_uint64)]
+    c_lib.chfl_frame_velocities.restype = chfl_status
+    c_lib.chfl_frame_velocities.errcheck = _check_return_code
+
+    # Function "chfl_frame_add_atom", at frame.h:94
+    c_lib.chfl_frame_add_atom.argtypes = [POINTER(CHFL_FRAME), POINTER(CHFL_ATOM), chfl_vector_t, chfl_vector_t]
+    c_lib.chfl_frame_add_atom.restype = chfl_status
+    c_lib.chfl_frame_add_atom.errcheck = _check_return_code
+
+    # Function "chfl_frame_remove", at frame.h:107
+    c_lib.chfl_frame_remove.argtypes = [POINTER(CHFL_FRAME), c_uint64]
+    c_lib.chfl_frame_remove.restype = chfl_status
+    c_lib.chfl_frame_remove.errcheck = _check_return_code
+
+    # Function "chfl_frame_resize", at frame.h:119
+    c_lib.chfl_frame_resize.argtypes = [POINTER(CHFL_FRAME), c_uint64]
+    c_lib.chfl_frame_resize.restype = chfl_status
+    c_lib.chfl_frame_resize.errcheck = _check_return_code
+
+    # Function "chfl_frame_add_velocities", at frame.h:131
+    c_lib.chfl_frame_add_velocities.argtypes = [POINTER(CHFL_FRAME)]
+    c_lib.chfl_frame_add_velocities.restype = chfl_status
+    c_lib.chfl_frame_add_velocities.errcheck = _check_return_code
+
+    # Function "chfl_frame_has_velocities", at frame.h:139
+    c_lib.chfl_frame_has_velocities.argtypes = [POINTER(CHFL_FRAME), POINTER(c_bool)]
+    c_lib.chfl_frame_has_velocities.restype = chfl_status
+    c_lib.chfl_frame_has_velocities.errcheck = _check_return_code
+
+    # Function "chfl_frame_set_cell", at frame.h:148
+    c_lib.chfl_frame_set_cell.argtypes = [POINTER(CHFL_FRAME), POINTER(CHFL_CELL)]
+    c_lib.chfl_frame_set_cell.restype = chfl_status
+    c_lib.chfl_frame_set_cell.errcheck = _check_return_code
+
+    # Function "chfl_frame_set_topology", at frame.h:160
+    c_lib.chfl_frame_set_topology.argtypes = [POINTER(CHFL_FRAME), POINTER(CHFL_TOPOLOGY)]
+    c_lib.chfl_frame_set_topology.restype = chfl_status
+    c_lib.chfl_frame_set_topology.errcheck = _check_return_code
+
+    # Function "chfl_frame_step", at frame.h:170
+    c_lib.chfl_frame_step.argtypes = [POINTER(CHFL_FRAME), POINTER(c_uint64)]
+    c_lib.chfl_frame_step.restype = chfl_status
+    c_lib.chfl_frame_step.errcheck = _check_return_code
+
+    # Function "chfl_frame_set_step", at frame.h:179
+    c_lib.chfl_frame_set_step.argtypes = [POINTER(CHFL_FRAME), c_uint64]
+    c_lib.chfl_frame_set_step.restype = chfl_status
+    c_lib.chfl_frame_set_step.errcheck = _check_return_code
+
+    # Function "chfl_frame_guess_topology", at frame.h:191
+    c_lib.chfl_frame_guess_topology.argtypes = [POINTER(CHFL_FRAME)]
+    c_lib.chfl_frame_guess_topology.restype = chfl_status
+    c_lib.chfl_frame_guess_topology.errcheck = _check_return_code
+
+    # Function "chfl_frame_free", at frame.h:197
+    c_lib.chfl_frame_free.argtypes = [POINTER(CHFL_FRAME)]
+    c_lib.chfl_frame_free.restype = chfl_status
+    c_lib.chfl_frame_free.errcheck = _check_return_code
+
+    # Function "chfl_trajectory_open", at trajectory.h:26
+    c_lib.chfl_trajectory_open.argtypes = [c_char_p, c_char]
+    c_lib.chfl_trajectory_open.restype = POINTER(CHFL_TRAJECTORY)
+
+    # Function "chfl_trajectory_with_format", at trajectory.h:42
+    c_lib.chfl_trajectory_with_format.argtypes = [c_char_p, c_char, c_char_p]
+    c_lib.chfl_trajectory_with_format.restype = POINTER(CHFL_TRAJECTORY)
+
+    # Function "chfl_trajectory_read", at trajectory.h:54
+    c_lib.chfl_trajectory_read.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(CHFL_FRAME)]
+    c_lib.chfl_trajectory_read.restype = chfl_status
+    c_lib.chfl_trajectory_read.errcheck = _check_return_code
+
+    # Function "chfl_trajectory_read_step", at trajectory.h:66
+    c_lib.chfl_trajectory_read_step.argtypes = [POINTER(CHFL_TRAJECTORY), c_uint64, POINTER(CHFL_FRAME)]
+    c_lib.chfl_trajectory_read_step.restype = chfl_status
+    c_lib.chfl_trajectory_read_step.errcheck = _check_return_code
+
+    # Function "chfl_trajectory_write", at trajectory.h:75
+    c_lib.chfl_trajectory_write.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(CHFL_FRAME)]
+    c_lib.chfl_trajectory_write.restype = chfl_status
+    c_lib.chfl_trajectory_write.errcheck = _check_return_code
+
+    # Function "chfl_trajectory_set_topology", at trajectory.h:86
+    c_lib.chfl_trajectory_set_topology.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(CHFL_TOPOLOGY)]
+    c_lib.chfl_trajectory_set_topology.restype = chfl_status
+    c_lib.chfl_trajectory_set_topology.errcheck = _check_return_code
+
+    # Function "chfl_trajectory_set_topology_file", at trajectory.h:96
+    c_lib.chfl_trajectory_set_topology_file.argtypes = [POINTER(CHFL_TRAJECTORY), c_char_p]
+    c_lib.chfl_trajectory_set_topology_file.restype = chfl_status
+    c_lib.chfl_trajectory_set_topology_file.errcheck = _check_return_code
+
+    # Function "chfl_trajectory_set_topology_with_format", at trajectory.h:111
+    c_lib.chfl_trajectory_set_topology_with_format.argtypes = [POINTER(CHFL_TRAJECTORY), c_char_p, c_char_p]
+    c_lib.chfl_trajectory_set_topology_with_format.restype = chfl_status
+    c_lib.chfl_trajectory_set_topology_with_format.errcheck = _check_return_code
+
+    # Function "chfl_trajectory_set_cell", at trajectory.h:121
+    c_lib.chfl_trajectory_set_cell.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(CHFL_CELL)]
+    c_lib.chfl_trajectory_set_cell.restype = chfl_status
+    c_lib.chfl_trajectory_set_cell.errcheck = _check_return_code
+
+    # Function "chfl_trajectory_nsteps", at trajectory.h:131
+    c_lib.chfl_trajectory_nsteps.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(c_uint64)]
+    c_lib.chfl_trajectory_nsteps.restype = chfl_status
+    c_lib.chfl_trajectory_nsteps.errcheck = _check_return_code
+
+    # Function "chfl_trajectory_close", at trajectory.h:142
+    c_lib.chfl_trajectory_close.argtypes = [POINTER(CHFL_TRAJECTORY)]
+    c_lib.chfl_trajectory_close.restype = chfl_status
+    c_lib.chfl_trajectory_close.errcheck = _check_return_code
+
+    # Function "chfl_selection", at selection.h:21
     c_lib.chfl_selection.argtypes = [c_char_p]
     c_lib.chfl_selection.restype = POINTER(CHFL_SELECTION)
 
-    # Function "chfl_selection_size", at chemfiles.h:907
-    c_lib.chfl_selection_size.argtypes = [POINTER(CHFL_SELECTION), POINTER(c_size_t)]
-    c_lib.chfl_selection_size.restype = c_int
+    # Function "chfl_selection_copy", at selection.h:34
+    c_lib.chfl_selection_copy.argtypes = [POINTER(CHFL_SELECTION)]
+    c_lib.chfl_selection_copy.restype = POINTER(CHFL_SELECTION)
+
+    # Function "chfl_selection_size", at selection.h:46
+    c_lib.chfl_selection_size.argtypes = [POINTER(CHFL_SELECTION), POINTER(c_uint64)]
+    c_lib.chfl_selection_size.restype = chfl_status
     c_lib.chfl_selection_size.errcheck = _check_return_code
 
-    # Function "chfl_selection_evalutate", at chemfiles.h:919
-    c_lib.chfl_selection_evalutate.argtypes = [POINTER(CHFL_SELECTION), POINTER(CHFL_FRAME), POINTER(c_size_t)]
-    c_lib.chfl_selection_evalutate.restype = c_int
+    # Function "chfl_selection_string", at selection.h:59
+    c_lib.chfl_selection_string.argtypes = [POINTER(CHFL_SELECTION), c_char_p, c_uint64]
+    c_lib.chfl_selection_string.restype = chfl_status
+    c_lib.chfl_selection_string.errcheck = _check_return_code
+
+    # Function "chfl_selection_evalutate", at selection.h:72
+    c_lib.chfl_selection_evalutate.argtypes = [POINTER(CHFL_SELECTION), POINTER(CHFL_FRAME), POINTER(c_uint64)]
+    c_lib.chfl_selection_evalutate.restype = chfl_status
     c_lib.chfl_selection_evalutate.errcheck = _check_return_code
 
-    # Function "chfl_selection_matches", at chemfiles.h:943
-    c_lib.chfl_selection_matches.argtypes = [POINTER(CHFL_SELECTION), ndpointer(chfl_match_t, flags="C_CONTIGUOUS", ndim=1), c_size_t]
-    c_lib.chfl_selection_matches.restype = c_int
+    # Function "chfl_selection_matches", at selection.h:98
+    c_lib.chfl_selection_matches.argtypes = [POINTER(CHFL_SELECTION), ndpointer(chfl_match_t, flags="C_CONTIGUOUS", ndim=1), c_uint64]
+    c_lib.chfl_selection_matches.restype = chfl_status
     c_lib.chfl_selection_matches.errcheck = _check_return_code
 
-    # Function "chfl_selection_free", at chemfiles.h:952
+    # Function "chfl_selection_free", at selection.h:106
     c_lib.chfl_selection_free.argtypes = [POINTER(CHFL_SELECTION)]
-    c_lib.chfl_selection_free.restype = c_int
+    c_lib.chfl_selection_free.restype = chfl_status
     c_lib.chfl_selection_free.errcheck = _check_return_code

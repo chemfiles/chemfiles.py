@@ -7,9 +7,9 @@ get_c_library = FindChemfilesLibrary()
 __version__ = get_c_library().chfl_version().decode("utf8")
 
 from .errors import ChemfilesException, ArgumentError
-from .atom import Atom, AtomType
+from .atom import Atom
 from .topology import Topology
-from .cell import UnitCell, CellType
+from .cell import UnitCell, CellShape
 from .frame import Frame
 from .trajectory import Trajectory
 from .selection import Selection

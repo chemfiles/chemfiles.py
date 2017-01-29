@@ -26,10 +26,10 @@ class TestFrame(unittest.TestCase):
         expected = np.array([[1.0, 2.0, 3.0],
                              [4.0, 5.0, 6.0],
                              [7.0, 8.0, 9.0],
-                             [10.0, 11.0, 12.0]], np.float32)
+                             [10.0, 11.0, 12.0]], np.float64)
         positions = frame.positions()
         np.copyto(positions, expected)
-        self.assertEqual(positions.all(), expected.all())
+        self.assertEqual(frame.positions().all(), expected.all())
 
         positions[3, 2] = 42
         self.assertEqual(frame.positions()[3, 2], 42)
@@ -44,10 +44,13 @@ class TestFrame(unittest.TestCase):
         expected = np.array([[1.0, 2.0, 3.0],
                              [4.0, 5.0, 6.0],
                              [7.0, 8.0, 9.0],
-                             [10.0, 11.0, 12.0]], np.float32)
+                             [10.0, 11.0, 12.0]], np.float64)
         velocities = frame.velocities()
         np.copyto(velocities, expected)
         self.assertEqual(frame.velocities().all(), expected.all())
+
+        velocities[3, 2] = 42
+        self.assertEqual(frame.velocities()[3, 2], 42)
 
     def test_cell(self):
         frame = Frame(0)
@@ -56,7 +59,7 @@ class TestFrame(unittest.TestCase):
         frame.set_cell(cell)
         self.assertEqual(frame.cell().lengths(), cell.lengths())
         self.assertEqual(frame.cell().angles(), cell.angles())
-        self.assertEqual(frame.cell().type(), cell.type())
+        self.assertEqual(frame.cell().shape(), cell.shape())
 
     def test_topology(self):
         frame = Frame(2)

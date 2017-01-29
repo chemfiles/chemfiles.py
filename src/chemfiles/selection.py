@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from ctypes import byref, c_size_t
+from ctypes import byref, c_uint64
 import numpy as np
 
 from chemfiles import get_c_library
@@ -42,7 +42,7 @@ class Selection(object):
         context, 3 for the 'three' and 'angles' contextes and 4 for the 'four'
         and 'dihedral' contextes.
         '''
-        res = c_size_t()
+        res = c_uint64()
         self.c_lib.chfl_selection_size(self._handle_, byref(res))
         return res.value
 
@@ -52,7 +52,7 @@ class Selection(object):
         return a list of matching atoms, either a a list of index or a list
         of tuples of indexes.
         '''
-        matching = c_size_t()
+        matching = c_uint64()
         self.c_lib.chfl_selection_evalutate(
             self._handle_, frame._handle_, byref(matching)
         )

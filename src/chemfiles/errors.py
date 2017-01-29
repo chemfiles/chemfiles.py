@@ -1,7 +1,5 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_int
-
 import chemfiles
 
 
@@ -22,23 +20,11 @@ class NullPointerError(ChemfilesException):
         super(NullPointerError, self).__init__(message)
 
 
-class CPPException(ChemfilesException):
-    '''Error in C++ runtime'''
-    CPP_STD_ERROR = 1
-    CHEMHARP_CPP_ERROR = 2
-    MEMORY_ERROR = 3
-    FILE_ERROR = 4
-    FORMAT_ERROR = 5
-
+class CxxException(ChemfilesException):
+    '''Error in the C++ runtime'''
     def __init__(self, status):
         self.status = status
-        if (status == CPPException.CPP_STD_ERROR or
-                status == CPPException.CHEMHARP_CPP_ERROR):
-            message = last_error()
-        else:
-            message = chemfiles.get_c_library().chfl_strerror(c_int(status))
-            message = message.decode("utf8")
-        super(CPPException, self).__init__(message)
+        super(CxxException, self).__init__(last_error())
 
 
 def last_error():
@@ -51,10 +37,10 @@ def clear_errors():
     return chemfiles.get_c_library().chfl_clear_errors()
 
 
-def _check_return_code(result, func, arguments):
+def _check_return_code(status, _function, _arguments):
     '''Check that the function call was OK, and raise an exception if needed'''
-    if result != 0:
-        raise CPPException(result)
+    if status.value != 0:
+        raise CxxException(status)
 
 
 def _check_handle(handle):

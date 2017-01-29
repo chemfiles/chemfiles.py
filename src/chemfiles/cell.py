@@ -1,15 +1,14 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import numpy as np
-from ctypes import c_double, c_int, byref
+from ctypes import c_double, byref, ARRAY
 from enum import IntEnum
 
 from chemfiles import get_c_library
-from chemfiles.ffi import CHFL_CELL_TYPES
+from chemfiles.ffi import chfl_cell_shape_t, chfl_vector_t
 from chemfiles.errors import _check_handle
 
 
-class CellType(IntEnum):
+class CellShape(IntEnum):
     '''
     Available cell types in Chemfiles:
 
@@ -19,9 +18,9 @@ class CellType(IntEnum):
       conditions
     '''
 
-    Orthorhombic = CHFL_CELL_TYPES.CHFL_CELL_ORTHORHOMBIC
-    Triclinic = CHFL_CELL_TYPES.CHFL_CELL_TRICLINIC
-    Infinite = CHFL_CELL_TYPES.CHFL_CELL_INFINITE
+    Orthorhombic = chfl_cell_shape_t.CHFL_CELL_ORTHORHOMBIC
+    Triclinic = chfl_cell_shape_t.CHFL_CELL_TRICLINIC
+    Infinite = chfl_cell_shape_t.CHFL_CELL_INFINITE
 
 
 class UnitCell(object):
@@ -49,14 +48,12 @@ class UnitCell(object):
         ``c``, and cell angles ``alpha``, ``beta`` and ``gamma``.
         '''
         self.c_lib = get_c_library()
+        lenghts = chfl_vector_t(a, b, c)
+        angles = chfl_vector_t(alpha, beta, gamma)
         if alpha == 90.0 and beta == 90.0 and gamma == 90.0:
-            a, b, c = c_double(a), c_double(b), c_double(c)
-            self._handle_ = self.c_lib.chfl_cell(a, b, c)
+            self._handle_ = self.c_lib.chfl_cell(lenghts)
         else:
-            self._handle_ = self.c_lib.chfl_cell_triclinic(
-                c_double(a), c_double(b), c_double(c),
-                c_double(alpha), c_double(beta), c_double(gamma)
-            )
+            self._handle_ = self.c_lib.chfl_cell_triclinic(lenghts, angles)
         _check_handle(self._handle_)
 
     def __del__(self):
@@ -65,25 +62,19 @@ class UnitCell(object):
 
     def lengths(self):
         '''Get the three lenghts of an :py:class:`UnitCell`, in Angstroms.'''
-        a, b, c = c_double(), c_double(), c_double()
-        self.c_lib.chfl_cell_lengths(
-            self._handle_, byref(a), byref(b), byref(c)
-        )
-        return a.value, b.value, c.value
+        lengths = chfl_vector_t(0, 0, 0)
+        self.c_lib.chfl_cell_lengths(self._handle_, lengths)
+        return lengths[0], lengths[1], lengths[2]
 
     def set_lengths(self, a, b, c):
         '''Set the three lenghts of an :py:class:`UnitCell`, in Angstroms.'''
-        self.c_lib.chfl_cell_set_lengths(
-            self._handle_, c_double(a), c_double(b), c_double(c)
-        )
+        self.c_lib.chfl_cell_set_lengths(self._handle_, chfl_vector_t(a, b, c))
 
     def angles(self):
         '''Get the three angles of an :py:class:`UnitCell`, in degrees.'''
-        alpha, beta, gamma = c_double(), c_double(), c_double()
-        self.c_lib.chfl_cell_angles(
-            self._handle_, byref(alpha), byref(beta), byref(gamma)
-        )
-        return alpha.value, beta.value, gamma.value
+        angles = chfl_vector_t(0, 0, 0)
+        self.c_lib.chfl_cell_angles(self._handle_, angles)
+        return angles[0], angles[1], angles[2]
 
     def set_angles(self, alpha, beta, gamma):
         '''
@@ -91,24 +82,28 @@ class UnitCell(object):
         only possible for ``CellType.Triclinic`` cells.
         '''
         self.c_lib.chfl_cell_set_angles(
-            self._handle_, c_double(alpha), c_double(beta), c_double(gamma)
+            self._handle_, chfl_vector_t(alpha, beta, gamma)
         )
 
     def matrix(self):
         '''Get the unit cell matricial representation.'''
-        res = np.zeros((3, 3), np.float64)
-        self.c_lib.chfl_cell_matrix(self._handle_, res)
-        return res
+        m = ARRAY(chfl_vector_t, 3)()
+        self.c_lib.chfl_cell_matrix(self._handle_, m)
+        return [
+            (m[0][0], m[0][1], m[0][2]),
+            (m[1][0], m[1][1], m[1][2]),
+            (m[2][0], m[2][1], m[2][2]),
+        ]
 
-    def type(self):
+    def shape(self):
         '''Get the type of the unit cell'''
-        res = CHFL_CELL_TYPES()
-        self.c_lib.chfl_cell_type(self._handle_, byref(res))
-        return CellType(res.value)
+        res = chfl_cell_shape_t()
+        self.c_lib.chfl_cell_shape(self._handle_, byref(res))
+        return CellShape(res.value)
 
-    def set_type(self, celltype):
+    def set_shape(self, shape):
         '''Set the type of the unit cell'''
-        self.c_lib.chfl_cell_set_type(self._handle_, c_int(celltype))
+        self.c_lib.chfl_cell_set_shape(self._handle_, chfl_cell_shape_t(shape))
 
     def volume(self):
         '''Get the volume of the unit cell'''

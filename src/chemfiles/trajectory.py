@@ -1,6 +1,6 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_size_t, byref
+from ctypes import c_uint64, byref
 
 from chemfiles import get_c_library
 from chemfiles.errors import _check_handle
@@ -51,7 +51,7 @@ class Trajectory(object):
         '''
         frame = Frame()
         self.c_lib.chfl_trajectory_read_step(
-            self._handle_, c_size_t(step), frame._handle_
+            self._handle_, c_uint64(step), frame._handle_
         )
         return frame
 
@@ -92,12 +92,6 @@ class Trajectory(object):
         Get the number of steps (the number of frames) in a
         :py:class:`Trajectory`.
         '''
-        res = c_size_t()
+        res = c_uint64()
         self.c_lib.chfl_trajectory_nsteps(self._handle_, byref(res))
         return res.value
-
-    def sync(self):
-        '''
-        Synchronize any buffered content to the hard drive.
-        '''
-        self.c_lib.chfl_trajectory_sync(self._handle_)

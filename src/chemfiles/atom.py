@@ -1,27 +1,9 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_float, c_double, c_int, byref, create_string_buffer
-from enum import IntEnum
+from ctypes import c_double, c_int64, byref, create_string_buffer
 
 from chemfiles import get_c_library
-from chemfiles.ffi import CHFL_ATOM_TYPES
 from chemfiles.errors import _check_handle
-
-
-class AtomType(IntEnum):
-    '''
-    Available types of atoms:
-
-    - ``AtomType.Element``: Element from the periodic table of elements
-    - ``AtomType.CorseGrain``: Corse-grained atom are composed of more than one
-        element: CH3 groups, amino-acids are corse-grained atoms.
-    - ``AtomType.Dummy``: Dummy site, with no physical reality
-    - ``AtomType.Undefined``: Undefined atom type
-    '''
-    Element = CHFL_ATOM_TYPES.CHFL_ATOM_ELEMENT
-    CoarseGrained = CHFL_ATOM_TYPES.CHFL_ATOM_COARSE_GRAINED
-    Dummy = CHFL_ATOM_TYPES.CHFL_ATOM_DUMMY
-    Undefined = CHFL_ATOM_TYPES.CHFL_ATOM_UNDEFINED
 
 
 class Atom(object):
@@ -42,19 +24,19 @@ class Atom(object):
 
     def mass(self):
         '''Get the :py:class:`Atom` mass, in atomic mass units'''
-        res = c_float()
+        res = c_double()
         self.c_lib.chfl_atom_mass(self._handle_, byref(res))
         return res.value
 
     def set_mass(self, mass):
         '''Set the :py:class:`Atom` mass, in atomic mass units'''
-        self.c_lib.chfl_atom_set_mass(self._handle_, c_float(mass))
+        self.c_lib.chfl_atom_set_mass(self._handle_, c_double(mass))
 
     def charge(self):
         '''
         Get the :py:class:`Atom` charge, in number of the electron charge *e*
         '''
-        res = c_float()
+        res = c_double()
         self.c_lib.chfl_atom_charge(self._handle_, byref(res))
         return res.value
 
@@ -62,7 +44,7 @@ class Atom(object):
         '''
         Set the :py:class:`Atom` charge, in number of the electron charge *e*
         '''
-        self.c_lib.chfl_atom_set_charge(self._handle_, c_float(charge))
+        self.c_lib.chfl_atom_set_charge(self._handle_, c_double(charge))
 
     def name(self):
         '''Get the :py:class:`Atom` name'''
@@ -107,16 +89,6 @@ class Atom(object):
         Try to get the atomic number of the :py:class:`Atom`. If the number can
         not be found, returns -1.
         '''
-        res = c_int()
+        res = c_int64()
         self.c_lib.chfl_atom_atomic_number(self._handle_, byref(res))
         return res.value
-
-    def type(self):
-        '''Get the type of the atom'''
-        res = CHFL_ATOM_TYPES()
-        self.c_lib.chfl_atom_type(self._handle_, byref(res))
-        return AtomType(res.value)
-
-    def set_type(self, atomtype):
-        '''Set the type of the atom'''
-        self.c_lib.chfl_atom_set_type(self._handle_, c_int(atomtype))

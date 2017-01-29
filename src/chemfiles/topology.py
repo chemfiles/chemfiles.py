@@ -1,6 +1,6 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_size_t, c_bool, byref
+from ctypes import c_uint64, c_bool, byref
 import numpy as np
 
 from chemfiles import get_c_library
@@ -32,7 +32,7 @@ class Topology(object):
         atom = Atom("")
         self.c_lib.chfl_atom_free(atom._handle_)
         atom._handle_ = self.c_lib.chfl_atom_from_topology(
-            self._handle_, c_size_t(index)
+            self._handle_, c_uint64(index)
         )
         try:
             _check_handle(atom._handle_)
@@ -42,7 +42,7 @@ class Topology(object):
 
     def natoms(self):
         '''Get the current number of atoms in the :py:class:`Topology`.'''
-        res = c_size_t()
+        res = c_uint64()
         self.c_lib.chfl_topology_atoms_count(self._handle_, res)
         return res.value
 
@@ -52,20 +52,20 @@ class Topology(object):
 
     def append(self, atom):
         '''Add an :py:class:`Atom` at the end of the :py:class:`Topology`'''
-        self.c_lib.chfl_topology_append(self._handle_, atom._handle_)
+        self.c_lib.chfl_topology_add_atom(self._handle_, atom._handle_)
 
     def remove(self, index):
         '''
         Remove an :py:class:`Atom` from the :py:class:`Topology` by index. This
         can modify all the other atoms indexes.
         '''
-        self.c_lib.chfl_topology_remove(self._handle_, c_size_t(index))
+        self.c_lib.chfl_topology_remove(self._handle_, c_uint64(index))
 
     def isbond(self, i, j):
         '''Tell if the atoms at indexes ``i`` and ``j`` are bonded together'''
         res = c_bool()
         self.c_lib.chfl_topology_isbond(
-            self._handle_, c_size_t(i), c_size_t(j), byref(res)
+            self._handle_, c_uint64(i), c_uint64(j), byref(res)
         )
         return res.value
 
@@ -75,7 +75,7 @@ class Topology(object):
         '''
         res = c_bool()
         self.c_lib.chfl_topology_isangle(
-            self._handle_, c_size_t(i), c_size_t(j), c_size_t(k), byref(res)
+            self._handle_, c_uint64(i), c_uint64(j), c_uint64(k), byref(res)
         )
         return res.value
 
@@ -87,26 +87,26 @@ class Topology(object):
         res = c_bool()
         self.c_lib.chfl_topology_isdihedral(
             self._handle_,
-            c_size_t(i), c_size_t(j), c_size_t(k), c_size_t(m),
+            c_uint64(i), c_uint64(j), c_uint64(k), c_uint64(m),
             byref(res)
         )
         return res.value
 
     def bonds_count(self):
         '''Get the number of bonds in the system'''
-        res = c_size_t()
+        res = c_uint64()
         self.c_lib.chfl_topology_bonds_count(self._handle_, byref(res))
         return res.value
 
     def angles_count(self):
         '''Get the number of angles in the system'''
-        res = c_size_t()
+        res = c_uint64()
         self.c_lib.chfl_topology_angles_count(self._handle_, byref(res))
         return res.value
 
     def dihedrals_count(self):
         '''Get the number of dihedral angles in the system'''
-        res = c_size_t()
+        res = c_uint64()
         self.c_lib.chfl_topology_dihedrals_count(self._handle_, byref(res))
         return res.value
 
@@ -114,14 +114,14 @@ class Topology(object):
         '''Get the list of bonds in the system'''
         nbonds = self.bonds_count()
         res = np.zeros((nbonds, 2), np.uintp)
-        self.c_lib.chfl_topology_bonds(self._handle_, res, c_size_t(nbonds))
+        self.c_lib.chfl_topology_bonds(self._handle_, res, c_uint64(nbonds))
         return res
 
     def angles(self):
         '''Get the list of angles in the system'''
         nangles = self.angles_count()
         res = np.zeros((nangles, 3), np.uintp)
-        self.c_lib.chfl_topology_angles(self._handle_, res, c_size_t(nangles))
+        self.c_lib.chfl_topology_angles(self._handle_, res, c_uint64(nangles))
         return res
 
     def dihedrals(self):
@@ -129,7 +129,7 @@ class Topology(object):
         ndihedrals = self.dihedrals_count()
         res = np.zeros((ndihedrals, 4), np.uintp)
         self.c_lib.chfl_topology_dihedrals(
-            self._handle_, res, c_size_t(ndihedrals)
+            self._handle_, res, c_uint64(ndihedrals)
         )
         return res
 
@@ -138,7 +138,7 @@ class Topology(object):
         Add a bond between the atoms at indexes ``i`` and ``j`` in the system
         '''
         self.c_lib.chfl_topology_add_bond(
-            self._handle_, c_size_t(i), c_size_t(j)
+            self._handle_, c_uint64(i), c_uint64(j)
         )
 
     def remove_bond(self, i, j):
@@ -147,5 +147,5 @@ class Topology(object):
         in the system
         '''
         self.c_lib.chfl_topology_remove_bond(
-            self._handle_, c_size_t(i), c_size_t(j)
+            self._handle_, c_uint64(i), c_uint64(j)
         )
