@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from ctypes import byref, c_uint64
+from ctypes import byref, c_uint64, create_string_buffer
 import numpy as np
 
 from chemfiles import get_c_library
@@ -52,6 +52,14 @@ class Selection(object):
         res = c_uint64()
         self.c_lib.chfl_selection_size(self._handle_, byref(res))
         return res.value
+
+    def string(self):
+        '''
+        Get the selection string used to create the :py:class:`Selection`
+        '''
+        res = create_string_buffer(10)
+        self.c_lib.chfl_selection_string(self._handle_, res, 10)
+        return res.value.decode("utf8")
 
     def evaluate(self, frame):
         '''

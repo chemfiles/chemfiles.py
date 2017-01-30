@@ -67,6 +67,19 @@ class Frame(object):
         '''Get the positions from the :py:class:`Frame`.'''
         self.c_lib.chfl_frame_resize(self._handle_, c_uint64(size))
 
+    def add_atom(self, atom, position, velocity=None):
+        '''Get the positions from the :py:class:`Frame`.'''
+        position = chfl_vector_t(position[0], position[1], position[2])
+        if velocity:
+            velocity = chfl_vector_t(velocity[0], velocity[1], velocity[2])
+        self.c_lib.chfl_frame_add_atom(
+            self._handle_, atom._handle_, position, velocity
+        )
+
+    def remove(self, i):
+        '''Remove the atom at index `i` in the :py:class:`Frame`.'''
+        self.c_lib.chfl_frame_remove(self._handle_, c_uint64(i))
+
     def positions(self):
         '''Get a view into the positions of the :py:class:`Frame`.'''
         natoms = c_uint64()

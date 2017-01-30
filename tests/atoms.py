@@ -26,6 +26,19 @@ class TestAtom(unittest.TestCase):
         atom.set_name("Zn")
         self.assertEqual(atom.name(), 'Zn')
 
+    def test_type(self):
+        atom = Atom("He")
+        self.assertEqual(atom.type(), 'He')
+        self.assertEqual(atom.full_name(), 'Helium')
+
+        atom.set_type("Zn")
+        self.assertEqual(atom.type(), 'Zn')
+        self.assertEqual(atom.full_name(), 'Zinc')
+
+        atom = Atom("He2", "H")
+        self.assertEqual(atom.name(), 'He2')
+        self.assertEqual(atom.type(), 'H')
+
     def test_mass(self):
         atom = Atom("He")
         self.assertAlmostEqual(atom.mass(), 4.002602, 6)

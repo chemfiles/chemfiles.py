@@ -10,34 +10,37 @@ from chemfiles import Topology, Atom
 class TestTopology(unittest.TestCase):
     def test_copy(self):
         topology = Topology()
-        topology.append(Atom("H"))
-        topology.append(Atom("O"))
-        topology.append(Atom("O"))
-        topology.append(Atom("H"))
+        topology.resize(4)
         cloned = copy.copy(topology)
 
         self.assertEqual(topology.natoms(), 4)
         self.assertEqual(cloned.natoms(), 4)
 
-        topology.append(Atom("H"))
-        topology.append(Atom("O"))
-        topology.append(Atom("O"))
-        topology.append(Atom("H"))
+        topology.resize(8)
         self.assertEqual(topology.natoms(), 8)
         self.assertEqual(cloned.natoms(), 4)
 
-    def test_topology(self):
+    def test_size(self):
         topology = Topology()
 
         self.assertEqual(topology.natoms(), 0)
         self.assertEqual(len(topology), 0)
 
-        topology.append(Atom("H"))
-        topology.append(Atom("O"))
-        topology.append(Atom("O"))
-        topology.append(Atom("H"))
+        topology.add_atom(Atom("H"))
+        topology.add_atom(Atom("O"))
+        topology.add_atom(Atom("O"))
+        topology.add_atom(Atom("H"))
 
         self.assertEqual(len(topology), 4)
+        topology.resize(8)
+        self.assertEqual(len(topology), 8)
+
+        topology.remove(3)
+        self.assertEqual(len(topology), 7)
+
+    def test_bonding(self):
+        topology = Topology()
+        topology.resize(4)
         self.assertEqual(topology.bonds_count(), 0)
         self.assertEqual(topology.angles_count(), 0)
         self.assertEqual(topology.dihedrals_count(), 0)
@@ -79,14 +82,9 @@ class TestTopology(unittest.TestCase):
         self.assertEqual(topology.angles_count(), 1)
         self.assertEqual(topology.dihedrals_count(), 0)
 
-        topology.remove(3)
-        self.assertEqual(len(topology), 3)
-
     def test_out_of_bounds(self):
         topology = Topology()
-        topology.append(Atom("H"))
-        topology.append(Atom("O"))
-        topology.append(Atom("H"))
+        topology.resize(4)
 
         topology.atom(2)
         self.assertRaises(IndexError, topology.atom, 6)

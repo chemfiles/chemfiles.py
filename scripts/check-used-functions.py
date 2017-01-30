@@ -5,6 +5,8 @@ effectivelly used in the chemfiles binding.
 """
 import os
 
+# Function not used by the Python API
+IGNORED = ["chfl_trajectory_set_topology_file", "chfl_trajectory_open"]
 ROOT = os.path.dirname(os.path.dirname(__file__))
 
 
@@ -15,7 +17,8 @@ def functions_list():
             line = line.strip()
             if line.startswith("# Function"):
                 name = line.split('"')[1]
-                functions.append(name)
+                if name not in IGNORED:
+                    functions.append(name)
     return functions
 
 

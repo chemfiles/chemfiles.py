@@ -57,7 +57,15 @@ class Topology(object):
         '''Get the current number of atoms in the :py:class:`Topology`.'''
         return self.natoms()
 
-    def append(self, atom):
+    def resize(self, natoms):
+        '''
+        Resize the :py:class:`Topology` to contain ``natoms`` atoms. If the new
+        number of atoms is bigger than the current number, new atoms will be
+        created with an empty name and type.
+        '''
+        self.c_lib.chfl_topology_resize(self._handle_, natoms)
+
+    def add_atom(self, atom):
         '''Add an :py:class:`Atom` at the end of the :py:class:`Topology`'''
         self.c_lib.chfl_topology_add_atom(self._handle_, atom._handle_)
 

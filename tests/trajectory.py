@@ -66,15 +66,14 @@ class TestTrajectory(unittest.TestCase):
         self.assertEqual(topology.angles_count(), 87)
 
         topology = Topology()
-        a = Atom("Cs")
         for i in range(297):
-            topology.append(a)
+            topology.add_atom(Atom("Cs"))
 
         trajectory.set_topology(topology)
         frame = trajectory.read_step(10)
         self.assertEqual(frame.atom(10).name(), "Cs")
 
-        trajectory.set_topology_file(os.path.join(DATA, "topology.xyz"))
+        trajectory.set_topology(os.path.join(DATA, "topology.xyz"), "XYZ")
         frame = trajectory.read()
         self.assertEqual(frame.atom(100).name(), "Rd")
 
@@ -83,7 +82,7 @@ class TestTrajectory(unittest.TestCase):
         topology = Topology()
         for i in range(4):
             positions[i] = [1, 2, 3]
-            topology.append(Atom("X"))
+            topology.add_atom(Atom("X"))
 
         frame1 = Frame(4)
         np.copyto(frame1.positions(), positions)
@@ -93,7 +92,7 @@ class TestTrajectory(unittest.TestCase):
         topology = Topology()
         for i in range(6):
             positions[i] = [4, 5, 6]
-            topology.append(Atom("X"))
+            topology.add_atom(Atom("X"))
 
         frame2 = Frame(6)
         np.copyto(frame2.positions(), positions)

@@ -8,16 +8,26 @@ from chemfiles.errors import _check_handle
 
 class Atom(object):
     '''
-    An :py:class:`Atom` is a particle in the current :py:class:`Frame`. It can
-    be used to store and retrieve informations about a particle, such as mass,
-    name, atomic number, *etc.*
+    An :py:class:`Atom` is a particle in the current :py:class:`Frame`. It
+    stores the following atomic properties:
+
+    - atom name;
+    - atom type;
+    - atom mass;
+    - atom charge.
+
+    The atom name is usually an unique identifier (``"H1"``, ``"C_a"``) while
+    the atom type will be shared between all particles of the same type:
+    ``"H"``, ``"Ow"``, ``"CH3"``.
     '''
 
-    def __init__(self, name):
+    def __init__(self, name, type=None):
         '''Create a new :py:class:`Atom` from a ``name``.'''
         self.c_lib = get_c_library()
         self._handle_ = self.c_lib.chfl_atom(name.encode("utf8"))
         _check_handle(self._handle_)
+        if type:
+            self.set_type(type)
 
     def __del__(self):
         self.c_lib.chfl_atom_free(self._handle_)
@@ -62,6 +72,16 @@ class Atom(object):
     def set_name(self, name):
         '''Set the :py:class:`Atom` name'''
         self.c_lib.chfl_atom_set_name(self._handle_, name.encode("utf8"))
+
+    def type(self):
+        '''Get the :py:class:`Atom` type'''
+        res = create_string_buffer(10)
+        self.c_lib.chfl_atom_type(self._handle_, res, 10)
+        return res.value.decode("utf8")
+
+    def set_type(self, type):
+        '''Set the :py:class:`Atom` type'''
+        self.c_lib.chfl_atom_set_type(self._handle_, type.encode("utf8"))
 
     def full_name(self):
         '''

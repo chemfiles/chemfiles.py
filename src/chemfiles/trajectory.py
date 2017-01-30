@@ -4,7 +4,7 @@ from ctypes import c_uint64, byref
 
 from chemfiles import get_c_library
 from chemfiles.errors import _check_handle
-from chemfiles.frame import Frame
+from chemfiles.frame import Frame, Topology
 
 
 class Trajectory(object):
@@ -13,14 +13,16 @@ class Trajectory(object):
     main entry point of Chemfiles.
     '''
 
-    def __init__(self, path, mode="r", fformat=""):
+    def __init__(self, path, mode="r", format=""):
         '''
         Open a trajectory file at ``path`` with mode ``mode``. Supported modes
-        are "r" for read (this is the default) or "w" for write.
+        are "r" for read (this is the default) or "w" for write. If ``format``
+        is not the empty string, use it instead of guessing the format from the
+        file extension.
         '''
         self.c_lib = get_c_library()
         self._handle_ = self.c_lib.chfl_trajectory_with_format(
-            path.encode("utf8"), mode.encode("utf8"), fformat.encode("utf8")
+            path.encode("utf8"), mode.encode("utf8"), format.encode("utf8")
         )
         _check_handle(self._handle_)
 
@@ -32,7 +34,7 @@ class Trajectory(object):
 
     def __exit__(self, *args):
         # The C pointer will be deleted by the call to __del__, so no need to
-        # call close ourselves.
+        # call chfl_trajectory_close ourselves.
         pass
 
     def read(self):
@@ -59,25 +61,29 @@ class Trajectory(object):
         '''Write a :py:class:`Frame` to the :py:class:`Trajectory`'''
         self.c_lib.chfl_trajectory_write(self._handle_, frame._handle_)
 
-    def set_topology(self, topology):
+    def set_topology(self, topology, format=""):
         '''
         Set the :py:class:`Topology` associated with a :py:class:`Trajectory`.
         This :py:class:`Topology` will be used when reading and writing the
         files, replacing any :py:class:`Topology` in the frames or files.
-        '''
-        self.c_lib.chfl_trajectory_set_topology(
-            self._handle_, topology._handle_
-        )
 
-    def set_topology_file(self, filename):
+        If ``topology`` is a :py:class:`Topology` instance, it is used
+        directly. If ``topology`` is a string, the first :py:class:`Frame` of
+        the corresponding file is read, and the topology of this frame is used.
+
+        When reading from a file, if ``format`` is not the empty string, the
+        code uses this file format instead of guessing it from the file
+        extension.
         '''
-        Set the :py:class:`Topology` associated with a :py:class:`Trajectory`
-        by reading the first :py:class:`Frame` of ``filename``; and extracting
-        the :py:class:`Topology` of this :py:class:`Frame`.
-        '''
-        self.c_lib.chfl_trajectory_set_topology_file(
-            self._handle_, filename.encode("utf8")
-        )
+
+        if isinstance(topology, Topology):
+            self.c_lib.chfl_trajectory_set_topology(
+                self._handle_, topology._handle_
+            )
+        else:
+            self.c_lib.chfl_trajectory_set_topology_with_format(
+                self._handle_, topology.encode("utf8"), format.encode("utf8")
+            )
 
     def set_cell(self, cell):
         '''

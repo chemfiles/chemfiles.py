@@ -32,6 +32,21 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(frame.natoms(), 4)
         self.assertEqual(len(frame), 4)
 
+        frame.remove(2)
+        self.assertEqual(frame.natoms(), 3)
+        self.assertEqual(len(frame), 3)
+
+    def test_add_atom(self):
+        frame = Frame()
+        frame.add_atom(Atom("F"), (3, 4, 5))
+        self.assertEqual(len(frame), 1)
+        self.assertEqual(list(frame.positions()[0]), [3, 4, 5])
+
+        frame.add_velocities()
+        frame.add_atom(Atom("F"), (-3, -4, 5), (1, 0, 1))
+        self.assertEqual(list(frame.positions()[1]), [-3, -4, 5])
+        self.assertEqual(list(frame.velocities()[1]), [1, 0, 1])
+
     def test_positions(self):
         frame = Frame(4)
 
@@ -77,8 +92,8 @@ class TestFrame(unittest.TestCase):
         frame = Frame(2)
         topology = Topology()
 
-        topology.append(Atom("Zn"))
-        topology.append(Atom("Ar"))
+        topology.add_atom(Atom("Zn"))
+        topology.add_atom(Atom("Ar"))
 
         frame.set_topology(topology)
 
