@@ -1,12 +1,24 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
+import copy
 
 from chemfiles import UnitCell, CellShape
 from chemfiles import ChemfilesException
 
 
 class TestUnitCell(unittest.TestCase):
+    def test_copy(self):
+        cell = UnitCell(3, 4, 5)
+        cloned = copy.copy(cell)
+
+        self.assertEqual(cell.lengths(), (3.0, 4.0, 5.0))
+        self.assertEqual(cloned.lengths(), (3.0, 4.0, 5.0))
+
+        cell.set_lengths(10, 11, 12)
+        self.assertEqual(cell.lengths(), (10.0, 11.0, 12.0))
+        self.assertEqual(cloned.lengths(), (3.0, 4.0, 5.0))
+
     def test_lengths(self):
         cell = UnitCell(3, 4, 5)
         self.assertEqual(cell.lengths(), (3.0, 4.0, 5.0))

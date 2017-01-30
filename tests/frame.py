@@ -1,12 +1,24 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
+import copy
 import numpy as np
 
 from chemfiles import Frame, UnitCell, Topology, Atom
 
 
 class TestFrame(unittest.TestCase):
+    def test_copy(self):
+        frame = Frame(3)
+        cloned = copy.copy(frame)
+
+        self.assertEqual(frame.natoms(), 3)
+        self.assertEqual(cloned.natoms(), 3)
+
+        frame.resize(6)
+        self.assertEqual(frame.natoms(), 6)
+        self.assertEqual(cloned.natoms(), 3)
+
     def test_natoms(self):
         frame = Frame()
         self.assertEqual(frame.natoms(), 0)

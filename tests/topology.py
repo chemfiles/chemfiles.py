@@ -1,25 +1,41 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
+import copy
 import numpy as np
 
 from chemfiles import Topology, Atom
 
 
 class TestTopology(unittest.TestCase):
+    def test_copy(self):
+        topology = Topology()
+        topology.append(Atom("H"))
+        topology.append(Atom("O"))
+        topology.append(Atom("O"))
+        topology.append(Atom("H"))
+        cloned = copy.copy(topology)
+
+        self.assertEqual(topology.natoms(), 4)
+        self.assertEqual(cloned.natoms(), 4)
+
+        topology.append(Atom("H"))
+        topology.append(Atom("O"))
+        topology.append(Atom("O"))
+        topology.append(Atom("H"))
+        self.assertEqual(topology.natoms(), 8)
+        self.assertEqual(cloned.natoms(), 4)
+
     def test_topology(self):
         topology = Topology()
 
         self.assertEqual(topology.natoms(), 0)
         self.assertEqual(len(topology), 0)
 
-        H = Atom("H")
-        O = Atom("O")
-
-        topology.append(H)
-        topology.append(O)
-        topology.append(O)
-        topology.append(H)
+        topology.append(Atom("H"))
+        topology.append(Atom("O"))
+        topology.append(Atom("O"))
+        topology.append(Atom("H"))
 
         self.assertEqual(len(topology), 4)
         self.assertEqual(topology.bonds_count(), 0)

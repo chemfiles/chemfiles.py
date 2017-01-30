@@ -30,6 +30,13 @@ class Frame(object):
     def __del__(self):
         self.c_lib.chfl_frame_free(self._handle_)
 
+    def __copy__(self):
+        frame = self.__new__(Frame)
+        frame.c_lib = get_c_library()
+        frame._handle_ = self.c_lib.chfl_frame_copy(self._handle_)
+        _check_handle(frame._handle_)
+        return frame
+
     def atom(self, index):
         '''
         Get a specific :py:class:`Atom` from a frame, given its `index` in the

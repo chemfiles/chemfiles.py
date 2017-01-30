@@ -27,6 +27,13 @@ class Topology(object):
     def __del__(self):
         self.c_lib.chfl_topology_free(self._handle_)
 
+    def __copy__(self):
+        topology = self.__new__(Topology)
+        topology.c_lib = get_c_library()
+        topology._handle_ = self.c_lib.chfl_topology_copy(self._handle_)
+        _check_handle(topology._handle_)
+        return topology
+
     def atom(self, index):
         '''Get the :py:class:`Atom` at ``index`` from a topology.'''
         atom = Atom("")

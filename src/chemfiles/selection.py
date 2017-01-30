@@ -33,6 +33,13 @@ class Selection(object):
     def __del__(self):
         self.c_lib.chfl_selection_free(self._handle_)
 
+    def __copy__(self):
+        selection = self.__new__(Selection)
+        selection.c_lib = get_c_library()
+        selection._handle_ = self.c_lib.chfl_selection_copy(self._handle_)
+        _check_handle(selection._handle_)
+        return selection
+
     def size(self):
         '''
         Get the size of the :py:class:`Selection`, i.e. the number of atoms we

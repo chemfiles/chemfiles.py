@@ -60,6 +60,13 @@ class UnitCell(object):
         c_lib = get_c_library()
         c_lib.chfl_cell_free(self._handle_)
 
+    def __copy__(self):
+        cell = self.__new__(UnitCell)
+        cell.c_lib = get_c_library()
+        cell._handle_ = self.c_lib.chfl_cell_copy(self._handle_)
+        _check_handle(cell._handle_)
+        return cell
+
     def lengths(self):
         '''Get the three lenghts of an :py:class:`UnitCell`, in Angstroms.'''
         lengths = chfl_vector_t(0, 0, 0)

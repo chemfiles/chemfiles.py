@@ -1,6 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
+import copy
 
 from chemfiles import Selection, Topology, Frame, Atom
 
@@ -23,6 +24,11 @@ def testing_frame():
 
 
 class TestSelection(unittest.TestCase):
+    def test_copy(self):
+        # Just checking that we can call copy.copy on a selction
+        selection = Selection("name H")
+        copy.copy(selection)
+
     def test_size(self):
         self.assertEqual(Selection("name H").size(), 1)
         self.assertEqual(Selection("pairs: all").size(), 2)

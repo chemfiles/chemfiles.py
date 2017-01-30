@@ -22,6 +22,13 @@ class Atom(object):
     def __del__(self):
         self.c_lib.chfl_atom_free(self._handle_)
 
+    def __copy__(self):
+        atom = self.__new__(Atom)
+        atom.c_lib = get_c_library()
+        atom._handle_ = self.c_lib.chfl_atom_copy(self._handle_)
+        _check_handle(atom._handle_)
+        return atom
+
     def mass(self):
         '''Get the :py:class:`Atom` mass, in atomic mass units'''
         res = c_double()
