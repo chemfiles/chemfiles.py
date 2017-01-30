@@ -55,6 +55,13 @@ add_custom_command(
     DEPENDS ${PYTHON_SRC}
     COMMENT "Running python setup.py build"
 )
+
+set(ADDITIONAL_CLEANUP "${CMAKE_CURRENT_BINARY_DIR}/build/")
+if(NOT "${CMAKE_CURRENT_BINARY_DIR}" STREQUAL "${CMAKE_CURRENT_SOURCE_DIR}")
+    set(ADDITIONAL_CLEANUP "${ADDITIONAL_CLEANUP};${CMAKE_CURRENT_BINARY_DIR}/src/")
+endif()
+set_property(DIRECTORY PROPERTY ADDITIONAL_MAKE_CLEAN_FILES ${ADDITIONAL_CLEANUP})
+
 add_custom_target(chemfiles.py ALL DEPENDS ${SETUP_PY_BUILD_OUTPUT})
 add_dependencies(chemfiles.py chemfiles)
 
