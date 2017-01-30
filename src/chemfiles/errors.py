@@ -1,6 +1,12 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
+import warnings
 import chemfiles
+
+
+class ChemfilesWarning(UserWarning):
+    '''Warnigns coming from the Chemfiles C++ runtime'''
+    pass
 
 
 class ChemfilesException(BaseException):
@@ -49,3 +55,33 @@ def _check_handle(handle):
         handle.contents
     except ValueError:
         raise NullPointerError()
+
+
+# Store a reference to the last logging callback, to preven Python from
+# garbage-collecting it.
+_CURRENT_CALLBACK = None
+
+
+def set_warnings_callback(function):
+    '''
+    Call `function` on every warning event. The callback should take a string
+    message and return nothing.
+    '''
+    from chemfiles.ffi import chfl_warning_callback
+    from chemfiles import get_c_library
+
+    def callback(message):
+        function(message.decode("utf8"))
+
+    global _CURRENT_CALLBACK
+    _CURRENT_CALLBACK = chfl_warning_callback(callback)
+
+    get_c_library().chfl_set_warning_callback(_CURRENT_CALLBACK)
+
+
+def _set_default_warning_callback():
+    set_warnings_callback(
+        # We need to set stacklevel=4 to get through the lambda =>
+        # adapatator => C++ code => Python binding => user code
+        lambda message: warnings.warn(message, ChemfilesWarning, stacklevel=4)
+    )
