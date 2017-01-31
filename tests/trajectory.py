@@ -83,6 +83,11 @@ class TestTrajectory(unittest.TestCase):
                 # Checking iterator protocol
                 pass
 
+    def test_close(self):
+        trajectory = Trajectory(os.path.join(DATA, "water.xyz"))
+        trajectory.close()
+        self.assertRaises(ChemfilesException, trajectory.read)
+
     def test_write(self):
         positions = np.zeros((4, 3), np.float32)
         topology = Topology()
