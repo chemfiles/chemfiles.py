@@ -1,11 +1,14 @@
 cmake_minimum_required(VERSION 2.8.11)
 project(chemfiles.py)
 
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
+
 # We need to read the location of chemfiles library for tests
 # FIXME: maybe there is an other way to do this
 cmake_policy(SET CMP0026 OLD)
 
 option(CHFL_PY_CODE_COVERAGE "Enable python code coverage" OFF)
+option(CHFL_PY_BUILD_DOCUMENTATION "Build the python documentation" OFF)
 
 # TODO: add option to use external chemfiles
 
@@ -71,3 +74,7 @@ install(CODE "execute_process(COMMAND ${PYTHON_EXECUTABLE} ${SETUP_PY} install -
 
 enable_testing()
 add_subdirectory(tests)
+
+if(${CHFL_PY_BUILD_DOCUMENTATION})
+    add_subdirectory(doc)
+endif()

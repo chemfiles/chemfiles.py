@@ -6,14 +6,14 @@ if [[ "$TRAVIS_BRANCH" != "master" && "$TRAVIS_TAG" == "" ]]; then
 fi
 
 # Install doc dependencies
-cd $TRAVIS_BUILD_DIR
+cd $TRAVIS_BUILD_DIR/build
 pip install sphinx
 pip install -r doc/requirements.txt
 
 # Build documentation
-cd doc
-make html
-rm -rf _build/html/_static/bootswatch-* _build/html/_static/bootstrap-2.3.2
+cmake -DCHFL_PY_BUILD_DOCUMENTATION=ON .
+make python_doc_html
+rm -rf doc/html/_static/bootswatch-* doc/html/_static/bootstrap-2.3.2
 
 cd ../gh-pages
 git checkout gh-pages
@@ -21,9 +21,9 @@ git checkout gh-pages
 # Copy the right directory
 if [[ "$TRAVIS_BRANCH == master" ]]; then
     rm -rf latest
-    mv ../doc/_build/html/ latest
+    mv ../doc/doc/html/ latest
 elif [[ "$TRAVIS_TAG" != "" ]]; then
-    mv ../doc/_build/html/ $TRAVIS_TAG
+    mv ../doc/doc/html/ $TRAVIS_TAG
 else
     echo "We should have exited earlier"
     exit 1

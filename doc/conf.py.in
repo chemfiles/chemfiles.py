@@ -4,7 +4,7 @@ import os
 import sphinx_bootstrap_theme
 
 DOC_ROOT = os.path.abspath(os.path.dirname(__file__))
-sys.path.append(os.path.join(DOC_ROOT, ".."))
+sys.path.append("${PROJECT_BINARY_DIR}/src/")
 
 # -- General configuration ------------------------------------------------
 
@@ -54,4 +54,4 @@ html_theme = 'bootstrap'
 html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'chemfiles'
+htmlhelp_basename = 'chemfiles.py'
