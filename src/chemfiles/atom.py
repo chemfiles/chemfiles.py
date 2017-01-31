@@ -1,12 +1,10 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_double, c_int64, byref, create_string_buffer
-
-from chemfiles import get_c_library
-from chemfiles.errors import _check_handle
+from chemfiles.types import CxxPointer
 
 
-class Atom(object):
+class Atom(CxxPointer):
     '''
     An :py:class:`Atom` is a particle in the current :py:class:`Frame`. It
     stores the following atomic properties:
@@ -23,65 +21,59 @@ class Atom(object):
 
     def __init__(self, name, type=None):
         '''Create a new :py:class:`Atom` from a ``name``.'''
-        self.c_lib = get_c_library()
-        self._handle_ = self.c_lib.chfl_atom(name.encode("utf8"))
-        _check_handle(self._handle_)
+        super(Atom, self).__init__(self.ffi.chfl_atom(name.encode("utf8")))
         if type:
             self.set_type(type)
 
     def __del__(self):
-        self.c_lib.chfl_atom_free(self._handle_)
+        self.ffi.chfl_atom_free(self)
 
     def __copy__(self):
-        atom = self.__new__(Atom)
-        atom.c_lib = get_c_library()
-        atom._handle_ = self.c_lib.chfl_atom_copy(self._handle_)
-        _check_handle(atom._handle_)
-        return atom
+        return Atom.from_ptr(self.ffi.chfl_atom_copy(self))
 
     def mass(self):
         '''Get the :py:class:`Atom` mass, in atomic mass units'''
         res = c_double()
-        self.c_lib.chfl_atom_mass(self._handle_, byref(res))
+        self.ffi.chfl_atom_mass(self, byref(res))
         return res.value
 
     def set_mass(self, mass):
         '''Set the :py:class:`Atom` mass, in atomic mass units'''
-        self.c_lib.chfl_atom_set_mass(self._handle_, c_double(mass))
+        self.ffi.chfl_atom_set_mass(self, c_double(mass))
 
     def charge(self):
         '''
         Get the :py:class:`Atom` charge, in number of the electron charge *e*
         '''
         res = c_double()
-        self.c_lib.chfl_atom_charge(self._handle_, byref(res))
+        self.ffi.chfl_atom_charge(self, byref(res))
         return res.value
 
     def set_charge(self, charge):
         '''
         Set the :py:class:`Atom` charge, in number of the electron charge *e*
         '''
-        self.c_lib.chfl_atom_set_charge(self._handle_, c_double(charge))
+        self.ffi.chfl_atom_set_charge(self, c_double(charge))
 
     def name(self):
         '''Get the :py:class:`Atom` name'''
         res = create_string_buffer(10)
-        self.c_lib.chfl_atom_name(self._handle_, res, 10)
+        self.ffi.chfl_atom_name(self, res, 10)
         return res.value.decode("utf8")
 
     def set_name(self, name):
         '''Set the :py:class:`Atom` name'''
-        self.c_lib.chfl_atom_set_name(self._handle_, name.encode("utf8"))
+        self.ffi.chfl_atom_set_name(self, name.encode("utf8"))
 
     def type(self):
         '''Get the :py:class:`Atom` type'''
         res = create_string_buffer(10)
-        self.c_lib.chfl_atom_type(self._handle_, res, 10)
+        self.ffi.chfl_atom_type(self, res, 10)
         return res.value.decode("utf8")
 
     def set_type(self, type):
         '''Set the :py:class:`Atom` type'''
-        self.c_lib.chfl_atom_set_type(self._handle_, type.encode("utf8"))
+        self.ffi.chfl_atom_set_type(self, type.encode("utf8"))
 
     def full_name(self):
         '''
@@ -90,7 +82,7 @@ class Atom(object):
         string.
         '''
         res = create_string_buffer(100)
-        self.c_lib.chfl_atom_full_name(self._handle_, res, 100)
+        self.ffi.chfl_atom_full_name(self, res, 100)
         return res.value.decode("utf8")
 
     def vdw_radius(self):
@@ -99,7 +91,7 @@ class Atom(object):
         radius can not be found, returns -1.
         '''
         res = c_double()
-        self.c_lib.chfl_atom_vdw_radius(self._handle_, byref(res))
+        self.ffi.chfl_atom_vdw_radius(self, byref(res))
         return res.value
 
     def covalent_radius(self):
@@ -108,7 +100,7 @@ class Atom(object):
         can not be found, returns -1.
         '''
         res = c_double()
-        self.c_lib.chfl_atom_covalent_radius(self._handle_, byref(res))
+        self.ffi.chfl_atom_covalent_radius(self, byref(res))
         return res.value
 
     def atomic_number(self):
@@ -117,5 +109,5 @@ class Atom(object):
         not be found, returns -1.
         '''
         res = c_int64()
-        self.c_lib.chfl_atom_atomic_number(self._handle_, byref(res))
+        self.ffi.chfl_atom_atomic_number(self, byref(res))
         return res.value

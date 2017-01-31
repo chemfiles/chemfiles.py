@@ -4,12 +4,11 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import byref, c_uint64, create_string_buffer
 import numpy as np
 
-from chemfiles import get_c_library
-from chemfiles.errors import _check_handle
+from chemfiles.types import CxxPointer
 from chemfiles.ffi import chfl_match_t
 
 
-class Selection(object):
+class Selection(CxxPointer):
     '''
     Select atoms in a :py:class:`Frame` with a selection language.
 
@@ -26,19 +25,14 @@ class Selection(object):
         '''
         Create a new :py:class:`Selection` from the given selection string.
         '''
-        self.c_lib = get_c_library()
-        self._handle_ = self.c_lib.chfl_selection(selection.encode("utf8"))
-        _check_handle(self._handle_)
+        ptr = self.ffi.chfl_selection(selection.encode("utf8"))
+        super(Selection, self).__init__(ptr)
 
     def __del__(self):
-        self.c_lib.chfl_selection_free(self._handle_)
+        self.ffi.chfl_selection_free(self)
 
     def __copy__(self):
-        selection = self.__new__(Selection)
-        selection.c_lib = get_c_library()
-        selection._handle_ = self.c_lib.chfl_selection_copy(self._handle_)
-        _check_handle(selection._handle_)
-        return selection
+        return Selection.from_ptr(self.ffi.chfl_selection_copy(self))
 
     def size(self):
         '''
@@ -50,7 +44,7 @@ class Selection(object):
         and 'dihedral' contextes.
         '''
         res = c_uint64()
-        self.c_lib.chfl_selection_size(self._handle_, byref(res))
+        self.ffi.chfl_selection_size(self, byref(res))
         return res.value
 
     def string(self):
@@ -58,7 +52,7 @@ class Selection(object):
         Get the selection string used to create the :py:class:`Selection`
         '''
         res = create_string_buffer(10)
-        self.c_lib.chfl_selection_string(self._handle_, res, 10)
+        self.ffi.chfl_selection_string(self, res, 10)
         return res.value.decode("utf8")
 
     def evaluate(self, frame):
@@ -68,14 +62,10 @@ class Selection(object):
         of tuples of indexes.
         '''
         matching = c_uint64()
-        self.c_lib.chfl_selection_evalutate(
-            self._handle_, frame._handle_, byref(matching)
-        )
+        self.ffi.chfl_selection_evalutate(self, frame, byref(matching))
 
         matches = np.zeros(matching.value, chfl_match_t)
-        self.c_lib.chfl_selection_matches(
-            self._handle_, matches, matching
-        )
+        self.ffi.chfl_selection_matches(self, matches, matching)
 
         size = self.size()
         res = []

@@ -2,12 +2,11 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_uint64, byref
 
-from chemfiles import get_c_library
-from chemfiles.errors import _check_handle
+from chemfiles.types import CxxPointer
 from chemfiles.frame import Frame, Topology
 
 
-class Trajectory(object):
+class Trajectory(CxxPointer):
     '''
     A :py:class:`Trajectory` is a chemistry file on the hard drive. It is the
     main entry point of Chemfiles.
@@ -20,14 +19,13 @@ class Trajectory(object):
         is not the empty string, use it instead of guessing the format from the
         file extension.
         '''
-        self.c_lib = get_c_library()
-        self._handle_ = self.c_lib.chfl_trajectory_with_format(
+        ptr = self.ffi.chfl_trajectory_with_format(
             path.encode("utf8"), mode.encode("utf8"), format.encode("utf8")
         )
-        _check_handle(self._handle_)
+        super(Trajectory, self).__init__(ptr)
 
     def __del__(self):
-        self.c_lib.chfl_trajectory_close(self._handle_)
+        self.ffi.chfl_trajectory_close(self)
 
     def __enter__(self):
         return self
@@ -43,7 +41,7 @@ class Trajectory(object):
         corresponding :py:class:`Frame`
         '''
         frame = Frame()
-        self.c_lib.chfl_trajectory_read(self._handle_, frame._handle_)
+        self.ffi.chfl_trajectory_read(self, frame)
         return frame
 
     def read_step(self, step):
@@ -52,14 +50,12 @@ class Trajectory(object):
         corresponding :py:class:`Frame`.
         '''
         frame = Frame()
-        self.c_lib.chfl_trajectory_read_step(
-            self._handle_, c_uint64(step), frame._handle_
-        )
+        self.ffi.chfl_trajectory_read_step(self, c_uint64(step), frame)
         return frame
 
     def write(self, frame):
         '''Write a :py:class:`Frame` to the :py:class:`Trajectory`'''
-        self.c_lib.chfl_trajectory_write(self._handle_, frame._handle_)
+        self.ffi.chfl_trajectory_write(self, frame)
 
     def set_topology(self, topology, format=""):
         '''
@@ -77,12 +73,10 @@ class Trajectory(object):
         '''
 
         if isinstance(topology, Topology):
-            self.c_lib.chfl_trajectory_set_topology(
-                self._handle_, topology._handle_
-            )
+            self.ffi.chfl_trajectory_set_topology(self, topology)
         else:
-            self.c_lib.chfl_trajectory_set_topology_with_format(
-                self._handle_, topology.encode("utf8"), format.encode("utf8")
+            self.ffi.chfl_trajectory_set_topology_with_format(
+                self, topology.encode("utf8"), format.encode("utf8")
             )
 
     def set_cell(self, cell):
@@ -91,7 +85,7 @@ class Trajectory(object):
         This :py:class:`UnitCell` will be used when reading and writing the
         files, replacing any :py:class:`UnitCell` in the frames or files.
         '''
-        self.c_lib.chfl_trajectory_set_cell(self._handle_, cell._handle_)
+        self.ffi.chfl_trajectory_set_cell(self, cell)
 
     def nsteps(self):
         '''
@@ -99,5 +93,5 @@ class Trajectory(object):
         :py:class:`Trajectory`.
         '''
         res = c_uint64()
-        self.c_lib.chfl_trajectory_nsteps(self._handle_, byref(res))
+        self.ffi.chfl_trajectory_nsteps(self, byref(res))
         return res.value

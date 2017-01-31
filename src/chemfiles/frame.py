@@ -3,15 +3,12 @@ from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
 from ctypes import c_uint64, c_bool, byref, POINTER
 
-from chemfiles import get_c_library
 from chemfiles.ffi import chfl_vector_t
-from chemfiles.errors import _check_handle, ChemfilesException
-from chemfiles.cell import UnitCell
-from chemfiles.atom import Atom
-from chemfiles.topology import Topology
+from chemfiles.types import CxxPointer
+from chemfiles import Atom, Topology, UnitCell
 
 
-class Frame(object):
+class Frame(CxxPointer):
     '''
     A :py:class:`Frame` holds data from one step of a simulation: the current
     :py:class:`Topology`, the positions, and maybe the velocities of the
@@ -23,40 +20,28 @@ class Frame(object):
         Create an empty frame with initial capacity of `natoms`. It will be
         resized by the library as needed.
         '''
-        self.c_lib = get_c_library()
-        self._handle_ = self.c_lib.chfl_frame(c_uint64(natoms))
-        _check_handle(self._handle_)
+        super(Frame, self).__init__(self.ffi.chfl_frame(c_uint64(natoms)))
 
     def __del__(self):
-        self.c_lib.chfl_frame_free(self._handle_)
+        self.ffi.chfl_frame_free(self)
 
     def __copy__(self):
-        frame = self.__new__(Frame)
-        frame.c_lib = get_c_library()
-        frame._handle_ = self.c_lib.chfl_frame_copy(self._handle_)
-        _check_handle(frame._handle_)
-        return frame
+        return Frame.from_ptr(self.ffi.chfl_frame_copy(self))
 
     def atom(self, index):
         '''
         Get a specific :py:class:`Atom` from a frame, given its `index` in the
         frame
         '''
-        atom = Atom("")
-        self.c_lib.chfl_atom_free(atom._handle_)
-        atom._handle_ = self.c_lib.chfl_atom_from_frame(
-            self._handle_, c_uint64(index)
-        )
-        try:
-            _check_handle(atom._handle_)
-        except ChemfilesException:
+        ptr = self.ffi.chfl_atom_from_frame(self, c_uint64(index))
+        if not ptr:
             raise IndexError("Not atom at index {} in frame".format(index))
-        return atom
+        return Atom.from_ptr(ptr)
 
     def natoms(self):
         '''Get the current number of atoms in the :py:class:`Frame`.'''
         res = c_uint64()
-        self.c_lib.chfl_frame_atoms_count(self._handle_, res)
+        self.ffi.chfl_frame_atoms_count(self, res)
         return res.value
 
     def __len__(self):
@@ -65,28 +50,24 @@ class Frame(object):
 
     def resize(self, size):
         '''Get the positions from the :py:class:`Frame`.'''
-        self.c_lib.chfl_frame_resize(self._handle_, c_uint64(size))
+        self.ffi.chfl_frame_resize(self, c_uint64(size))
 
     def add_atom(self, atom, position, velocity=None):
         '''Get the positions from the :py:class:`Frame`.'''
         position = chfl_vector_t(position[0], position[1], position[2])
         if velocity:
             velocity = chfl_vector_t(velocity[0], velocity[1], velocity[2])
-        self.c_lib.chfl_frame_add_atom(
-            self._handle_, atom._handle_, position, velocity
-        )
+        self.ffi.chfl_frame_add_atom(self, atom, position, velocity)
 
     def remove(self, i):
         '''Remove the atom at index `i` in the :py:class:`Frame`.'''
-        self.c_lib.chfl_frame_remove(self._handle_, c_uint64(i))
+        self.ffi.chfl_frame_remove(self, c_uint64(i))
 
     def positions(self):
         '''Get a view into the positions of the :py:class:`Frame`.'''
         natoms = c_uint64()
         data = POINTER(chfl_vector_t)()
-        self.c_lib.chfl_frame_positions(
-            self._handle_, byref(data), byref(natoms)
-        )
+        self.ffi.chfl_frame_positions(self, byref(data), byref(natoms))
         positions = np.ctypeslib.as_array(data, shape=(natoms.value,))
         return positions.view(np.float64).reshape((natoms.value, 3))
 
@@ -94,57 +75,47 @@ class Frame(object):
         '''Get a view into the velocities of the :py:class:`Frame`.'''
         natoms = c_uint64()
         data = POINTER(chfl_vector_t)()
-        self.c_lib.chfl_frame_velocities(
-            self._handle_, byref(data), byref(natoms)
-        )
+        self.ffi.chfl_frame_velocities(self, byref(data), byref(natoms))
         velocities = np.ctypeslib.as_array(data, shape=(natoms.value,))
         return velocities.view(np.float64).reshape((natoms.value, 3))
 
     def add_velocities(self):
         '''Add velocity information to this :py:class:`Frame`'''
-        self.c_lib.chfl_frame_add_velocities(self._handle_)
+        self.ffi.chfl_frame_add_velocities(self)
 
     def has_velocities(self):
         '''Check if the :py:class:`Frame` has velocity information.'''
         res = c_bool()
-        self.c_lib.chfl_frame_has_velocities(self._handle_, byref(res))
+        self.ffi.chfl_frame_has_velocities(self, byref(res))
         return res.value
 
     def cell(self):
         '''Get the :py:class:`UnitCell` from the :py:class:`Frame`'''
-        cell = UnitCell(0, 0, 0)
-        self.c_lib.chfl_cell_free(cell._handle_)
-        cell._handle_ = self.c_lib.chfl_cell_from_frame(self._handle_)
-        _check_handle(cell._handle_)
-        return cell
+        return UnitCell.from_ptr(self.ffi.chfl_cell_from_frame(self))
 
     def set_cell(self, cell):
         '''Set the :py:class:`UnitCell` of the :py:class:`Frame`'''
-        self.c_lib.chfl_frame_set_cell(self._handle_, cell._handle_)
+        self.ffi.chfl_frame_set_cell(self, cell)
 
     def topology(self):
         '''Get the :py:class:`Topology` from the :py:class:`Frame`'''
-        topology = Topology()
-        self.c_lib.chfl_topology_free(topology._handle_)
-        topology._handle_ = self.c_lib.chfl_topology_from_frame(self._handle_)
-        _check_handle(topology._handle_)
-        return topology
+        return Topology.from_ptr(self.ffi.chfl_topology_from_frame(self))
 
     def set_topology(self, topology):
         '''Set the :py:class:`Topology` of the :py:class:`Frame`'''
-        self.c_lib.chfl_frame_set_topology(self._handle_, topology._handle_)
+        self.ffi.chfl_frame_set_topology(self, topology)
 
     def step(self):
         '''
         Get the :py:class:`Frame` step, i.e. the frame number in the trajectory
         '''
         res = c_uint64()
-        self.c_lib.chfl_frame_step(self._handle_, byref(res))
+        self.ffi.chfl_frame_step(self, byref(res))
         return res.value
 
     def set_step(self, step):
         '''Set the :py:class:`Frame` step'''
-        self.c_lib.chfl_frame_set_step(self._handle_, c_uint64(step))
+        self.ffi.chfl_frame_set_step(self, c_uint64(step))
 
     def guess_topology(self, bonds=True):
         '''
@@ -152,4 +123,4 @@ class Frame(object):
         ``bonds`` is True, guess everything; else only guess the angles and
         dihedrals from the topology bond list.
         '''
-        self.c_lib.chfl_frame_guess_topology(self._handle_, c_bool(bonds))
+        self.ffi.chfl_frame_guess_topology(self, c_bool(bonds))

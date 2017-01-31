@@ -3,9 +3,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_double, byref, ARRAY
 from enum import IntEnum
 
-from chemfiles import get_c_library
+from chemfiles.types import CxxPointer
 from chemfiles.ffi import chfl_cell_shape_t, chfl_vector_t
-from chemfiles.errors import _check_handle
 
 
 class CellShape(IntEnum):
@@ -23,7 +22,7 @@ class CellShape(IntEnum):
     Infinite = chfl_cell_shape_t.CHFL_CELL_INFINITE
 
 
-class UnitCell(object):
+class UnitCell(CxxPointer):
     '''
     An :py:class:`UnitCell` represent the box containing the atoms in the
     system, and its periodicity.
@@ -47,40 +46,34 @@ class UnitCell(object):
         Create a new :py:class:`UnitCell` with cell lenghts of ``a``, ``b`` and
         ``c``, and cell angles ``alpha``, ``beta`` and ``gamma``.
         '''
-        self.c_lib = get_c_library()
         lenghts = chfl_vector_t(a, b, c)
         angles = chfl_vector_t(alpha, beta, gamma)
         if alpha == 90.0 and beta == 90.0 and gamma == 90.0:
-            self._handle_ = self.c_lib.chfl_cell(lenghts)
+            ptr = self.ffi.chfl_cell(lenghts)
         else:
-            self._handle_ = self.c_lib.chfl_cell_triclinic(lenghts, angles)
-        _check_handle(self._handle_)
+            ptr = self.ffi.chfl_cell_triclinic(lenghts, angles)
+        super(UnitCell, self).__init__(ptr)
 
     def __del__(self):
-        c_lib = get_c_library()
-        c_lib.chfl_cell_free(self._handle_)
+        self.ffi.chfl_cell_free(self)
 
     def __copy__(self):
-        cell = self.__new__(UnitCell)
-        cell.c_lib = get_c_library()
-        cell._handle_ = self.c_lib.chfl_cell_copy(self._handle_)
-        _check_handle(cell._handle_)
-        return cell
+        return UnitCell.from_ptr(self.ffi.chfl_cell_copy(self))
 
     def lengths(self):
         '''Get the three lenghts of an :py:class:`UnitCell`, in Angstroms.'''
         lengths = chfl_vector_t(0, 0, 0)
-        self.c_lib.chfl_cell_lengths(self._handle_, lengths)
+        self.ffi.chfl_cell_lengths(self, lengths)
         return lengths[0], lengths[1], lengths[2]
 
     def set_lengths(self, a, b, c):
         '''Set the three lenghts of an :py:class:`UnitCell`, in Angstroms.'''
-        self.c_lib.chfl_cell_set_lengths(self._handle_, chfl_vector_t(a, b, c))
+        self.ffi.chfl_cell_set_lengths(self, chfl_vector_t(a, b, c))
 
     def angles(self):
         '''Get the three angles of an :py:class:`UnitCell`, in degrees.'''
         angles = chfl_vector_t(0, 0, 0)
-        self.c_lib.chfl_cell_angles(self._handle_, angles)
+        self.ffi.chfl_cell_angles(self, angles)
         return angles[0], angles[1], angles[2]
 
     def set_angles(self, alpha, beta, gamma):
@@ -88,14 +81,14 @@ class UnitCell(object):
         Set the three angles of an :py:class:`UnitCell`, in degrees. This is
         only possible for ``CellType.Triclinic`` cells.
         '''
-        self.c_lib.chfl_cell_set_angles(
-            self._handle_, chfl_vector_t(alpha, beta, gamma)
+        self.ffi.chfl_cell_set_angles(
+            self, chfl_vector_t(alpha, beta, gamma)
         )
 
     def matrix(self):
         '''Get the unit cell matricial representation.'''
         m = ARRAY(chfl_vector_t, 3)()
-        self.c_lib.chfl_cell_matrix(self._handle_, m)
+        self.ffi.chfl_cell_matrix(self, m)
         return [
             (m[0][0], m[0][1], m[0][2]),
             (m[1][0], m[1][1], m[1][2]),
@@ -105,15 +98,15 @@ class UnitCell(object):
     def shape(self):
         '''Get the type of the unit cell'''
         res = chfl_cell_shape_t()
-        self.c_lib.chfl_cell_shape(self._handle_, byref(res))
+        self.ffi.chfl_cell_shape(self, byref(res))
         return CellShape(res.value)
 
     def set_shape(self, shape):
         '''Set the type of the unit cell'''
-        self.c_lib.chfl_cell_set_shape(self._handle_, chfl_cell_shape_t(shape))
+        self.ffi.chfl_cell_set_shape(self, chfl_cell_shape_t(shape))
 
     def volume(self):
         '''Get the volume of the unit cell'''
-        V = c_double()
-        self.c_lib.chfl_cell_volume(self._handle_, byref(V))
-        return V.value
+        volume = c_double()
+        self.ffi.chfl_cell_volume(self, byref(volume))
+        return volume.value
