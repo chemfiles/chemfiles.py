@@ -11,29 +11,13 @@ standard module.
 This interface is contained in the :py:mod:`chemfiles` module, and this page list all
 the classes and methods in this module.
 
-Logging functions
------------------
-
-All logging in chemfiles uses a global maximal logging level, of type
-:py:class:`LogLevel <chemfiles.logging.LogLevel>`, which can be manipulated using
-:py:func:`log_level <chemfiles.logging.log_level>` and
-:py:func:`set_log_level <chemfiles.logging.set_log_level>`. The logging output is by
-default redirected to the standard error stream, but this can be changed by using the
-:py:func:`log_to_stderr <chemfiles.logging.log_to_stderr>`;
-:py:func:`log_to_stdout <chemfiles.logging.log_to_stdout>`;
-:py:func:`log_to_file <chemfiles.logging.log_to_file>`;
-:py:func:`log_callback <chemfiles.logging.log_callback>` and
-:py:func:`silent <chemfiles.logging.silent>` functions.
-
-.. automodule:: chemfiles.logging
-    :members:
-
-Error classes
--------------
+Error handling
+--------------
 
 Chemfiles uses exceptions for error handling, and will only throw one of these
-exceptions. The :py:class:`ChemfilesException <chemfiles.errors.ChemfilesException>`
-base class can be used to catch all chemfiles related errors.
+exceptions. The :py:class:`ChemfilesException
+<chemfiles.errors.ChemfilesException>` base class can be used to catch all
+chemfiles related errors.
 
 .. automodule:: chemfiles.errors
     :members:
@@ -58,7 +42,7 @@ Frame class
 UnitCell class
 --------------
 
-.. autoclass:: CellType
+.. autoclass:: CellShape
     :members:
 
 .. autoclass:: UnitCell
@@ -73,10 +57,14 @@ Topology class
 Atom class
 ----------
 
-.. autoclass:: AtomType
+.. autoclass:: Atom
     :members:
 
-.. autoclass:: Atom
+
+Residue class
+-------------
+
+.. autoclass:: Residue
     :members:
 
 
