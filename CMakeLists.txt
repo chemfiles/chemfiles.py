@@ -3,9 +3,11 @@ project(chemfiles.py)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 
-# We need to read the location of chemfiles library for tests
-# FIXME: maybe there is an other way to do this
-cmake_policy(SET CMP0026 OLD)
+if(${CMAKE_VERSION} VERSION_GREATER 3.0.0)
+    # We need to read the location of chemfiles library for tests
+    # FIXME: maybe there is an other way to do this
+    cmake_policy(SET CMP0026 OLD)
+endif()
 
 option(CHFL_PY_CODE_COVERAGE "Enable python code coverage" OFF)
 option(CHFL_PY_BUILD_DOCUMENTATION "Build the python documentation" OFF)
