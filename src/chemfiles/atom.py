@@ -1,7 +1,8 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_double, c_int64, create_string_buffer
-from chemfiles.types import CxxPointer
+from ctypes import c_double, c_int64
+
+from chemfiles.utils import CxxPointer, call_with_growing_buffer
 
 
 class Atom(CxxPointer):
@@ -58,9 +59,10 @@ class Atom(CxxPointer):
 
     def name(self):
         '''Get the :py:class:`Atom` name'''
-        name = create_string_buffer(10)
-        self.ffi.chfl_atom_name(self, name, 10)
-        return name.value.decode("utf8")
+        return call_with_growing_buffer(
+            lambda buffer, size: self.ffi.chfl_atom_name(self, buffer, size),
+            initial=32,
+        )
 
     def set_name(self, name):
         '''Set the :py:class:`Atom` name'''
@@ -68,9 +70,10 @@ class Atom(CxxPointer):
 
     def type(self):
         '''Get the :py:class:`Atom` type'''
-        type = create_string_buffer(10)
-        self.ffi.chfl_atom_type(self, type, 10)
-        return type.value.decode("utf8")
+        return call_with_growing_buffer(
+            lambda buffer, size: self.ffi.chfl_atom_type(self, buffer, size),
+            initial=32,
+        )
 
     def set_type(self, type):
         '''Set the :py:class:`Atom` type'''
@@ -82,9 +85,10 @@ class Atom(CxxPointer):
         is "Helium", and so on. If the name can not be found, returns the empty
         string.
         '''
-        name = create_string_buffer(100)
-        self.ffi.chfl_atom_full_name(self, name, 100)
-        return name.value.decode("utf8")
+        return call_with_growing_buffer(
+            lambda buff, size: self.ffi.chfl_atom_full_name(self, buff, size),
+            initial=64,
+        )
 
     def vdw_radius(self):
         '''

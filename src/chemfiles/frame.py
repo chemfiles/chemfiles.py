@@ -4,7 +4,7 @@ import numpy as np
 from ctypes import c_uint64, c_bool, POINTER
 
 from chemfiles.ffi import chfl_vector_t
-from chemfiles.types import CxxPointer
+from chemfiles.utils import CxxPointer
 from chemfiles import Atom, Topology, UnitCell
 
 

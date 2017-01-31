@@ -1,7 +1,8 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_bool, c_uint64, create_string_buffer
-from chemfiles.types import CxxPointer
+from ctypes import c_bool, c_uint64
+
+from chemfiles.utils import CxxPointer, call_with_growing_buffer
 
 
 class Residue(CxxPointer):
@@ -45,9 +46,10 @@ class Residue(CxxPointer):
 
     def name(self):
         '''Get the :py:class:`Residue` name'''
-        name = create_string_buffer(32)
-        self.ffi.chfl_residue_name(self, name, 32)
-        return name.value.decode("utf8")
+        return call_with_growing_buffer(
+            lambda buff, size: self.ffi.chfl_residue_name(self, buff, size),
+            initial=32,
+        )
 
     def id(self):
         '''Get the :py:class:`Residue` index in the initial topology'''

@@ -1,10 +1,10 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from ctypes import c_uint64, create_string_buffer
+from ctypes import c_uint64
 import numpy as np
 
-from chemfiles.types import CxxPointer
+from chemfiles.utils import CxxPointer, call_with_growing_buffer
 from chemfiles.ffi import chfl_match_t
 
 
@@ -52,9 +52,10 @@ class Selection(CxxPointer):
         '''
         Get the selection string used to create the :py:class:`Selection`
         '''
-        selection = create_string_buffer(10)
-        self.ffi.chfl_selection_string(self, selection, 10)
-        return selection.value.decode("utf8")
+        return call_with_growing_buffer(
+            lambda buff, n: self.ffi.chfl_selection_string(self, buff, n),
+            initial=128,
+        )
 
     def evaluate(self, frame):
         '''
