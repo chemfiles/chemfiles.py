@@ -43,7 +43,7 @@ class TestTrajectory(unittest.TestCase):
         self.assertEqual(topology.atom(1).name(), "H")
 
         trajectory.set_cell(UnitCell(30, 30, 30))
-        frame = trajectory.read_step(41)
+        trajectory.read_step(41, frame)
         self.assertEqual(frame.cell().lengths(), (30.0, 30.0, 30.0))
 
         positions = frame.positions()

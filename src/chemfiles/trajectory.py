@@ -35,21 +35,25 @@ class Trajectory(CxxPointer):
         # call chfl_trajectory_close ourselves.
         pass
 
-    def read(self):
+    def read(self, frame=None):
         '''
         Read the next step of the :py:class:`Trajectory` and return the
-        corresponding :py:class:`Frame`
+        corresponding :py:class:`Frame`. If the ``frame`` parameter is given,
+        reuse the corresponding allocation.
         '''
-        frame = Frame()
+        if not frame:
+            frame = Frame()
         self.ffi.chfl_trajectory_read(self, frame)
         return frame
 
-    def read_step(self, step):
+    def read_step(self, step, frame=None):
         '''
         Read a specific step in the :py:class:`Trajectory` and return the
-        corresponding :py:class:`Frame`.
+        corresponding :py:class:`Frame`. If the ``frame`` parameter is given,
+        reuse the corresponding allocation.
         '''
-        frame = Frame()
+        if not frame:
+            frame = Frame()
         self.ffi.chfl_trajectory_read_step(self, c_uint64(step), frame)
         return frame
 
