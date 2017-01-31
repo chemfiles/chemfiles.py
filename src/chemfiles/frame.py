@@ -23,7 +23,8 @@ class Frame(CxxPointer):
         super(Frame, self).__init__(self.ffi.chfl_frame(c_uint64(natoms)))
 
     def __del__(self):
-        self.ffi.chfl_frame_free(self)
+        if hasattr(self, 'ptr'):
+            self.ffi.chfl_frame_free(self)
 
     def __copy__(self):
         return Frame.from_ptr(self.ffi.chfl_frame_copy(self))

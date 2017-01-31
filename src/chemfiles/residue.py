@@ -25,7 +25,8 @@ class Residue(CxxPointer):
         super(Residue, self).__init__(ptr)
 
     def __del__(self):
-        self.ffi.chfl_residue_free(self)
+        if hasattr(self, 'ptr'):
+            self.ffi.chfl_residue_free(self)
 
     def __copy__(self):
         residue = self.__new__(Residue)

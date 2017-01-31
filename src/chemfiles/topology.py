@@ -22,7 +22,8 @@ class Topology(CxxPointer):
         super(Topology, self).__init__(self.ffi.chfl_topology())
 
     def __del__(self):
-        self.ffi.chfl_topology_free(self)
+        if hasattr(self, 'ptr'):
+            self.ffi.chfl_topology_free(self)
 
     def __copy__(self):
         return Topology.from_ptr(self.ffi.chfl_topology_copy(self))

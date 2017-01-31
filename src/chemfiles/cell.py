@@ -55,7 +55,8 @@ class UnitCell(CxxPointer):
         super(UnitCell, self).__init__(ptr)
 
     def __del__(self):
-        self.ffi.chfl_cell_free(self)
+        if hasattr(self, 'ptr'):
+            self.ffi.chfl_cell_free(self)
 
     def __copy__(self):
         return UnitCell.from_ptr(self.ffi.chfl_cell_copy(self))

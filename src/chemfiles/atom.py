@@ -26,7 +26,8 @@ class Atom(CxxPointer):
             self.set_type(type)
 
     def __del__(self):
-        self.ffi.chfl_atom_free(self)
+        if hasattr(self, 'ptr'):
+            self.ffi.chfl_atom_free(self)
 
     def __copy__(self):
         return Atom.from_ptr(self.ffi.chfl_atom_copy(self))
