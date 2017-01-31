@@ -1,6 +1,6 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_double, byref, ARRAY
+from ctypes import c_double, ARRAY
 from enum import IntEnum
 
 from chemfiles.types import CxxPointer
@@ -97,9 +97,9 @@ class UnitCell(CxxPointer):
 
     def shape(self):
         '''Get the type of the unit cell'''
-        res = chfl_cell_shape_t()
-        self.ffi.chfl_cell_shape(self, byref(res))
-        return CellShape(res.value)
+        shape = chfl_cell_shape_t()
+        self.ffi.chfl_cell_shape(self, shape)
+        return CellShape(shape.value)
 
     def set_shape(self, shape):
         '''Set the type of the unit cell'''
@@ -108,5 +108,5 @@ class UnitCell(CxxPointer):
     def volume(self):
         '''Get the volume of the unit cell'''
         volume = c_double()
-        self.ffi.chfl_cell_volume(self, byref(volume))
+        self.ffi.chfl_cell_volume(self, volume)
         return volume.value

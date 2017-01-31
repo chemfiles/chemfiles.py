@@ -34,9 +34,9 @@ class Residue(CxxPointer):
 
     def natoms(self):
         '''Get the current number of atoms in the :py:class:`Residue`.'''
-        res = c_uint64()
-        self.ffi.chfl_residue_atoms_count(self, res)
-        return res.value
+        natoms = c_uint64()
+        self.ffi.chfl_residue_atoms_count(self, natoms)
+        return natoms.value
 
     def __len__(self):
         '''Get the current number of atoms in the :py:class:`Residue`.'''
@@ -44,23 +44,23 @@ class Residue(CxxPointer):
 
     def name(self):
         '''Get the :py:class:`Residue` name'''
-        res = create_string_buffer(32)
-        self.ffi.chfl_residue_name(self, res, 32)
-        return res.value.decode("utf8")
+        name = create_string_buffer(32)
+        self.ffi.chfl_residue_name(self, name, 32)
+        return name.value.decode("utf8")
 
     def id(self):
         '''Get the :py:class:`Residue` index in the initial topology'''
-        res = c_uint64()
-        self.ffi.chfl_residue_id(self, res)
-        return res.value
+        id = c_uint64()
+        self.ffi.chfl_residue_id(self, id)
+        return id.value
 
     def contains(self, atom):
         '''
         Check if the :py:class:`Residue` contains the atom at index ``atom``.
         '''
-        res = c_bool()
-        self.ffi.chfl_residue_contains(self, c_uint64(atom), res)
-        return res.value
+        contained = c_bool()
+        self.ffi.chfl_residue_contains(self, c_uint64(atom), contained)
+        return contained.value
 
     def add_atom(self, atom):
         '''Add the atom index ``atom`` in the :py:class:`Residue`.'''

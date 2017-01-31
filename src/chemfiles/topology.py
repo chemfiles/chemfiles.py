@@ -1,6 +1,6 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_uint64, c_bool, byref
+from ctypes import c_uint64, c_bool
 import numpy as np
 
 from chemfiles.types import CxxPointer
@@ -38,9 +38,9 @@ class Topology(CxxPointer):
 
     def natoms(self):
         '''Get the current number of atoms in the :py:class:`Topology`.'''
-        res = c_uint64()
-        self.ffi.chfl_topology_atoms_count(self, res)
-        return res.value
+        natoms = c_uint64()
+        self.ffi.chfl_topology_atoms_count(self, natoms)
+        return natoms.value
 
     def __len__(self):
         '''Get the current number of atoms in the :py:class:`Topology`.'''
@@ -88,9 +88,9 @@ class Topology(CxxPointer):
 
     def residues_count(self):
         '''Get the current number of residues in the :py:class:`Topology`.'''
-        res = c_uint64()
-        self.ffi.chfl_topology_residues_count(self, res)
-        return res.value
+        residues = c_uint64()
+        self.ffi.chfl_topology_residues_count(self, residues)
+        return residues.value
 
     def add_residue(self, residue):
         '''Add a :py:class:`Residue` to this :py:class:`Topology`.'''
@@ -102,77 +102,75 @@ class Topology(CxxPointer):
         :py:class:`Topology` are linked together, *i.e.* if there is a bond
         between one atom in the first residue and one atom in the second one.
         '''
-        res = c_bool()
-        self.ffi.chfl_topology_residues_linked(self, first, second, res)
-        return res.value
+        linked = c_bool()
+        self.ffi.chfl_topology_residues_linked(self, first, second, linked)
+        return linked.value
 
     def isbond(self, i, j):
         '''Tell if the atoms at indexes ``i`` and ``j`` are bonded together'''
-        res = c_bool()
-        self.ffi.chfl_topology_isbond(
-            self, c_uint64(i), c_uint64(j), res
-        )
-        return res.value
+        is_bond = c_bool()
+        self.ffi.chfl_topology_isbond(self, c_uint64(i), c_uint64(j), is_bond)
+        return is_bond.value
 
     def isangle(self, i, j, k):
         '''
         Tell if the atoms at indexes ``i``, ``j`` and ``k`` constitues an angle
         '''
-        res = c_bool()
+        is_angle = c_bool()
         self.ffi.chfl_topology_isangle(
-            self, c_uint64(i), c_uint64(j), c_uint64(k), res
+            self, c_uint64(i), c_uint64(j), c_uint64(k), is_angle
         )
-        return res.value
+        return is_angle.value
 
     def isdihedral(self, i, j, k, m):
         '''
         Tell if the atoms at indexes ``i``, ``j``, ``k`` and ``m`` constitues a
         dihedral angle
         '''
-        res = c_bool()
+        is_dih = c_bool()
         self.ffi.chfl_topology_isdihedral(
-            self, c_uint64(i), c_uint64(j), c_uint64(k), c_uint64(m), res
+            self, c_uint64(i), c_uint64(j), c_uint64(k), c_uint64(m), is_dih
         )
-        return res.value
+        return is_dih.value
 
     def bonds_count(self):
         '''Get the number of bonds in the system'''
-        res = c_uint64()
-        self.ffi.chfl_topology_bonds_count(self, byref(res))
-        return res.value
+        bonds = c_uint64()
+        self.ffi.chfl_topology_bonds_count(self, bonds)
+        return bonds.value
 
     def angles_count(self):
         '''Get the number of angles in the system'''
-        res = c_uint64()
-        self.ffi.chfl_topology_angles_count(self, byref(res))
-        return res.value
+        angles = c_uint64()
+        self.ffi.chfl_topology_angles_count(self, angles)
+        return angles.value
 
     def dihedrals_count(self):
         '''Get the number of dihedral angles in the system'''
-        res = c_uint64()
-        self.ffi.chfl_topology_dihedrals_count(self, byref(res))
-        return res.value
+        dihedrals = c_uint64()
+        self.ffi.chfl_topology_dihedrals_count(self, dihedrals)
+        return dihedrals.value
 
     def bonds(self):
         '''Get the list of bonds in the system'''
-        nbonds = self.bonds_count()
-        res = np.zeros((nbonds, 2), np.uintp)
-        self.ffi.chfl_topology_bonds(self, res, c_uint64(nbonds))
-        return res
+        n = self.bonds_count()
+        bonds = np.zeros((n, 2), np.uint64)
+        self.ffi.chfl_topology_bonds(self, bonds, c_uint64(n))
+        return bonds
 
     def angles(self):
         '''Get the list of angles in the system'''
-        nangles = self.angles_count()
-        res = np.zeros((nangles, 3), np.uintp)
-        self.ffi.chfl_topology_angles(self, res, c_uint64(nangles))
-        return res
+        n = self.angles_count()
+        angles = np.zeros((n, 3), np.uint64)
+        self.ffi.chfl_topology_angles(self, angles, c_uint64(n))
+        return angles
 
     def dihedrals(self):
         '''Get the list of dihedral angles in the system'''
-        ndihedrals = self.dihedrals_count()
-        res = np.zeros((ndihedrals, 4), np.uintp)
-        self.ffi.chfl_topology_dihedrals(self, res, c_uint64(ndihedrals))
-        return res
+        n = self.dihedrals_count()
+        dihedrals = np.zeros((n, 4), np.uint64)
+        self.ffi.chfl_topology_dihedrals(self, dihedrals, c_uint64(n))
+        return dihedrals
 
     def add_bond(self, i, j):
         '''

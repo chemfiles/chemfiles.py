@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
-from ctypes import c_uint64, c_bool, byref, POINTER
+from ctypes import c_uint64, c_bool, POINTER
 
 from chemfiles.ffi import chfl_vector_t
 from chemfiles.types import CxxPointer
@@ -40,9 +40,9 @@ class Frame(CxxPointer):
 
     def natoms(self):
         '''Get the current number of atoms in the :py:class:`Frame`.'''
-        res = c_uint64()
-        self.ffi.chfl_frame_atoms_count(self, res)
-        return res.value
+        natoms = c_uint64()
+        self.ffi.chfl_frame_atoms_count(self, natoms)
+        return natoms.value
 
     def __len__(self):
         '''Get the current number of atoms in the :py:class:`Frame`.'''
@@ -67,7 +67,7 @@ class Frame(CxxPointer):
         '''Get a view into the positions of the :py:class:`Frame`.'''
         natoms = c_uint64()
         data = POINTER(chfl_vector_t)()
-        self.ffi.chfl_frame_positions(self, byref(data), byref(natoms))
+        self.ffi.chfl_frame_positions(self, data, natoms)
         positions = np.ctypeslib.as_array(data, shape=(natoms.value,))
         return positions.view(np.float64).reshape((natoms.value, 3))
 
@@ -75,7 +75,7 @@ class Frame(CxxPointer):
         '''Get a view into the velocities of the :py:class:`Frame`.'''
         natoms = c_uint64()
         data = POINTER(chfl_vector_t)()
-        self.ffi.chfl_frame_velocities(self, byref(data), byref(natoms))
+        self.ffi.chfl_frame_velocities(self, data, natoms)
         velocities = np.ctypeslib.as_array(data, shape=(natoms.value,))
         return velocities.view(np.float64).reshape((natoms.value, 3))
 
@@ -85,9 +85,9 @@ class Frame(CxxPointer):
 
     def has_velocities(self):
         '''Check if the :py:class:`Frame` has velocity information.'''
-        res = c_bool()
-        self.ffi.chfl_frame_has_velocities(self, byref(res))
-        return res.value
+        velocities = c_bool()
+        self.ffi.chfl_frame_has_velocities(self, velocities)
+        return velocities.value
 
     def cell(self):
         '''Get the :py:class:`UnitCell` from the :py:class:`Frame`'''
@@ -109,9 +109,9 @@ class Frame(CxxPointer):
         '''
         Get the :py:class:`Frame` step, i.e. the frame number in the trajectory
         '''
-        res = c_uint64()
-        self.ffi.chfl_frame_step(self, byref(res))
-        return res.value
+        step = c_uint64()
+        self.ffi.chfl_frame_step(self, step)
+        return step.value
 
     def set_step(self, step):
         '''Set the :py:class:`Frame` step'''

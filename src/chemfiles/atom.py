@@ -1,6 +1,6 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_double, c_int64, byref, create_string_buffer
+from ctypes import c_double, c_int64, create_string_buffer
 from chemfiles.types import CxxPointer
 
 
@@ -33,9 +33,9 @@ class Atom(CxxPointer):
 
     def mass(self):
         '''Get the :py:class:`Atom` mass, in atomic mass units'''
-        res = c_double()
-        self.ffi.chfl_atom_mass(self, byref(res))
-        return res.value
+        mass = c_double()
+        self.ffi.chfl_atom_mass(self, mass)
+        return mass.value
 
     def set_mass(self, mass):
         '''Set the :py:class:`Atom` mass, in atomic mass units'''
@@ -45,9 +45,9 @@ class Atom(CxxPointer):
         '''
         Get the :py:class:`Atom` charge, in number of the electron charge *e*
         '''
-        res = c_double()
-        self.ffi.chfl_atom_charge(self, byref(res))
-        return res.value
+        charge = c_double()
+        self.ffi.chfl_atom_charge(self, charge)
+        return charge.value
 
     def set_charge(self, charge):
         '''
@@ -57,9 +57,9 @@ class Atom(CxxPointer):
 
     def name(self):
         '''Get the :py:class:`Atom` name'''
-        res = create_string_buffer(10)
-        self.ffi.chfl_atom_name(self, res, 10)
-        return res.value.decode("utf8")
+        name = create_string_buffer(10)
+        self.ffi.chfl_atom_name(self, name, 10)
+        return name.value.decode("utf8")
 
     def set_name(self, name):
         '''Set the :py:class:`Atom` name'''
@@ -67,9 +67,9 @@ class Atom(CxxPointer):
 
     def type(self):
         '''Get the :py:class:`Atom` type'''
-        res = create_string_buffer(10)
-        self.ffi.chfl_atom_type(self, res, 10)
-        return res.value.decode("utf8")
+        type = create_string_buffer(10)
+        self.ffi.chfl_atom_type(self, type, 10)
+        return type.value.decode("utf8")
 
     def set_type(self, type):
         '''Set the :py:class:`Atom` type'''
@@ -81,33 +81,33 @@ class Atom(CxxPointer):
         is "Helium", and so on. If the name can not be found, returns the empty
         string.
         '''
-        res = create_string_buffer(100)
-        self.ffi.chfl_atom_full_name(self, res, 100)
-        return res.value.decode("utf8")
+        name = create_string_buffer(100)
+        self.ffi.chfl_atom_full_name(self, name, 100)
+        return name.value.decode("utf8")
 
     def vdw_radius(self):
         '''
         Try to get the Van der Waals radius of the :py:class:`Atom`. If the
         radius can not be found, returns -1.
         '''
-        res = c_double()
-        self.ffi.chfl_atom_vdw_radius(self, byref(res))
-        return res.value
+        radius = c_double()
+        self.ffi.chfl_atom_vdw_radius(self, radius)
+        return radius.value
 
     def covalent_radius(self):
         '''
         Try to get the covalent radius of the :py:class:`Atom`. If the radius
         can not be found, returns -1.
         '''
-        res = c_double()
-        self.ffi.chfl_atom_covalent_radius(self, byref(res))
-        return res.value
+        radius = c_double()
+        self.ffi.chfl_atom_covalent_radius(self, radius)
+        return radius.value
 
     def atomic_number(self):
         '''
         Try to get the atomic number of the :py:class:`Atom`. If the number can
         not be found, returns -1.
         '''
-        res = c_int64()
-        self.ffi.chfl_atom_atomic_number(self, byref(res))
-        return res.value
+        number = c_int64()
+        self.ffi.chfl_atom_atomic_number(self, number)
+        return number.value

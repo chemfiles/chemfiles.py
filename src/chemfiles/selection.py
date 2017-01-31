@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from ctypes import byref, c_uint64, create_string_buffer
+from ctypes import c_uint64, create_string_buffer
 import numpy as np
 
 from chemfiles.types import CxxPointer
@@ -43,17 +43,17 @@ class Selection(CxxPointer):
         context, 3 for the 'three' and 'angles' contextes and 4 for the 'four'
         and 'dihedral' contextes.
         '''
-        res = c_uint64()
-        self.ffi.chfl_selection_size(self, byref(res))
-        return res.value
+        size = c_uint64()
+        self.ffi.chfl_selection_size(self, size)
+        return size.value
 
     def string(self):
         '''
         Get the selection string used to create the :py:class:`Selection`
         '''
-        res = create_string_buffer(10)
-        self.ffi.chfl_selection_string(self, res, 10)
-        return res.value.decode("utf8")
+        selection = create_string_buffer(10)
+        self.ffi.chfl_selection_string(self, selection, 10)
+        return selection.value.decode("utf8")
 
     def evaluate(self, frame):
         '''
@@ -62,22 +62,22 @@ class Selection(CxxPointer):
         of tuples of indexes.
         '''
         matching = c_uint64()
-        self.ffi.chfl_selection_evalutate(self, frame, byref(matching))
+        self.ffi.chfl_selection_evalutate(self, frame, matching)
 
         matches = np.zeros(matching.value, chfl_match_t)
         self.ffi.chfl_selection_matches(self, matches, matching)
 
         size = self.size()
-        res = []
+        result = []
         for match in matches:
             assert(match[0] == size)
             atoms = match[1]
             if size == 1:
-                res.append(atoms[0])
+                result.append(atoms[0])
             elif size == 2:
-                res.append((atoms[0], atoms[1]))
+                result.append((atoms[0], atoms[1]))
             elif size == 3:
-                res.append((atoms[0], atoms[1], atoms[2]))
+                result.append((atoms[0], atoms[1], atoms[2]))
             elif size == 4:
-                res.append((atoms[0], atoms[1], atoms[2], atoms[3]))
-        return res
+                result.append((atoms[0], atoms[1], atoms[2], atoms[3]))
+        return result

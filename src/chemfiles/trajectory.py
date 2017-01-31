@@ -1,6 +1,6 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_uint64, byref
+from ctypes import c_uint64
 
 from chemfiles.types import CxxPointer
 from chemfiles.frame import Frame, Topology
@@ -92,6 +92,6 @@ class Trajectory(CxxPointer):
         Get the number of steps (the number of frames) in a
         :py:class:`Trajectory`.
         '''
-        res = c_uint64()
-        self.ffi.chfl_trajectory_nsteps(self, byref(res))
-        return res.value
+        nsteps = c_uint64()
+        self.ffi.chfl_trajectory_nsteps(self, nsteps)
+        return nsteps.value
