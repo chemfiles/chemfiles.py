@@ -14,11 +14,6 @@ class ChemfilesException(BaseException):
     pass
 
 
-class ArgumentError(ChemfilesException):
-    '''Error in argument type'''
-    pass
-
-
 class NullPointerError(ChemfilesException):
     '''Got a NULL pointer from C!'''
     def __init__(self):

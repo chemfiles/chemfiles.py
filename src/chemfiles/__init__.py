@@ -5,7 +5,7 @@ from .clib import FindChemfilesLibrary
 get_c_library = FindChemfilesLibrary()
 __version__ = get_c_library().chfl_version().decode("utf8")
 
-from .errors import ChemfilesException, ArgumentError
+from .errors import ChemfilesException
 from .atom import Atom
 from .residue import Residue
 from .topology import Topology
