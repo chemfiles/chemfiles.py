@@ -35,6 +35,12 @@ class Trajectory(CxxPointer):
         # call chfl_trajectory_close ourselves.
         pass
 
+    def __iter__(self):
+        frame = Frame()
+        for _ in range(self.nsteps()):
+            self.read(frame)
+            yield frame
+
     def read(self, frame=None):
         '''
         Read the next step of the :py:class:`Trajectory` and return the

@@ -77,6 +77,12 @@ class TestTrajectory(unittest.TestCase):
         frame = trajectory.read()
         self.assertEqual(frame.atom(100).name(), "Rd")
 
+    def test_protocols(self):
+        with Trajectory(os.path.join(DATA, "water.xyz")) as trajectory:
+            for frame in trajectory:
+                # Checking iterator protocol
+                pass
+
     def test_write(self):
         positions = np.zeros((4, 3), np.float32)
         topology = Topology()
