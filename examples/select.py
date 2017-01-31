@@ -22,7 +22,7 @@ for i in zincs:
 
 
 # Create a selection for multiple atoms
-selection = Selection("angles: name($1) H and name($2) O and name($3) H")
+selection = Selection("angles: name(#1) H and name(#2) O and name(#3) H")
 # Get the list of matching atoms in the frame
 waters = selection.evaluate(frame)
 

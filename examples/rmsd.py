@@ -12,8 +12,7 @@ trajectory = Trajectory("filename.nc")
 distances = []
 # Accumulate the distances to the origin of the 10th atom throughtout the
 # trajectory
-for _ in range(trajectory.nsteps()):
-    frame = trajectory.read()
+for frame in trajectory:
     # Position of the 10th atom
     position = frame.positions()[9, :]
     distance = math.sqrt(position.dot(position))
@@ -28,3 +27,5 @@ rmsd /= len(distances)
 rmsd = math.sqrt(rmsd)
 
 print("Root-mean square displacement is: {}".format(rmsd))
+
+trajectory.close()

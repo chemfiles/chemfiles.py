@@ -7,11 +7,11 @@
 
 from chemfiles import Trajectory, UnitCell, Atom, Topology
 
-infile = Trajectory("water.xyz")
+trajectory = Trajectory("water.xyz")
 
 # Orthorombic UnitCell with lengths of 20, 15 and 35 A
 cell = UnitCell(20, 15, 35)
-infile.set_cell(cell)
+trajectory.set_cell(cell)
 
 # Create Atoms
 O = Atom("O")
@@ -25,11 +25,11 @@ topology.append(H)
 
 topology.add_bond(0, 1)
 topology.add_bond(0, 2)
-infile.set_topology(topology)
+trajectory.set_topology(topology)
 
 # Write an output file using PDB format
-output = Trajectory("water.pdb", "w")
+with Trajectory("water.pdb", "w") as output:
+    for frame in trajectory:
+        output.write(frame)
 
-for _ in range(infile.nsteps()):
-    frame = infile.read()
-    output.write(frame)
+trajectory.close()
