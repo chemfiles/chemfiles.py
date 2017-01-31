@@ -4,7 +4,7 @@ import unittest
 import copy
 import numpy as np
 
-from chemfiles import Topology, Atom
+from chemfiles import Topology, Atom, Residue
 
 
 class TestTopology(unittest.TestCase):
@@ -88,6 +88,32 @@ class TestTopology(unittest.TestCase):
 
         topology.atom(2)
         self.assertRaises(IndexError, topology.atom, 6)
+        self.assertRaises(IndexError, topology.residue, 6)
+
+    def test_residues(self):
+        topology = Topology()
+        topology.resize(6)
+
+        residue = Residue('foo', 4)
+        residue.add_atom(3)
+        residue.add_atom(4)
+        topology.add_residue(residue)
+
+        residue = Residue('bar', 67)
+        residue.add_atom(1)
+        residue.add_atom(2)
+        topology.add_residue(residue)
+
+        first = topology.residue(0)
+        self.assertEqual(first.name(), 'foo')
+
+        second = topology.residue(1)
+        self.assertEqual(second.name(), 'bar')
+
+        self.assertFalse(topology.residues_linked(first, second))
+
+        topology.add_bond(2, 3)
+        self.assertTrue(topology.residues_linked(first, second))
 
 
 if __name__ == '__main__':

@@ -4,8 +4,8 @@ from ctypes import c_uint64, c_bool, byref
 import numpy as np
 
 from chemfiles import get_c_library
-from chemfiles.errors import _check_handle, ChemfilesException
-from chemfiles.atom import Atom
+from chemfiles.errors import _check_handle, NullPointerError
+from chemfiles import Atom, Residue
 
 
 class Topology(object):
@@ -35,7 +35,9 @@ class Topology(object):
         return topology
 
     def atom(self, index):
-        '''Get the :py:class:`Atom` at ``index`` from a topology.'''
+        '''
+        Get the :py:class:`Atom` at ``index`` from a :py:class:`Topology`.
+        '''
         atom = Atom("")
         self.c_lib.chfl_atom_free(atom._handle_)
         atom._handle_ = self.c_lib.chfl_atom_from_topology(
@@ -43,8 +45,8 @@ class Topology(object):
         )
         try:
             _check_handle(atom._handle_)
-        except ChemfilesException:
-            raise IndexError("Not atom at index {} in frame".format(index))
+        except NullPointerError:
+            raise IndexError("No atom at index {} in frame".format(index))
         return atom
 
     def natoms(self):
@@ -75,6 +77,60 @@ class Topology(object):
         can modify all the other atoms indexes.
         '''
         self.c_lib.chfl_topology_remove(self._handle_, c_uint64(index))
+
+    def residue(self, index):
+        '''
+        Get the :py:class:`Residue` at ``index`` from the :py:class:`Topology`.
+        '''
+        residue = Residue("")
+        self.c_lib.chfl_residue_free(residue._handle_)
+        residue._handle_ = self.c_lib.chfl_residue_from_topology(
+            self._handle_, c_uint64(index)
+        )
+        try:
+            _check_handle(residue._handle_)
+        except NullPointerError:
+            raise IndexError("No residue at index {} in frame".format(index))
+        return residue
+
+    def residue_for_atom(self, index):
+        '''
+        Get the :py:class:`Residue` containing the atom at ``index`` from the
+        :py:class:`Topology`. If the atom is not in a residue, this function
+        returns None.
+        '''
+        residue = Residue("")
+        self.c_lib.chfl_residue_free(residue._handle_)
+        residue._handle_ = self.c_lib.chfl_residue_for_atom(
+            self._handle_, c_uint64(index)
+        )
+        try:
+            _check_handle(residue._handle_)
+            return residue
+        except NullPointerError:
+            return None
+
+    def residues_count(self):
+        '''Get the current number of residues in the :py:class:`Topology`.'''
+        res = c_uint64()
+        self.c_lib.chfl_topology_residues_count(self._handle_, res)
+        return res.value
+
+    def add_residue(self, residue):
+        '''Add a :py:class:`Residue` to this :py:class:`Topology`.'''
+        self.c_lib.chfl_topology_add_residue(self._handle_, residue._handle_)
+
+    def residues_linked(self, first, second):
+        '''
+        Check if the two :py:class:`Residue` ``first`` and ``second`` from the
+        :py:class:`Topology` are linked together, *i.e.* if there is a bond
+        between one atom in the first residue and one atom in the second one.
+        '''
+        res = c_bool()
+        self.c_lib.chfl_topology_residues_linked(
+            self._handle_, first._handle_, second._handle_, res
+        )
+        return res.value
 
     def isbond(self, i, j):
         '''Tell if the atoms at indexes ``i`` and ``j`` are bonded together'''

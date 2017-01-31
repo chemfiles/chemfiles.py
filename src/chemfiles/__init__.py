@@ -7,6 +7,7 @@ __version__ = get_c_library().chfl_version().decode("utf8")
 
 from .errors import ChemfilesException, ArgumentError
 from .atom import Atom
+from .residue import Residue
 from .topology import Topology
 from .cell import UnitCell, CellShape
 from .frame import Frame
