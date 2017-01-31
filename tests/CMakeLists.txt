@@ -1,8 +1,14 @@
+if(${CHFL_PY_CODE_COVERAGE})
+    set(TEST_COMMAND "coverage;run")
+else()
+    set(TEST_COMMAND ${PYTHON_EXECUTABLE})
+endif()
+
 function(python_test _file_)
     get_filename_component(_name_ ${_file_} NAME_WE)
     add_test(
         NAME ${_name_}
-        COMMAND ${PYTHON_EXECUTABLE} ${_file_}
+        COMMAND ${TEST_COMMAND} ${_file_}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
     set_tests_properties(

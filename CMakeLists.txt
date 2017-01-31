@@ -5,6 +5,8 @@ project(chemfiles.py)
 # FIXME: maybe there is an other way to do this
 cmake_policy(SET CMP0026 OLD)
 
+option(CHFL_PY_CODE_COVERAGE "Enable python code coverage" OFF)
+
 # TODO: add option to use external chemfiles
 
 set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries instead of static ones" FORCE)
