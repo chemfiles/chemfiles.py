@@ -29,6 +29,10 @@ class Frame(CxxPointer):
     def __copy__(self):
         return Frame.from_ptr(self.ffi.chfl_frame_copy(self))
 
+    def __iter__(self):
+        for i in range(self.natoms()):
+            yield self.atom(i)
+
     def atom(self, index):
         '''
         Get a specific :py:class:`Atom` from a frame, given its `index` in the

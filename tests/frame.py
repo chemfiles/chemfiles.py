@@ -116,6 +116,14 @@ class TestFrame(unittest.TestCase):
         frame.atom(2)
         self.assertRaises(IndexError, frame.atom, 6)
 
+    def test_iter(self):
+        frame = Frame(5)
+        i = 0
+        for atom in frame:
+            self.assertEqual(atom.name(), "")
+            i += 1
+        self.assertEqual(i, 5)
+
 
 if __name__ == '__main__':
     unittest.main()

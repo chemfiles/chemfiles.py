@@ -28,6 +28,10 @@ class Topology(CxxPointer):
     def __copy__(self):
         return Topology.from_ptr(self.ffi.chfl_topology_copy(self))
 
+    def __iter__(self):
+        for i in range(self.natoms()):
+            yield self.atom(i)
+
     def atom(self, index):
         '''
         Get the :py:class:`Atom` at ``index`` from a :py:class:`Topology`.

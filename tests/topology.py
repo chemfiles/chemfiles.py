@@ -115,6 +115,16 @@ class TestTopology(unittest.TestCase):
         topology.add_bond(2, 3)
         self.assertTrue(topology.residues_linked(first, second))
 
+    def test_iter(self):
+        topology = Topology()
+        topology.resize(6)
+
+        i = 0
+        for atom in topology:
+            self.assertEqual(atom.name(), "")
+            i += 1
+        self.assertEqual(i, 6)
+
 
 if __name__ == '__main__':
     unittest.main()
