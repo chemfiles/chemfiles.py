@@ -7,20 +7,22 @@ import os
 from chemfiles import Trajectory, Topology, Frame, UnitCell, Atom
 from chemfiles import ChemfilesException
 
-DATA = os.path.join(os.path.dirname(__file__), "data")
-
 
 class TestTrajectory(unittest.TestCase):
     def test_errors(self):
         self.assertRaises(
-            ChemfilesException, Trajectory, os.path.join(DATA, "not-here.xyz")
+            ChemfilesException,
+            Trajectory,
+            os.path.join("data", "not-here.xyz")
         )
         self.assertRaises(
-            ChemfilesException, Trajectory, os.path.join(DATA, "empty.unknown")
+            ChemfilesException,
+            Trajectory,
+            os.path.join("data", "empty.unknown")
         )
 
     def test_read(self):
-        trajectory = Trajectory(os.path.join(DATA, "water.xyz"))
+        trajectory = Trajectory(os.path.join("data", "water.xyz"))
 
         self.assertEqual(trajectory.nsteps(), 100)
 
@@ -73,18 +75,18 @@ class TestTrajectory(unittest.TestCase):
         frame = trajectory.read_step(10)
         self.assertEqual(frame.atom(10).name(), "Cs")
 
-        trajectory.set_topology(os.path.join(DATA, "topology.xyz"), "XYZ")
+        trajectory.set_topology(os.path.join("data", "topology.xyz"), "XYZ")
         frame = trajectory.read()
         self.assertEqual(frame.atom(100).name(), "Rd")
 
     def test_protocols(self):
-        with Trajectory(os.path.join(DATA, "water.xyz")) as trajectory:
+        with Trajectory(os.path.join("data", "water.xyz")) as trajectory:
             for frame in trajectory:
                 # Checking iterator protocol
                 pass
 
     def test_close(self):
-        trajectory = Trajectory(os.path.join(DATA, "water.xyz"))
+        trajectory = Trajectory(os.path.join("data", "water.xyz"))
         trajectory.close()
         self.assertRaises(ChemfilesException, trajectory.read)
 
@@ -135,7 +137,7 @@ class TestTrajectory(unittest.TestCase):
         os.unlink("test-tmp.xyz")
 
     def test_molfiles(self):
-        trajectory = Trajectory(os.path.join(DATA, "water.trr"))
+        trajectory = Trajectory(os.path.join("data", "water.trr"))
         self.assertEqual(trajectory.nsteps(), 100)
 
 
