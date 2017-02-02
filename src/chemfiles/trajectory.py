@@ -39,9 +39,7 @@ class Trajectory(CxxPointer):
         return self
 
     def __exit__(self, *args):
-        # The C pointer will be deleted by the call to __del__, so no need to
-        # call chfl_trajectory_close ourselves.
-        pass
+        self.close()
 
     def __iter__(self):
         self._check_opened()
