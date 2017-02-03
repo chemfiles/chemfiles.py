@@ -6,15 +6,19 @@ endif()
 
 set(TEST_RUNNER_PY "${CMAKE_CURRENT_BINARY_DIR}/test-runner.py")
 file(WRITE ${TEST_RUNNER_PY}
-"import sys
+"import os
+import sys
 sys.path.insert(1, '${PROJECT_BINARY_DIR}/src')
 
 path = sys.argv[1]
 
-# we need to remove sys.argv; as unittest main try to parse it and fails  
+# we need to remove sys.argv; as unittest main try to parse it and fails
 del sys.argv[1]
 
-execfile(path)
+with open(path) as fd:
+    name = os.path.basename(path)
+    code = compile(fd.read(), name, 'exec')
+    exec(code)
 ")
 
 function(python_test _file_)
