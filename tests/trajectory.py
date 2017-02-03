@@ -3,6 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import numpy as np
 import os
+from ctypes import ArgumentError
 
 from chemfiles import Trajectory, Topology, Frame, UnitCell, Atom
 from chemfiles import ChemfilesException
@@ -20,6 +21,10 @@ class TestTrajectory(unittest.TestCase):
             Trajectory,
             os.path.join("data", "empty.unknown")
         )
+
+        trajectory = Trajectory("test-tmp.xyz", "w")
+        self.assertRaises(ArgumentError, trajectory.write, None)
+        os.unlink("test-tmp.xyz")
 
     def test_read(self):
         trajectory = Trajectory(os.path.join("data", "water.xyz"))
@@ -135,10 +140,6 @@ class TestTrajectory(unittest.TestCase):
             self.assertEqual(fd.read(), expected_content)
 
         os.unlink("test-tmp.xyz")
-
-    def test_molfiles(self):
-        trajectory = Trajectory(os.path.join("data", "water.trr"))
-        self.assertEqual(trajectory.nsteps(), 100)
 
 
 if __name__ == '__main__':

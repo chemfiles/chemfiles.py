@@ -7,7 +7,20 @@ from chemfiles.errors import _check_handle
 
 
 class CxxPointer(object):
-    ffi = get_c_library()
+    @property
+    def ffi(self):
+        return get_c_library()
+
+    @classmethod
+    def from_param(cls, parameter):
+        if parameter is None:
+            raise TypeError("Can not pass None as a " + cls.__name__)
+        if not isinstance(parameter, cls):
+            raise TypeError(
+                "Can not pass " + parameter.__class__.__name__ +
+                " as a " + cls.__name__
+            )
+        return parameter
 
     def __init__(self, ptr):
         _check_handle(ptr)
