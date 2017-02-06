@@ -2,23 +2,37 @@ cmake_minimum_required(VERSION 2.8.11)
 project(chemfiles.py)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
-
-if(${CMAKE_VERSION} VERSION_GREATER 3.0.0)
-    # We need to read the location of chemfiles library for tests
-    # FIXME: maybe there is an other way to do this
-    cmake_policy(SET CMP0026 OLD)
-endif()
+cmake_policy(VERSION 2.8.11)
 
 option(CHFL_PY_CODE_COVERAGE "Enable python code coverage" OFF)
 option(CHFL_PY_BUILD_DOCUMENTATION "Build the python documentation" OFF)
+option(CHFL_PY_INTERNAL_CHEMFILES "Use the internal version of chemfiles" OFF)
 
-# TODO: add option to use external chemfiles
+if(NOT ${CHFL_PY_INTERNAL_CHEMFILES})
+    find_package(chemfiles CONFIG 0.7)
+endif()
 
-set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries instead of static ones" FORCE)
-add_subdirectory(chemfiles)
-file(READ chemfiles/VERSION CHEMFILES_VERSION)
-string(STRIP ${CHEMFILES_VERSION} CHEMFILES_VERSION)
-set(CHEMFILES_LOCATION "chemfiles")
+if(${chemfiles_FOUND})
+    set(CHEMFILES_VERSION "${chemfiles_VERSION}")
+    get_target_property(CHEMFILES_LOCATION chemfiles LOCATION)
+    get_target_property(CHEMFILES_TYPE chemfiles TYPE)
+    if ("${CHEMFILES_TYPE}" STREQUAL "SHARED_LIBRARY")
+        message(STATUS "Using chemfiles (version ${CHEMFILES_VERSION}) at ${CHEMFILES_LOCATION}")
+    elseif ("${CHEMFILES_TYPE}" STREQUAL "STATIC_LIBRARY")
+        message(FATAL_ERROR
+            "Can not use the static version of chemfiles at ${CHEMFILES_LOCATION}\n"
+            "Define CHFL_PY_INTERNAL_CHEMFILES=ON to use use the internal chemfiles."
+        )
+    endif()
+else()
+    # Use the git submodule
+    message(STATUS "Using internal chemfiles from ${CMAKE_CURRENT_SOURCE_DIR}/chemfiles")
+    set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries instead of static ones" FORCE)
+    add_subdirectory(chemfiles)
+    file(READ chemfiles/VERSION CHEMFILES_VERSION)
+    string(STRIP ${CHEMFILES_VERSION} CHEMFILES_VERSION)
+    get_target_property(CHEMFILES_LOCATION chemfiles LOCATION)
+endif()
 
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/setup.py.in"
@@ -29,13 +43,13 @@ configure_file(
 # installed, and the one in `src/chemfiles` will be used for testing.
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/chemfiles/clib.py.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/build/lib/chemfiles/clib.py"
+  "${CMAKE_CURRENT_BINARY_DIR}/src/chemfiles/clib.py"
 )
 
-get_target_property(CHEMFILES_LOCATION chemfiles LOCATION)
+set(CHEMFILES_LOCATION "chemfiles")
 configure_file(
   "${CMAKE_CURRENT_SOURCE_DIR}/src/chemfiles/clib.py.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/src/chemfiles/clib.py"
+  "${CMAKE_CURRENT_BINARY_DIR}/build/lib/chemfiles/clib.py"
 )
 
 find_package(PythonInterp REQUIRED)
