@@ -64,7 +64,7 @@ class Selection(CxxPointer):
         of tuples of indexes.
         '''
         matching = c_uint64()
-        self.ffi.chfl_selection_evalutate(self, frame, matching)
+        self.ffi.chfl_selection_evaluate(self, frame, matching)
 
         matches = np.zeros(matching.value, chfl_match_t)
         self.ffi.chfl_selection_matches(self, matches, matching)

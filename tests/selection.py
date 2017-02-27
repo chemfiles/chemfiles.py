@@ -18,7 +18,8 @@ def testing_frame():
     topology.add_bond(1, 2)
     topology.add_bond(2, 3)
 
-    frame = Frame(4)
+    frame = Frame()
+    frame.resize(4)
     frame.set_topology(topology)
     return frame
 

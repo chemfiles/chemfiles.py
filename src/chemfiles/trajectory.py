@@ -95,7 +95,7 @@ class Trajectory(CxxPointer):
         if isinstance(topology, Topology):
             self.ffi.chfl_trajectory_set_topology(self, topology)
         else:
-            self.ffi.chfl_trajectory_set_topology_with_format(
+            self.ffi.chfl_trajectory_topology_file(
                 self, topology.encode("utf8"), format.encode("utf8")
             )
 

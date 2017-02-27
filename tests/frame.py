@@ -9,15 +9,15 @@ from chemfiles import Frame, UnitCell, Topology, Atom
 
 class TestFrame(unittest.TestCase):
     def test_copy(self):
-        frame = Frame(3)
+        frame = Frame()
         cloned = copy.copy(frame)
 
-        self.assertEqual(frame.natoms(), 3)
-        self.assertEqual(cloned.natoms(), 3)
+        self.assertEqual(frame.natoms(), 0)
+        self.assertEqual(cloned.natoms(), 0)
 
         frame.resize(6)
         self.assertEqual(frame.natoms(), 6)
-        self.assertEqual(cloned.natoms(), 3)
+        self.assertEqual(cloned.natoms(), 0)
 
     def test_natoms(self):
         frame = Frame()
@@ -25,10 +25,6 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(len(frame), 0)
 
         frame.resize(4)
-        self.assertEqual(frame.natoms(), 4)
-        self.assertEqual(len(frame), 4)
-
-        frame = Frame(4)
         self.assertEqual(frame.natoms(), 4)
         self.assertEqual(len(frame), 4)
 
@@ -48,7 +44,8 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(list(frame.velocities()[1]), [1, 0, 1])
 
     def test_positions(self):
-        frame = Frame(4)
+        frame = Frame()
+        frame.resize(4)
 
         expected = np.array([[1.0, 2.0, 3.0],
                              [4.0, 5.0, 6.0],
@@ -62,7 +59,8 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(frame.positions()[3, 2], 42)
 
     def test_velocities(self):
-        frame = Frame(4)
+        frame = Frame()
+        frame.resize(4)
 
         self.assertFalse(frame.has_velocities())
         frame.add_velocities()
@@ -80,7 +78,7 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(frame.velocities()[3, 2], 42)
 
     def test_cell(self):
-        frame = Frame(0)
+        frame = Frame()
         cell = UnitCell(1, 2, 4)
 
         frame.set_cell(cell)
@@ -89,16 +87,16 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(frame.cell().shape(), cell.shape())
 
     def test_topology(self):
-        frame = Frame(2)
-        topology = Topology()
+        frame = Frame()
+        frame.resize(2)
 
+        topology = Topology()
         topology.add_atom(Atom("Zn"))
         topology.add_atom(Atom("Ar"))
 
         frame.set_topology(topology)
 
         topology = frame.topology()
-
         self.assertEqual(topology.atom(0).name(), "Zn")
         self.assertEqual(topology.atom(1).name(), "Ar")
 
@@ -112,17 +110,19 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(frame.step(), 42)
 
     def test_out_of_bounds(self):
-        frame = Frame(5)
+        frame = Frame()
+        frame.resize(3)
         frame.atom(2)
         self.assertRaises(IndexError, frame.atom, 6)
 
     def test_iter(self):
-        frame = Frame(5)
+        frame = Frame()
+        frame.resize(3)
         i = 0
         for atom in frame:
             self.assertEqual(atom.name(), "")
             i += 1
-        self.assertEqual(i, 5)
+        self.assertEqual(i, 3)
 
 
 if __name__ == '__main__':

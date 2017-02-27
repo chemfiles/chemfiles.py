@@ -96,46 +96,25 @@ class TestTrajectory(unittest.TestCase):
         self.assertRaises(ChemfilesException, trajectory.read)
 
     def test_write(self):
-        positions = np.zeros((4, 3), np.float32)
+        frame = Frame()
+        frame.resize(4)
+        positions = frame.positions()
         topology = Topology()
         for i in range(4):
             positions[i] = [1, 2, 3]
             topology.add_atom(Atom("X"))
 
-        frame1 = Frame(4)
-        np.copyto(frame1.positions(), positions)
-        frame1.set_topology(topology)
-
-        positions = np.zeros((6, 3), np.float32)
-        topology = Topology()
-        for i in range(6):
-            positions[i] = [4, 5, 6]
-            topology.add_atom(Atom("X"))
-
-        frame2 = Frame(6)
-        np.copyto(frame2.positions(), positions)
-        frame2.set_topology(topology)
-
+        frame.set_topology(topology)
         with Trajectory("test-tmp.xyz", "w") as fd:
-            fd.write(frame1)
-            fd.write(frame2)
+            fd.write(frame)
 
-        expected_content = "\n".join(["4",
-                                      "Written by the chemfiles library",
-                                      "X 1 2 3",
-                                      "X 1 2 3",
-                                      "X 1 2 3",
-                                      "X 1 2 3",
-                                      "6",
-                                      "Written by the chemfiles library",
-                                      "X 4 5 6",
-                                      "X 4 5 6",
-                                      "X 4 5 6",
-                                      "X 4 5 6",
-                                      "X 4 5 6",
-                                      "X 4 5 6",
-                                      ""])
-
+        expected_content = """4
+Written by the chemfiles library
+X 1 2 3
+X 1 2 3
+X 1 2 3
+X 1 2 3
+"""
         with open("test-tmp.xyz") as fd:
             self.assertEqual(fd.read(), expected_content)
 

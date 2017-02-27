@@ -15,12 +15,11 @@ class Frame(CxxPointer):
     particles in the system.
     '''
 
-    def __init__(self, natoms=0):
+    def __init__(self):
         '''
-        Create an empty frame with initial capacity of `natoms`. It will be
-        resized by the library as needed.
+        Create an empty frame that will be resized by the library as needed.
         '''
-        super(Frame, self).__init__(self.ffi.chfl_frame(c_uint64(natoms)))
+        super(Frame, self).__init__(self.ffi.chfl_frame())
 
     def __del__(self):
         if hasattr(self, 'ptr'):
