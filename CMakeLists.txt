@@ -3,6 +3,9 @@ project(chemfiles.py)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 cmake_policy(VERSION 2.8.11)
+if (${CMAKE_VERSION} VERSION_GREATER 2.8.12)
+    cmake_policy(SET CMP0026 OLD)
+endif()
 
 option(CHFL_PY_CODE_COVERAGE "Enable python code coverage" OFF)
 option(CHFL_PY_BUILD_DOCUMENTATION "Build the python documentation" OFF)
