@@ -23,7 +23,7 @@ class Selection(CxxPointer):
 
     def __init__(self, selection):
         '''
-        Create a new :py:class:`Selection` from the given selection string.
+        Create a new :py:class:`Selection` from the given ``selection`` string.
         '''
         ptr = self.ffi.chfl_selection(selection.encode("utf8"))
         super(Selection, self).__init__(ptr)
@@ -37,12 +37,12 @@ class Selection(CxxPointer):
 
     def size(self):
         '''
-        Get the size of the :py:class:`Selection`, i.e. the number of atoms we
-        are selecting together.
+        Get the size of this :py:class:`Selection`.
 
-        This value is 1 for the 'atom' context, 2 for the 'pair' and 'bond'
-        context, 3 for the 'three' and 'angles' contextes and 4 for the 'four'
-        and 'dihedral' contextes.
+        The size of a selection is the number of atoms we are selecting
+        together. This value is 1 for the 'atom' context, 2 for the 'pair' and
+        'bond' context, 3 for the 'three' and 'angles' contextes and 4 for the
+        'four' and 'dihedral' contextes.
         '''
         size = c_uint64()
         self.ffi.chfl_selection_size(self, size)
@@ -50,7 +50,7 @@ class Selection(CxxPointer):
 
     def string(self):
         '''
-        Get the selection string used to create the :py:class:`Selection`
+        Get the selection string used to create this :py:class:`Selection`.
         '''
         return call_with_growing_buffer(
             lambda buff, n: self.ffi.chfl_selection_string(self, buff, n),
@@ -60,7 +60,7 @@ class Selection(CxxPointer):
     def evaluate(self, frame):
         '''
         Evaluate a :py:class:`Selection` for a given :py:class:`Frame`, and
-        return a list of matching atoms, either a a list of index or a list
+        return a list of matching atoms, either as a list of index or a list
         of tuples of indexes.
         '''
         matching = c_uint64()

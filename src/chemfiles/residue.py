@@ -41,18 +41,18 @@ class Residue(CxxPointer):
         return natoms.value
 
     def __len__(self):
-        '''Get the current number of atoms in the :py:class:`Residue`.'''
+        '''Get the current number of atoms in this :py:class:`Residue`.'''
         return self.natoms()
 
     def name(self):
-        '''Get the :py:class:`Residue` name'''
+        '''Get the name of this :py:class:`Residue`.'''
         return call_with_growing_buffer(
             lambda buff, size: self.ffi.chfl_residue_name(self, buff, size),
             initial=32,
         )
 
     def id(self):
-        '''Get the :py:class:`Residue` index in the initial topology'''
+        '''Get the :py:class:`Residue` index in the initial topology.'''
         id = c_uint64()
         self.ffi.chfl_residue_id(self, id)
         return id.value

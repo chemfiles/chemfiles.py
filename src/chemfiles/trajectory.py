@@ -15,9 +15,15 @@ class Trajectory(CxxPointer):
 
     def __init__(self, path, mode="r", format=""):
         '''
-        Open a trajectory file at ``path`` with mode ``mode``. Supported modes
-        are "r" for read (this is the default) or "w" for write. If ``format``
-        is not the empty string, use it instead of guessing the format from the
+        Open the :py:class:`Trajectory` at the given ``path`` using the
+        given ``mode`` and optional specific file ``format``.
+
+        Valid modes are ``'r'`` for read, ``'w'`` for write and ``'a'`` for
+        append.
+
+        The specific file format is needed when the file format does not match
+        the extension, or when there is not standard extension for this format.
+        If `format` is an empty string, the format will be guessed from the
         file extension.
         '''
         self.closed = False
@@ -28,7 +34,7 @@ class Trajectory(CxxPointer):
 
     def _check_opened(self):
         if self.closed:
-            raise ChemfilesException("Can not use a closed trajectory")
+            raise ChemfilesException(message="Can not use a closed Trajectory")
 
     def __del__(self):
         if not self.closed and hasattr(self, 'ptr'):
@@ -62,7 +68,7 @@ class Trajectory(CxxPointer):
 
     def read_step(self, step, frame=None):
         '''
-        Read a specific step in the :py:class:`Trajectory` and return the
+        Read a specific ``step`` in the :py:class:`Trajectory` and return the
         corresponding :py:class:`Frame`. If the ``frame`` parameter is given,
         reuse the corresponding allocation.
         '''
@@ -73,7 +79,7 @@ class Trajectory(CxxPointer):
         return frame
 
     def write(self, frame):
-        '''Write a :py:class:`Frame` to the :py:class:`Trajectory`'''
+        '''Write a :py:class:`Frame` to the :py:class:`Trajectory`.'''
         self._check_opened()
         self.ffi.chfl_trajectory_write(self, frame)
 
