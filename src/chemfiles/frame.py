@@ -39,12 +39,11 @@ class Frame(CxxPointer):
         Get a copy of the :py:class:`Atom` at index ``i`` in this
         :py:class:`Frame`.
         '''
-        ptr = self.ffi.chfl_atom_from_frame(self, c_uint64(i))
-        if not ptr:
+        if i >= self.natoms():
             raise IndexError(
                 "atom index ({}) out of range for this frame".format(i)
             )
-        return Atom.from_ptr(ptr)
+        return Atom.from_ptr(self.ffi.chfl_atom_from_frame(self, c_uint64(i)))
 
     def natoms(self):
         '''Get the current number of atoms in this :py:class:`Frame`.'''

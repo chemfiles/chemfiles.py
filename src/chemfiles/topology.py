@@ -34,12 +34,13 @@ class Topology(CxxPointer):
         Get a copy of the :py:class:`Atom` at index ``i`` from this
         :py:class:`Topology`.
         '''
-        ptr = self.ffi.chfl_atom_from_topology(self, c_uint64(i))
-        if not ptr:
+        if i >= self.natoms():
             raise IndexError(
                 "atom index ({}) out of range for this topology".format(i)
             )
-        return Atom.from_ptr(ptr)
+        return Atom.from_ptr(
+            self.ffi.chfl_atom_from_topology(self, c_uint64(i))
+        )
 
     def natoms(self):
         '''Get the number of atoms in this :py:class:`Topology`.'''
@@ -82,12 +83,13 @@ class Topology(CxxPointer):
         Get the :py:class:`Residue` at index ``i`` from this
         :py:class:`Topology`.
         '''
-        ptr = self.ffi.chfl_residue_from_topology(self, c_uint64(i))
-        if not ptr:
+        if i >= self.residues_count():
             raise IndexError(
-                "atom index ({}) out of range for this topology".format(i)
+                "residue index ({}) out of range for this topology".format(i)
             )
-        return Residue.from_ptr(ptr)
+        return Residue.from_ptr(
+            self.ffi.chfl_residue_from_topology(self, c_uint64(i))
+        )
 
     def residue_for_atom(self, i):
         '''
@@ -95,6 +97,10 @@ class Topology(CxxPointer):
         this :py:class:`Topology`. If the atom is not in a residue, this
         function returns None.
         '''
+        if i >= self.natoms():
+            raise IndexError(
+                "residue index ({}) out of range for this topology".format(i)
+            )
         ptr = self.ffi.chfl_residue_for_atom(self, c_uint64(i))
         if ptr:
             return Residue.from_ptr(ptr)

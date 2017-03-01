@@ -86,9 +86,17 @@ class TestTopology(unittest.TestCase):
         topology = Topology()
         topology.resize(4)
 
+        residue = Residue("")
+        residue.add_atom(1)
+        topology.add_residue(residue)
+
         topology.atom(2)
+        topology.residue(0)
+        topology.residue_for_atom(1)
+
         self.assertRaises(IndexError, topology.atom, 6)
         self.assertRaises(IndexError, topology.residue, 6)
+        self.assertRaises(IndexError, topology.residue_for_atom, 6)
 
     def test_residues(self):
         topology = Topology()
