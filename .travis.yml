@@ -50,7 +50,8 @@ script:
     if ${EXTRA_WORK}; then
         cd ${TRAVIS_BUILD_DIR}/tests
         coverage report
-        codecov
+        coverage xml --include="${TRAVIS_BUILD_DIR}/build/src/*" -o coverage.xml
+        codecov --file coverage.xml
     fi
     - |
       if ${EXTRA_WORK}; then
