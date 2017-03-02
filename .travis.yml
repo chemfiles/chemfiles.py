@@ -46,13 +46,11 @@ install:
 script:
   - cd ${TRAVIS_BUILD_DIR}/build
   - ctest --output-on-error
-
-after_script:
   - |
     if ${EXTRA_WORK}; then
+        cd ${TRAVIS_BUILD_DIR}/tests
         coverage report
         codecov
-        cd ${TRAVIS_BUILD_DIR}
         git clone https://${GH_TOKEN}@github.com/chemfiles/chemfiles.py gh-pages
         ./scripts/deploy-docs.sh
     fi

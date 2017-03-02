@@ -1,5 +1,5 @@
 if(${CHFL_PY_CODE_COVERAGE})
-    set(TEST_COMMAND "coverage;run")
+    set(TEST_COMMAND "coverage;run;--append")
 else()
     set(TEST_COMMAND ${PYTHON_EXECUTABLE})
 endif()

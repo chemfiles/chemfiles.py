@@ -112,6 +112,8 @@ class TestTopology(unittest.TestCase):
         residue.add_atom(2)
         topology.add_residue(residue)
 
+        self.assertEqual(topology.residue_for_atom(5), None)
+
         first = topology.residue(0)
         self.assertEqual(first.name(), 'foo')
 
