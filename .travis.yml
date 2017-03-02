@@ -51,6 +51,10 @@ script:
         cd ${TRAVIS_BUILD_DIR}/tests
         coverage report
         codecov
+    fi
+    - |
+      if ${EXTRA_WORK}; then
+        cd ${TRAVIS_BUILD_DIR}
         git clone https://${GH_TOKEN}@github.com/chemfiles/chemfiles.py gh-pages
         ./scripts/deploy-docs.sh
     fi
