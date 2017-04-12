@@ -50,8 +50,8 @@ class Trajectory(CxxPointer):
     def __iter__(self):
         self._check_opened()
         frame = Frame()
-        for _ in range(self.nsteps()):
-            yield self.read(frame)
+        for step in range(self.nsteps()):
+            yield self.read_step(step, frame)
 
     def read(self, frame=None):
         '''
