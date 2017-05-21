@@ -3,9 +3,6 @@ project(chemfiles.py)
 
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/cmake")
 cmake_policy(VERSION 2.8.11)
-if (${CMAKE_VERSION} VERSION_GREATER 3.0.0)
-    cmake_policy(SET CMP0026 OLD)
-endif()
 
 option(CHFL_PY_CODE_COVERAGE "Enable python code coverage" OFF)
 option(CHFL_PY_BUILD_DOCUMENTATION "Build the python documentation" OFF)
@@ -17,7 +14,6 @@ endif()
 
 if(${chemfiles_FOUND})
     set(CHEMFILES_VERSION "${chemfiles_VERSION}")
-    get_target_property(CHEMFILES_LOCATION chemfiles LOCATION)
     get_target_property(CHEMFILES_TYPE chemfiles TYPE)
     if ("${CHEMFILES_TYPE}" STREQUAL "SHARED_LIBRARY")
         message(STATUS "Using chemfiles (version ${CHEMFILES_VERSION}) at ${CHEMFILES_LOCATION}")
@@ -34,7 +30,6 @@ else()
     add_subdirectory(chemfiles)
     file(READ chemfiles/VERSION CHEMFILES_VERSION)
     string(STRIP ${CHEMFILES_VERSION} CHEMFILES_VERSION)
-    get_target_property(CHEMFILES_LOCATION chemfiles LOCATION)
 endif()
 
 configure_file(
@@ -44,15 +39,12 @@ configure_file(
 
 # We configure the same file twice: the one in `build/lib` will be the one
 # installed, and the one in `src/chemfiles` will be used for testing.
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/chemfiles/clib.py.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/src/chemfiles/clib.py"
+file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/src/chemfiles/location.py"
+    CONTENT "CHEMFILES_LOCATION = \"$<TARGET_FILE:chemfiles>\"\n"
 )
 
-set(CHEMFILES_LOCATION "chemfiles")
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/src/chemfiles/clib.py.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/build/lib/chemfiles/clib.py"
+file(GENERATE OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/build/lib/chemfiles/location.py"
+    CONTENT "CHEMFILES_LOCATION = \"${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/$<TARGET_FILE_NAME:chemfiles>\"\n"
 )
 
 find_package(PythonInterp REQUIRED)
