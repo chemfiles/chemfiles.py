@@ -4,7 +4,7 @@ import sys
 from ctypes import cdll, c_double, POINTER
 
 from chemfiles.ffi import set_interface, CHFL_FRAME, CHFL_ATOM, chfl_vector_t
-from .location import CHEMFILES_LOCATION
+from .location import CHEMFILES_LOCATION, __file__ as location_file_path
 
 
 class FindChemfilesLibrary(object):
@@ -16,7 +16,15 @@ class FindChemfilesLibrary(object):
             try:
                 self._cache = cdll.LoadLibrary(lib_path(CHEMFILES_LOCATION))
             except OSError:
-                raise ImportError("Could not find chemfiles library.")
+                if location_file_path.endswith(".pyc"):
+                    path = location_file_path[:-1]
+                else:
+                    path = location_file_path
+                raise ImportError(
+                    "Could not find chemfiles c++ library. " +
+                    "Please check the path defined in " + path
+                )
+
             set_interface(self._cache)
             # We update the arguments here, as ctypes can not pass a NULL value
             # as the last parameter
