@@ -19,9 +19,9 @@ H = Atom("H")
 
 # Create topology with one water molecule
 topology = Topology()
-topology.append(O)
-topology.append(H)
-topology.append(H)
+topology.add_atom(O)
+topology.add_atom(H)
+topology.add_atom(H)
 
 topology.add_bond(0, 1)
 topology.add_bond(0, 2)

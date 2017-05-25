@@ -27,5 +27,3 @@ rmsd /= len(distances)
 rmsd = math.sqrt(rmsd)
 
 print("Root-mean square displacement is: {}".format(rmsd))
-
-trajectory.close()
