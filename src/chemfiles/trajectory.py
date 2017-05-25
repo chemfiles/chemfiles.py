@@ -34,7 +34,7 @@ class Trajectory(CxxPointer):
 
     def _check_opened(self):
         if self.closed:
-            raise ChemfilesException(message="Can not use a closed Trajectory")
+            raise ChemfilesException("Can not use a closed Trajectory")
 
     def __del__(self):
         if not self.closed and hasattr(self, 'ptr'):

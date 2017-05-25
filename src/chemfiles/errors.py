@@ -3,27 +3,25 @@ from __future__ import absolute_import, print_function, unicode_literals
 import warnings
 import chemfiles
 
+__all__ = ["ChemfilesException", "set_warnings_callback"]
+
 
 class ChemfilesWarning(UserWarning):
-    '''Warnings coming from the Chemfiles runtime.'''
+    '''Warnings from the Chemfiles runtime.'''
     pass
 
 
 class ChemfilesException(BaseException):
-    '''Error in the chemfiles runtime.'''
-    def __init__(self, status=None, message=""):
-        self.status = status
-        if message == "":
-            message = last_error()
-        super(ChemfilesException, self).__init__(message)
+    '''Exception class for errors in chemfiles'''
+    pass
 
 
-def last_error():
+def _last_error():
     '''Get the last error from the chemfiles runtime.'''
     return chemfiles.get_c_library().chfl_last_error().decode("utf8")
 
 
-def clear_errors():
+def _clear_errors():
     '''Clear any error message saved in the chemfiles runtime.'''
     return chemfiles.get_c_library().chfl_clear_errors()
 
@@ -31,7 +29,7 @@ def clear_errors():
 def _check_return_code(status, _function, _arguments):
     '''Check that the function call was OK, and raise an exception if needed'''
     if status.value != 0:
-        raise ChemfilesException(status=status)
+        raise ChemfilesException(_last_error())
 
 
 def _check_handle(handle):
@@ -39,9 +37,7 @@ def _check_handle(handle):
     try:
         handle.contents
     except ValueError:
-        raise ChemfilesException(
-            message="Got a NULL pointer from the chemfiles runtime."
-        )
+        raise ChemfilesException(_last_error())
 
 
 # Store a reference to the last logging callback, to preven Python from
@@ -53,6 +49,8 @@ def set_warnings_callback(function):
     '''
     Call `function` on every warning event. The callback should take a string
     message and return nothing.
+
+    By default, warnings are send to python `warnings` module.
     '''
     from chemfiles.ffi import chfl_warning_callback
     from chemfiles import get_c_library
