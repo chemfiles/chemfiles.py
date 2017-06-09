@@ -16,10 +16,10 @@ if(${chemfiles_FOUND})
     set(CHEMFILES_VERSION "${chemfiles_VERSION}")
     get_target_property(CHEMFILES_TYPE chemfiles TYPE)
     if ("${CHEMFILES_TYPE}" STREQUAL "SHARED_LIBRARY")
-        message(STATUS "Using chemfiles (version ${CHEMFILES_VERSION}) at ${CHEMFILES_LOCATION}")
+        message(STATUS "Using external chemfiles (version ${CHEMFILES_VERSION})")
     elseif ("${CHEMFILES_TYPE}" STREQUAL "STATIC_LIBRARY")
         message(FATAL_ERROR
-            "Can not use the static version of chemfiles at ${CHEMFILES_LOCATION}\n"
+            "Can not use the static version of external chemfiles\n"
             "Define CHFL_PY_INTERNAL_CHEMFILES=ON to use use the internal chemfiles."
         )
     endif()
