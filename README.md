@@ -1,6 +1,7 @@
 # Python binding for the chemfiles library
 
 [![Build Status](https://travis-ci.org/chemfiles/chemfiles.py.svg?branch=master)](https://travis-ci.org/chemfiles/chemfiles.py)
+[![Build status](https://ci.appveyor.com/api/projects/status/hvkwj8rf59q5jyeg?svg=true)](https://ci.appveyor.com/project/Luthaf/chemfiles-py)
 [![Code coverage](http://codecov.io/github/chemfiles/chemfiles.py/coverage.svg?branch=master)](http://codecov.io/github/chemfiles/chemfiles.py?branch=master)
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://chemfiles.github.io/chemfiles.py/)
 

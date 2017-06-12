@@ -1,0 +1,56 @@
+version: "{build}"
+
+environment:
+  matrix:
+    - generator: Visual Studio 14 2015 Win64
+      ARCH: x64
+    - generator: Visual Studio 14 2015
+      ARCH: x86
+    - generator: MinGW Makefiles
+      CXX_PATH: 'C:\mingw-w64\x86_64-6.3.0-posix-seh-rt_v5-rev1\mingw64\bin'
+      ARCH: x64
+    - generator: MinGW Makefiles
+      CXX_PATH: 'C:\mingw-w64\i686-6.3.0-posix-dwarf-rt_v5-rev1\mingw32\bin'
+      ARCH: x86
+
+configuration:
+  - Release
+
+notifications:
+  - provider: Email
+    to: [luthaf@luthaf.fr]
+    on_build_success: false
+    on_build_failure: true
+    on_build_status_changed: true
+
+install:
+  - git submodule update --init
+  - ps: if ("$env:CXX_PATH" -ne "") {$env:PATH += ";$env:CXX_PATH"}
+  - ps: |
+        if ($env:generator -eq "MinGW Makefiles") {
+            # Remove sh.exe from git in the PATH for MinGW to work
+            $env:PATH = ($env:PATH.Split(';') | Where-Object { $_ -ne 'C:\Program Files\Git\usr\bin' }) -join ';'
+        }
+  - ps: $env:CMAKE_ARGUMENTS = "-G `"$env:generator`""
+  - ps: $env:CMAKE_ARGUMENTS += " -DCMAKE_BUILD_TYPE=$env:configuration"
+  - ps: |
+        if ($env:generator -Match "Visual Studio") {
+            $env:BUILD_ARGUMENTS="/verbosity:minimal"
+        } else {
+            $env:BUILD_ARGUMENTS=""
+        }
+  - ps: |
+        if ($env:ARCH -eq "x64") {
+            # Use 64-bit python
+            $env:PATH = "C:\Python27-x64;C:\Python27-x64\Scripts;" + $env:PATH
+        }
+
+build_script:
+  - pip install enum34 numpy
+  - mkdir build
+  - cd build
+  - cmake %CMAKE_ARGUMENTS% ..
+  - cmake --build . --config "%configuration%" -- %BUILD_ARGUMENTS%
+
+test_script:
+  - ctest --build-config "%configuration%" --timeout 300 --output-on-failure
