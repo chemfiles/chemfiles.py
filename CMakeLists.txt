@@ -25,6 +25,13 @@ if(${chemfiles_FOUND})
     endif()
 else()
     # Use the git submodule
+    if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/chemfiles/CMakeLists.txt")
+        message(FATAL_ERROR
+            "The git submodule for chemfiles is not initalized.\n"
+            "Please run `git submodule update --init."
+        )
+    endif()
+
     message(STATUS "Using internal chemfiles from ${CMAKE_CURRENT_SOURCE_DIR}/chemfiles")
     set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries instead of static ones" FORCE)
     add_subdirectory(chemfiles)
