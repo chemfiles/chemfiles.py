@@ -51,4 +51,4 @@ def lib_path(location):
         raise OSError("Unknown os. Edit this file to add logic for your OS.")
 
 
-get_c_library = FindChemfilesLibrary()
+_get_c_library = FindChemfilesLibrary()

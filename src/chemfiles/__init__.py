@@ -12,8 +12,8 @@ from .selection import Selection
 
 # Setup work
 from .errors import _set_default_warning_callback
-from .clib import get_c_library
+from .clib import _get_c_library
 _set_default_warning_callback()
 
-__version__ = get_c_library().chfl_version().decode("utf8")
+__version__ = _get_c_library().chfl_version().decode("utf8")
 assert(__version__.startswith("0.8"))
