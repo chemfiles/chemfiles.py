@@ -37,6 +37,28 @@ configure_file(
   "${CMAKE_CURRENT_BINARY_DIR}/setup.py"
 )
 
+find_package(PythonInterp REQUIRED)
+set(SETUP_PY "${CMAKE_CURRENT_BINARY_DIR}/setup.py")
+
+file(GLOB_RECURSE PYTHON_SRC src/chemfiles/**.py)
+set(SETUP_PY_BUILD_OUTPUT "")
+set(COPY_SRC_OUTPUT "")
+foreach(_file_ ${PYTHON_SRC})
+    file(RELATIVE_PATH _path_ ${CMAKE_CURRENT_SOURCE_DIR} ${_file_})
+    list(APPEND COPY_SRC_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_path_})
+
+    file(RELATIVE_PATH _path_ ${CMAKE_CURRENT_SOURCE_DIR}/src/chemfiles ${_file_})
+    list(APPEND SETUP_PY_BUILD_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/build/lib/${_path_})
+endforeach()
+
+add_custom_command(
+    OUTPUT ${COPY_SRC_OUTPUT}
+    COMMAND ${CMAKE_COMMAND} -E remove_directory ${CMAKE_CURRENT_BINARY_DIR}/src/
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/src/ ${CMAKE_CURRENT_BINARY_DIR}/src/
+    DEPENDS ${PYTHON_SRC}
+    COMMENT "Copying python sources"
+)
+
 # We configure the same file twice: the one in `build/lib` will be the one
 # installed, and the one in `src/chemfiles` will be used for testing.
 add_custom_command(
@@ -45,7 +67,6 @@ add_custom_command(
             -DLOCATION_PY_PATH=${CMAKE_CURRENT_BINARY_DIR}/src/
             -DCHEMFILES_LOCATION=$<TARGET_FILE:chemfiles>
             -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/generate_location.cmake
-    DEPENDS chemfiles
     COMMENT "Generating test location.py"
 )
 
@@ -55,35 +76,19 @@ add_custom_command(
             -DLOCATION_PY_PATH=${CMAKE_CURRENT_BINARY_DIR}/build/lib
             -DCHEMFILES_LOCATION=${CMAKE_INSTALL_PREFIX}/lib${LIB_SUFFIX}/$<TARGET_FILE_NAME:chemfiles>
             -P ${CMAKE_CURRENT_SOURCE_DIR}/cmake/generate_location.cmake
-    DEPENDS chemfiles
     COMMENT "Generating install location.py"
 )
 
 add_custom_target(location.py ALL
+    DEPENDS ${COPY_SRC_OUTPUT}
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/src/chemfiles/location.py
     DEPENDS ${CMAKE_CURRENT_BINARY_DIR}/build/lib/chemfiles/location.py
 )
 
-find_package(PythonInterp REQUIRED)
-set(SETUP_PY "${CMAKE_CURRENT_BINARY_DIR}/setup.py")
-
-file(GLOB_RECURSE PYTHON_SRC src/chemfiles/**.py)
-set(SETUP_PY_BUILD_OUTPUT "")
-foreach(_file_ ${PYTHON_SRC})
-    file(RELATIVE_PATH _path_ ${CMAKE_CURRENT_SOURCE_DIR} ${_file_})
-    list(APPEND SETUP_PY_BUILD_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${_path_})
-
-    file(RELATIVE_PATH _path_ ${CMAKE_CURRENT_SOURCE_DIR}/src/chemfiles ${_file_})
-    list(APPEND SETUP_PY_BUILD_OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/build/lib/${_path_})
-endforeach()
-
 add_custom_command(
     OUTPUT ${SETUP_PY_BUILD_OUTPUT}
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/src/ ${CMAKE_CURRENT_BINARY_DIR}/src/
-    COMMAND ${CMAKE_COMMAND} -E remove ${CMAKE_CURRENT_BINARY_DIR}/src/chemfiles/clib.py.in
     COMMAND ${PYTHON_EXECUTABLE} ${SETUP_PY} build
-    COMMAND ${CMAKE_COMMAND} -E touch ${CMAKE_CURRENT_BINARY_DIR}/build/lib/chemfiles/clib.py
-    DEPENDS ${PYTHON_SRC} location.py
+    DEPENDS location.py
     COMMENT "Running python setup.py build"
 )
 
