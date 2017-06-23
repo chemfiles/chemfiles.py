@@ -2,9 +2,9 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_uint64
 
-from chemfiles.utils import CxxPointer
-from chemfiles.frame import Frame, Topology
-from chemfiles.errors import ChemfilesException
+from .utils import CxxPointer
+from .frame import Frame, Topology
+from .errors import ChemfilesException
 
 
 class Trajectory(CxxPointer):

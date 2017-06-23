@@ -3,8 +3,9 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_uint64, c_bool
 import numpy as np
 
-from chemfiles.utils import CxxPointer
-from chemfiles import Atom, Residue
+from .utils import CxxPointer
+from .atom import Atom
+from .residue import Residue
 
 
 class Topology(CxxPointer):

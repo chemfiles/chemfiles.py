@@ -3,7 +3,6 @@ import os
 import sys
 from ctypes import cdll, c_double, POINTER
 
-from chemfiles.ffi import set_interface, CHFL_FRAME, CHFL_ATOM, chfl_vector_t
 from .location import CHEMFILES_LOCATION, __file__ as location_file_path
 
 
@@ -25,6 +24,8 @@ class FindChemfilesLibrary(object):
                     "Please check the path defined in " + path
                 )
 
+            from .ffi import set_interface
+            from .ffi import CHFL_FRAME, CHFL_ATOM, chfl_vector_t
             set_interface(self._cache)
             # We update the arguments here, as ctypes can not pass a NULL value
             # as the last parameter
@@ -48,3 +49,6 @@ def lib_path(location):
         return "lib" + location + ".dylib"
     else:
         raise OSError("Unknown os. Edit this file to add logic for your OS.")
+
+
+get_c_library = FindChemfilesLibrary()
