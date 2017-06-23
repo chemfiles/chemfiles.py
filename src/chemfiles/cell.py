@@ -3,8 +3,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_double, ARRAY
 from enum import IntEnum
 
-from chemfiles.utils import CxxPointer
-from chemfiles.ffi import chfl_cell_shape_t, chfl_vector_t
+from .utils import CxxPointer
+from .ffi import chfl_cell_shape_t, chfl_vector_t
 
 
 class CellShape(IntEnum):

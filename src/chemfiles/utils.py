@@ -2,8 +2,8 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import create_string_buffer, c_uint64
 
-from chemfiles import get_c_library
-from chemfiles.errors import _check_handle
+from .clib import get_c_library
+from .errors import _check_handle
 
 
 class CxxPointer(object):

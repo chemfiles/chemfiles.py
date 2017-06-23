@@ -3,9 +3,11 @@ from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
 from ctypes import c_uint64, c_bool, POINTER
 
-from chemfiles.ffi import chfl_vector_t
-from chemfiles.utils import CxxPointer
-from chemfiles import Atom, Topology, UnitCell
+from .ffi import chfl_vector_t
+from .utils import CxxPointer
+from .atom import Atom
+from .topology import Topology
+from .cell import UnitCell
 
 
 class Frame(CxxPointer):

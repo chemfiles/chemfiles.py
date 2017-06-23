@@ -4,8 +4,8 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_uint64
 import numpy as np
 
-from chemfiles.utils import CxxPointer, call_with_growing_buffer
-from chemfiles.ffi import chfl_match_t
+from .utils import CxxPointer, call_with_growing_buffer
+from .ffi import chfl_match_t
 
 
 class Selection(CxxPointer):

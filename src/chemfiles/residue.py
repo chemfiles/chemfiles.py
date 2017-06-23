@@ -2,7 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_bool, c_uint64
 
-from chemfiles.utils import CxxPointer, call_with_growing_buffer
+from .utils import CxxPointer, call_with_growing_buffer
 
 
 class Residue(CxxPointer):
