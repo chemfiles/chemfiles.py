@@ -17,4 +17,4 @@ from .errors import _set_default_warning_callback
 _set_default_warning_callback()
 
 __version__ = get_c_library().chfl_version().decode("utf8")
-assert(__version__.startswith("0.7"))
+assert(__version__.startswith("0.8"))

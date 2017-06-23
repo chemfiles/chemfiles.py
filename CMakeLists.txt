@@ -9,7 +9,7 @@ option(CHFL_PY_BUILD_DOCUMENTATION "Build the python documentation" OFF)
 option(CHFL_PY_INTERNAL_CHEMFILES "Use the internal version of chemfiles" OFF)
 
 if(NOT ${CHFL_PY_INTERNAL_CHEMFILES})
-    find_package(chemfiles CONFIG QUIET 0.7)
+    find_package(chemfiles CONFIG QUIET 0.8)
 endif()
 
 if(${chemfiles_FOUND})
