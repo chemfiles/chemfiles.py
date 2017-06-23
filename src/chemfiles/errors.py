@@ -2,7 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 import warnings
 
-from .clib import get_c_library
+from .clib import _get_c_library
 
 __all__ = ["ChemfilesException", "set_warnings_callback"]
 
@@ -19,12 +19,12 @@ class ChemfilesException(BaseException):
 
 def _last_error():
     '''Get the last error from the chemfiles runtime.'''
-    return get_c_library().chfl_last_error().decode("utf8")
+    return _get_c_library().chfl_last_error().decode("utf8")
 
 
 def _clear_errors():
     '''Clear any error message saved in the chemfiles runtime.'''
-    return get_c_library().chfl_clear_errors()
+    return _get_c_library().chfl_clear_errors()
 
 
 def _check_return_code(status, _function, _arguments):
@@ -61,7 +61,7 @@ def set_warnings_callback(function):
     global _CURRENT_CALLBACK
     _CURRENT_CALLBACK = chfl_warning_callback(callback)
 
-    get_c_library().chfl_set_warning_callback(_CURRENT_CALLBACK)
+    _get_c_library().chfl_set_warning_callback(_CURRENT_CALLBACK)
 
 
 def _set_default_warning_callback():

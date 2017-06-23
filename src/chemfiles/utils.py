@@ -2,14 +2,14 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import create_string_buffer, c_uint64
 
-from .clib import get_c_library
+from .clib import _get_c_library
 from .errors import _check_handle
 
 
 class CxxPointer(object):
     @property
     def ffi(self):
-        return get_c_library()
+        return _get_c_library()
 
     @classmethod
     def from_param(cls, parameter):
