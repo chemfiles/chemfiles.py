@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import create_string_buffer, c_uint64
 
 from .clib import _get_c_library
-from .errors import _check_handle
+from .misc import _check_handle
 
 
 class CxxPointer(object):

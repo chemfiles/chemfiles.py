@@ -4,7 +4,7 @@ import warnings
 
 from .clib import _get_c_library
 
-__all__ = ["ChemfilesException", "set_warnings_callback"]
+__all__ = ["ChemfilesException", "set_warnings_callback", "add_configuration"]
 
 
 class ChemfilesWarning(UserWarning):
@@ -70,3 +70,18 @@ def _set_default_warning_callback():
         # adapatator => C++ code => Python binding => user code
         lambda message: warnings.warn(message, ChemfilesWarning, stacklevel=4)
     )
+
+
+def add_configuration(path):
+    '''
+    Read configuration data from the file at `path`.
+
+    By default, chemfiles reads configuration from any file name `.chemfilesrc`
+    in the current directory or any parent directory. This function can be used
+    to add data from another configuration file.
+
+    This function will fail if there is no file at `path`, or if the file is
+    incorectly formatted. Data from the new configuration file will overwrite
+    any existing data.
+    '''
+    _get_c_library().chfl_add_configuration(path.encode("utf8"))
