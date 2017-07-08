@@ -22,8 +22,9 @@ class TestTrajectory(unittest.TestCase):
             os.path.join("data", "empty.unknown")
         )
 
-        trajectory = Trajectory("test-tmp.xyz", "w")
-        self.assertRaises(ArgumentError, trajectory.write, None)
+        with Trajectory("test-tmp.xyz", "w") as trajectory:
+            self.assertRaises(ArgumentError, trajectory.write, None)
+
         os.unlink("test-tmp.xyz")
 
     def test_read(self):
