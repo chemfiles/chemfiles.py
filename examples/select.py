@@ -1,4 +1,4 @@
-# File indexes.py, example for the Chemharp library
+# File select.py, example for the Chemharp library
 # Any copyright is dedicated to the Public Domain.
 # http://creativecommons.org/publicdomain/zero/1.0/
 
