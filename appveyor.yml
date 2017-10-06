@@ -25,25 +25,7 @@ notifications:
 
 install:
   - git submodule update --init
-  - ps: if ("$env:CXX_PATH" -ne "") {$env:PATH += ";$env:CXX_PATH"}
-  - ps: |
-        if ($env:generator -eq "MinGW Makefiles") {
-            # Remove sh.exe from git in the PATH for MinGW to work
-            $env:PATH = ($env:PATH.Split(';') | Where-Object { $_ -ne 'C:\Program Files\Git\usr\bin' }) -join ';'
-        }
-  - ps: $env:CMAKE_ARGUMENTS = "-G `"$env:generator`""
-  - ps: $env:CMAKE_ARGUMENTS += " -DCMAKE_BUILD_TYPE=$env:configuration"
-  - ps: |
-        if ($env:generator -Match "Visual Studio") {
-            $env:BUILD_ARGUMENTS="/verbosity:minimal"
-        } else {
-            $env:BUILD_ARGUMENTS=""
-        }
-  - ps: |
-        if ($env:ARCH -eq "x64") {
-            # Use 64-bit python
-            $env:PATH = "C:\Python27-x64;C:\Python27-x64\Scripts;" + $env:PATH
-        }
+  - ps: .\scripts\setup-appveyor.ps1
 
 build_script:
   - pip install enum34 numpy
