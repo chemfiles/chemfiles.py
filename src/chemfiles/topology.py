@@ -133,37 +133,6 @@ class Topology(CxxPointer):
         self.ffi.chfl_topology_residues_linked(self, first, second, linked)
         return linked.value
 
-    def isbond(self, i, j):
-        '''
-        Tell if the atoms at indexes ``i`` and ``j`` are bonded together in
-        this :py:class:`Topology`.
-        '''
-        is_bond = c_bool()
-        self.ffi.chfl_topology_isbond(self, c_uint64(i), c_uint64(j), is_bond)
-        return is_bond.value
-
-    def isangle(self, i, j, k):
-        '''
-        Tell if the atoms at indexes ``i``, ``j`` and ``k`` constitues an
-        angle in this :py:class:`Topology`.
-        '''
-        is_angle = c_bool()
-        self.ffi.chfl_topology_isangle(
-            self, c_uint64(i), c_uint64(j), c_uint64(k), is_angle
-        )
-        return is_angle.value
-
-    def isdihedral(self, i, j, k, m):
-        '''
-        Tell if the atoms at indexes ``i``, ``j``, ``k`` and ``m`` constitues a
-        dihedral angle in this :py:class:`Topology`.
-        '''
-        is_dih = c_bool()
-        self.ffi.chfl_topology_isdihedral(
-            self, c_uint64(i), c_uint64(j), c_uint64(k), c_uint64(m), is_dih
-        )
-        return is_dih.value
-
     def bonds_count(self):
         '''Get the number of bonds in this :py:class:`Topology`.'''
         bonds = c_uint64()

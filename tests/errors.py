@@ -16,7 +16,8 @@ class TestErrors(unittest.TestCase):
             pass
         self.assertEqual(
             chemfiles.errors._last_error(),
-            "Can not find a format associated with the \"\" extension."
+            "file at 'noextention' does not have an extension, provide a "
+            "format name to read it"
         )
 
         chemfiles.errors._clear_errors()

@@ -53,15 +53,6 @@ class TestTopology(unittest.TestCase):
         self.assertEqual(topology.angles_count(), 2)
         self.assertEqual(topology.dihedrals_count(), 1)
 
-        self.assertTrue(topology.isbond(0, 1))
-        self.assertFalse(topology.isbond(0, 3))
-
-        self.assertTrue(topology.isangle(0, 1, 2))
-        self.assertFalse(topology.isangle(0, 1, 3))
-
-        self.assertTrue(topology.isdihedral(0, 1, 2, 3))
-        self.assertFalse(topology.isdihedral(0, 1, 3, 2))
-
         self.assertEqual(
             topology.bonds().all(),
             np.array([[2, 3], [1, 2], [0, 1]]).all()

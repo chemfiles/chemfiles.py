@@ -9,6 +9,7 @@ from .cell import UnitCell, CellShape
 from .frame import Frame
 from .trajectory import Trajectory
 from .selection import Selection
+from .property import Property
 
 # Setup work
 from .errors import _set_default_warning_callback
@@ -16,4 +17,4 @@ from .clib import _get_c_library
 _set_default_warning_callback()
 
 __version__ = _get_c_library().chfl_version().decode("utf8")
-assert(__version__.startswith("0.7"))
+assert(__version__.startswith("0.8"))

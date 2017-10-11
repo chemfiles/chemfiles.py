@@ -4,7 +4,7 @@ from ctypes import c_double, ARRAY
 from enum import IntEnum
 
 from .utils import CxxPointer
-from .ffi import chfl_cell_shape_t, chfl_vector_t
+from .ffi import chfl_cellshape, chfl_vector3d
 
 
 class CellShape(IntEnum):
@@ -16,9 +16,9 @@ class CellShape(IntEnum):
     - ``CellType.Infinite``: for cells without periodic boundary conditions;
     '''
 
-    Orthorhombic = chfl_cell_shape_t.CHFL_CELL_ORTHORHOMBIC
-    Triclinic = chfl_cell_shape_t.CHFL_CELL_TRICLINIC
-    Infinite = chfl_cell_shape_t.CHFL_CELL_INFINITE
+    Orthorhombic = chfl_cellshape.CHFL_CELL_ORTHORHOMBIC
+    Triclinic = chfl_cellshape.CHFL_CELL_TRICLINIC
+    Infinite = chfl_cellshape.CHFL_CELL_INFINITE
 
 
 class UnitCell(CxxPointer):
@@ -51,8 +51,8 @@ class UnitCell(CxxPointer):
         If alpha, beta and gamma are equal to 90.0, the new unit cell shape is
         ``CellShape.Orthorhombic``. Else it is ``CellShape.Infinite``.
         '''
-        lenghts = chfl_vector_t(a, b, c)
-        angles = chfl_vector_t(alpha, beta, gamma)
+        lenghts = chfl_vector3d(a, b, c)
+        angles = chfl_vector3d(alpha, beta, gamma)
         if alpha == 90.0 and beta == 90.0 and gamma == 90.0:
             ptr = self.ffi.chfl_cell(lenghts)
         else:
@@ -68,7 +68,7 @@ class UnitCell(CxxPointer):
 
     def lengths(self):
         '''Get the three lenghts of this :py:class:`UnitCell`, in Angstroms.'''
-        lengths = chfl_vector_t(0, 0, 0)
+        lengths = chfl_vector3d(0, 0, 0)
         self.ffi.chfl_cell_lengths(self, lengths)
         return lengths[0], lengths[1], lengths[2]
 
@@ -77,11 +77,11 @@ class UnitCell(CxxPointer):
         Set the three lenghts of this :py:class:`UnitCell` to ``a``, ``b`` and
         ``c``. These values should be in Angstroms.
         '''
-        self.ffi.chfl_cell_set_lengths(self, chfl_vector_t(a, b, c))
+        self.ffi.chfl_cell_set_lengths(self, chfl_vector3d(a, b, c))
 
     def angles(self):
         '''Get the three angles of this :py:class:`UnitCell`, in degrees.'''
-        angles = chfl_vector_t(0, 0, 0)
+        angles = chfl_vector3d(0, 0, 0)
         self.ffi.chfl_cell_angles(self, angles)
         return angles[0], angles[1], angles[2]
 
@@ -92,7 +92,7 @@ class UnitCell(CxxPointer):
         angles is only possible for ``CellShape.Triclinic`` cells.
         '''
         self.ffi.chfl_cell_set_angles(
-            self, chfl_vector_t(alpha, beta, gamma)
+            self, chfl_vector3d(alpha, beta, gamma)
         )
 
     def matrix(self):
@@ -109,7 +109,7 @@ class UnitCell(CxxPointer):
             |  0    b_y   c_y |
             |  0     0    c_z |
         '''
-        m = ARRAY(chfl_vector_t, 3)()
+        m = ARRAY(chfl_vector3d, 3)()
         self.ffi.chfl_cell_matrix(self, m)
         return [
             (m[0][0], m[0][1], m[0][2]),
@@ -119,13 +119,13 @@ class UnitCell(CxxPointer):
 
     def shape(self):
         '''Get the shape of this :py:class:`UnitCell`.'''
-        shape = chfl_cell_shape_t()
+        shape = chfl_cellshape()
         self.ffi.chfl_cell_shape(self, shape)
         return CellShape(shape.value)
 
     def set_shape(self, shape):
         '''Set the shape of this :py:class:`UnitCell` to ``shape``.'''
-        self.ffi.chfl_cell_set_shape(self, chfl_cell_shape_t(shape))
+        self.ffi.chfl_cell_set_shape(self, chfl_cellshape(shape))
 
     def volume(self):
         '''Get the volume of this :py:class:`UnitCell`.'''

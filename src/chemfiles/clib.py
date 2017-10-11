@@ -28,13 +28,13 @@ class FindChemfilesLibrary(object):
                 )
 
             from .ffi import set_interface
-            from .ffi import CHFL_FRAME, CHFL_ATOM, chfl_vector_t
+            from .ffi import CHFL_FRAME, CHFL_ATOM, chfl_vector3d
             set_interface(self._cache)
             # We update the arguments here, as ctypes can not pass a NULL value
             # as the last parameter
             self._cache.chfl_frame_add_atom.argtypes = [
                 POINTER(CHFL_FRAME), POINTER(CHFL_ATOM),
-                chfl_vector_t, POINTER(c_double)
+                chfl_vector3d, POINTER(c_double)
             ]
         return self._cache
 

@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
 from ctypes import c_uint64, c_bool, POINTER
 
-from .ffi import chfl_vector_t
+from .ffi import chfl_vector3d
 from .utils import CxxPointer
 from .atom import Atom
 from .topology import Topology
@@ -77,9 +77,9 @@ class Frame(CxxPointer):
         ``velocity`` can be ``None`` if no velocity is associated with the
         atom.
         '''
-        position = chfl_vector_t(position[0], position[1], position[2])
+        position = chfl_vector3d(position[0], position[1], position[2])
         if velocity:
-            velocity = chfl_vector_t(velocity[0], velocity[1], velocity[2])
+            velocity = chfl_vector3d(velocity[0], velocity[1], velocity[2])
         self.ffi.chfl_frame_add_atom(self, atom, position, velocity)
 
     def remove(self, i):
@@ -106,7 +106,7 @@ class Frame(CxxPointer):
         cause a segfault.
         '''
         natoms = c_uint64()
-        data = POINTER(chfl_vector_t)()
+        data = POINTER(chfl_vector3d)()
         self.ffi.chfl_frame_positions(self, data, natoms)
         natoms = natoms.value
         if natoms != 0:
@@ -129,7 +129,7 @@ class Frame(CxxPointer):
         cause a segfault.
         '''
         natoms = c_uint64()
-        data = POINTER(chfl_vector_t)()
+        data = POINTER(chfl_vector3d)()
         self.ffi.chfl_frame_velocities(self, data, natoms)
         natoms = natoms.value
         if natoms != 0:

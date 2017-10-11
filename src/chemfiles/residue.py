@@ -14,15 +14,16 @@ class Residue(CxxPointer):
 
     def __init__(self, name, resid=None):
         '''
-        Create a new :py:class:`Residue` from a ``name`` and a residue id
-        ``resid``.
+        Create a new :py:class:`Residue` from a ``name`` and optionally a
+        residue id ``resid``.
         '''
 
         if resid:
-            resid = c_uint64(resid)
+            ptr = self.ffi.chfl_residue_with_id(
+                name.encode("utf8"), c_uint64(resid)
+            )
         else:
-            resid = c_uint64(-1)
-        ptr = self.ffi.chfl_residue(name.encode("utf8"), resid)
+            ptr = self.ffi.chfl_residue(name.encode("utf8"))
         super(Residue, self).__init__(ptr)
 
     def __del__(self):
