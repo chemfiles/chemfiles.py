@@ -96,7 +96,7 @@ class Atom(CxxPointer):
     def vdw_radius(self):
         '''
         Try to get the Van der Waals radius of this :py:class:`Atom` from its
-        type. If the radius can not be found, returns -1.
+        type. If the radius can not be found, returns 0.
         '''
         radius = c_double()
         self.ffi.chfl_atom_vdw_radius(self, radius)
@@ -105,7 +105,7 @@ class Atom(CxxPointer):
     def covalent_radius(self):
         '''
         Try to get the covalent radius of this :py:class:`Atom` from its type.
-        If the radius can not be found, returns -1.
+        If the radius can not be found, returns 0.
         '''
         radius = c_double()
         self.ffi.chfl_atom_covalent_radius(self, radius)
@@ -114,7 +114,7 @@ class Atom(CxxPointer):
     def atomic_number(self):
         '''
         Try to get the atomic number of this :py:class:`Atom` from its type. If
-        the atomic number can not be found, returns -1.
+        the atomic number can not be found, returns 0.
         '''
         number = c_uint64()
         self.ffi.chfl_atom_atomic_number(self, number)

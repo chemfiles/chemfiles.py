@@ -52,13 +52,15 @@ class TestAtom(unittest.TestCase):
         self.assertEqual(atom.charge(), -1.5)
 
     def test_radii(self):
-        atom = Atom("He")
-        self.assertAlmostEqual(atom.vdw_radius(), 1.4, 2)
-        self.assertAlmostEqual(atom.covalent_radius(), 0.32, 3)
+        self.assertAlmostEqual(Atom("He").vdw_radius(), 1.4, 2)
+        self.assertAlmostEqual(Atom("He").covalent_radius(), 0.32, 3)
+
+        self.assertEqual(Atom("H1").vdw_radius(), 0)
+        self.assertEqual(Atom("H1").covalent_radius(), 0)
 
     def test_atomic_number(self):
-        atom = Atom("He")
-        self.assertEqual(atom.atomic_number(), 2)
+        self.assertEqual(Atom("He").atomic_number(), 2)
+        self.assertEqual(Atom("H1").atomic_number(), 0)
 
 
 if __name__ == '__main__':
