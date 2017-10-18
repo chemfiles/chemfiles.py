@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 
 import chemfiles
-from chemfiles import Trajectory, ChemfilesException
+from chemfiles import Trajectory, ChemfilesError
 
 
 class TestErrors(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestErrors(unittest.TestCase):
 
         try:
             Trajectory("noextention")
-        except ChemfilesException:
+        except ChemfilesError:
             pass
         self.assertEqual(
             chemfiles.errors._last_error(),

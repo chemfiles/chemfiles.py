@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import copy
 
-from chemfiles import Residue, ChemfilesException
+from chemfiles import Residue, ChemfilesError
 
 
 class TestResidue(unittest.TestCase):
@@ -25,7 +25,7 @@ class TestResidue(unittest.TestCase):
 
     def test_id(self):
         residue = Residue('bar')
-        self.assertRaises(ChemfilesException, residue.id)
+        self.assertRaises(ChemfilesError, residue.id)
 
         residue = Residue('bar', 45)
         self.assertEqual(residue.id(), 45)

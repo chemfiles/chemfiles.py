@@ -10,7 +10,7 @@ Error handling
 --------------
 
 Chemfiles uses exceptions for error handling, throwing
-:py:class:`ChemfilesException <chemfiles.errors.ChemfilesException>` when an
+:py:class:`ChemfilesError <chemfiles.errors.ChemfilesError>` when an
 error occurs.
 
 .. automodule:: chemfiles.errors

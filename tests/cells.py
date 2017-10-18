@@ -4,7 +4,7 @@ import unittest
 import copy
 
 from chemfiles import UnitCell, CellShape
-from chemfiles import ChemfilesException
+from chemfiles import ChemfilesError
 
 
 class TestUnitCell(unittest.TestCase):
@@ -30,7 +30,7 @@ class TestUnitCell(unittest.TestCase):
         self.assertEqual(cell.angles(), (90.0, 90.0, 90.0))
 
         self.assertEqual(cell.shape(), CellShape.Orthorhombic)
-        self.assertRaises(ChemfilesException, cell.set_angles, 80, 89, 110)
+        self.assertRaises(ChemfilesError, cell.set_angles, 80, 89, 110)
 
         cell.set_shape(CellShape.Triclinic)
         cell.set_angles(80, 89, 110)

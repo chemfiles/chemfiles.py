@@ -6,18 +6,18 @@ import os
 from ctypes import ArgumentError
 
 from chemfiles import Trajectory, Topology, Frame, UnitCell, Atom
-from chemfiles import ChemfilesException
+from chemfiles import ChemfilesError
 
 
 class TestTrajectory(unittest.TestCase):
     def test_errors(self):
         self.assertRaises(
-            ChemfilesException,
+            ChemfilesError,
             Trajectory,
             os.path.join("data", "not-here.xyz")
         )
         self.assertRaises(
-            ChemfilesException,
+            ChemfilesError,
             Trajectory,
             os.path.join("data", "empty.unknown")
         )
@@ -94,7 +94,7 @@ class TestTrajectory(unittest.TestCase):
     def test_close(self):
         trajectory = Trajectory(os.path.join("data", "water.xyz"))
         trajectory.close()
-        self.assertRaises(ChemfilesException, trajectory.read)
+        self.assertRaises(ChemfilesError, trajectory.read)
 
     def test_write(self):
         frame = Frame()

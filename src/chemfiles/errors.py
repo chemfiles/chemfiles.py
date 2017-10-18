@@ -4,7 +4,7 @@ import warnings
 
 from .clib import _get_c_library
 
-__all__ = ["ChemfilesException", "set_warnings_callback"]
+__all__ = ["ChemfilesError", "set_warnings_callback"]
 
 
 class ChemfilesWarning(UserWarning):
@@ -12,7 +12,7 @@ class ChemfilesWarning(UserWarning):
     pass
 
 
-class ChemfilesException(BaseException):
+class ChemfilesError(BaseException):
     '''Exception class for errors in chemfiles'''
     pass
 
@@ -30,7 +30,7 @@ def _clear_errors():
 def _check_return_code(status, _function, _arguments):
     '''Check that the function call was OK, and raise an exception if needed'''
     if status.value != 0:
-        raise ChemfilesException(_last_error())
+        raise ChemfilesError(_last_error())
 
 
 def _check_handle(handle):
@@ -38,7 +38,7 @@ def _check_handle(handle):
     try:
         handle.contents
     except ValueError:
-        raise ChemfilesException(_last_error())
+        raise ChemfilesError(_last_error())
 
 
 # Store a reference to the last logging callback, to preven Python from

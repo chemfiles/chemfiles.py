@@ -4,7 +4,7 @@ from ctypes import c_uint64
 
 from .utils import CxxPointer
 from .frame import Frame, Topology
-from .errors import ChemfilesException
+from .errors import ChemfilesError
 
 
 class Trajectory(CxxPointer):
@@ -34,7 +34,7 @@ class Trajectory(CxxPointer):
 
     def _check_opened(self):
         if self.closed:
-            raise ChemfilesException("Can not use a closed Trajectory")
+            raise ChemfilesError("Can not use a closed Trajectory")
 
     def __del__(self):
         if not self.closed and hasattr(self, 'ptr'):
