@@ -4,7 +4,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_uint64
 import numpy as np
 
-from .utils import CxxPointer, call_with_growing_buffer
+from .utils import CxxPointer, _call_with_growing_buffer
 from .ffi import chfl_match_t
 
 
@@ -52,7 +52,7 @@ class Selection(CxxPointer):
         '''
         Get the selection string used to create this :py:class:`Selection`.
         '''
-        return call_with_growing_buffer(
+        return _call_with_growing_buffer(
             lambda buff, n: self.ffi.chfl_selection_string(self, buff, n),
             initial=128,
         )

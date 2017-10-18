@@ -4,8 +4,8 @@ import sys
 from ctypes import c_double, c_bool
 
 from .ffi import chfl_property_kind, chfl_vector3d
-from .utils import CxxPointer, call_with_growing_buffer
-from .errors import ChemfilesError
+from .utils import CxxPointer, _call_with_growing_buffer
+from .utils import ChemfilesError
 
 
 class Property(CxxPointer):
@@ -53,7 +53,7 @@ class Property(CxxPointer):
         if kind.value == chfl_property_kind.CHFL_PROPERTY_STRING:
             def callback(buffer, size):
                 self.ffi.chfl_property_get_string(self, buffer, size)
-            return call_with_growing_buffer(callback, initial=32)
+            return _call_with_growing_buffer(callback, initial=32)
         if kind.value == chfl_property_kind.CHFL_PROPERTY_VECTOR3D:
             value = chfl_vector3d()
             self.ffi.chfl_property_get_vector3d(self, value)

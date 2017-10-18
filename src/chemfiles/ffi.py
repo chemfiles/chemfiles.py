@@ -21,7 +21,7 @@ import numpy as np
 from ctypes import c_int, c_uint64, c_int64, c_double, c_char, c_char_p, c_bool
 from ctypes import CFUNCTYPE, ARRAY, POINTER, Structure
 
-from .errors import _check_return_code
+from .utils import _check_return_code
 
 
 class chfl_status(c_int):

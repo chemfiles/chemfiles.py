@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from .errors import ChemfilesError
+from .utils import ChemfilesError
 from .atom import Atom
 from .residue import Residue
 from .topology import Topology
@@ -12,7 +12,7 @@ from .selection import Selection
 from .property import Property
 
 # Setup work
-from .errors import _set_default_warning_callback
+from .utils import _set_default_warning_callback
 from .clib import _get_c_library
 _set_default_warning_callback()
 

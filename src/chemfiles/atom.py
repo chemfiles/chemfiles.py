@@ -2,7 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_double, c_uint64
 
-from .utils import CxxPointer, call_with_growing_buffer
+from .utils import CxxPointer, _call_with_growing_buffer
 from .property import Property
 
 
@@ -63,7 +63,7 @@ class Atom(CxxPointer):
 
     def name(self):
         '''Get this :py:class:`Atom` name.'''
-        return call_with_growing_buffer(
+        return _call_with_growing_buffer(
             lambda buffer, size: self.ffi.chfl_atom_name(self, buffer, size),
             initial=32,
         )
@@ -74,7 +74,7 @@ class Atom(CxxPointer):
 
     def type(self):
         '''Get this :py:class:`Atom` type.'''
-        return call_with_growing_buffer(
+        return _call_with_growing_buffer(
             lambda buffer, size: self.ffi.chfl_atom_type(self, buffer, size),
             initial=32,
         )
@@ -89,7 +89,7 @@ class Atom(CxxPointer):
         example, the full name of "He" is "Helium". If the name can not be
         found, returns the empty string.
         '''
-        return call_with_growing_buffer(
+        return _call_with_growing_buffer(
             lambda buff, size: self.ffi.chfl_atom_full_name(self, buff, size),
             initial=64,
         )

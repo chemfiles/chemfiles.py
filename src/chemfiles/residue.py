@@ -2,7 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_bool, c_uint64
 
-from .utils import CxxPointer, call_with_growing_buffer
+from .utils import CxxPointer, _call_with_growing_buffer
 
 
 class Residue(CxxPointer):
@@ -47,7 +47,7 @@ class Residue(CxxPointer):
 
     def name(self):
         '''Get the name of this :py:class:`Residue`.'''
-        return call_with_growing_buffer(
+        return _call_with_growing_buffer(
             lambda buff, size: self.ffi.chfl_residue_name(self, buff, size),
             initial=32,
         )
