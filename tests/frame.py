@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import copy
+import math
 import numpy as np
 
 from chemfiles import Frame, UnitCell, Topology, Atom, ChemfilesError
@@ -143,6 +144,31 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(frame.get("foo"), False)
 
         self.assertRaises(ChemfilesError, frame.get, "bar")
+
+    def test_distance(self):
+        frame = Frame()
+        frame.set_cell(UnitCell(3.0, 4.0, 5.0))
+        frame.add_atom(Atom(""), (0, 0, 0))
+        frame.add_atom(Atom(""), (1, 2, 6))
+
+        self.assertEqual(frame.distance(0, 1), math.sqrt(6.0))
+
+    def test_angle(self):
+        frame = Frame()
+        frame.add_atom(Atom(""), (1, 0, 0))
+        frame.add_atom(Atom(""), (0, 0, 0))
+        frame.add_atom(Atom(""), (0, 1, 0))
+
+        self.assertEqual(frame.angle(0, 1, 2), math.pi / 2.0)
+
+    def test_dihedral(self):
+        frame = Frame()
+        frame.add_atom(Atom(""), (1, 0, 0))
+        frame.add_atom(Atom(""), (0, 0, 0))
+        frame.add_atom(Atom(""), (0, 1, 0))
+        frame.add_atom(Atom(""), (-1, 1, 0))
+
+        self.assertEqual(frame.dihedral(0, 1, 2, 3), math.pi)
 
 
 if __name__ == '__main__':

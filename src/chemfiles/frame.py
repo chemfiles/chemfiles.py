@@ -1,7 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
-from ctypes import c_uint64, c_bool, POINTER
+from ctypes import c_uint64, c_bool, c_double, POINTER
 
 from .ffi import chfl_vector3d
 from .utils import CxxPointer
@@ -197,6 +197,40 @@ class Frame(CxxPointer):
         and dihedrals are guessed from the bonds.
         '''
         self.ffi.chfl_frame_guess_topology(self)
+
+    def distance(self, i, j):
+        '''
+        Get the distance between the atoms at indexes ``i`` and ``j`` in this
+        :py:class:`Frame`, accounting for periodic boundary conditions. The
+        result is expressed in angstroms.
+        '''
+        distance = c_double()
+        self.ffi.chfl_frame_distance(self, c_uint64(i), c_uint64(j), distance)
+        return distance.value
+
+    def angle(self, i, j, k):
+        '''
+        Get the angle formed by the atoms at indexes ``i``, ``j`` and ``k`` in
+        this :py:class:`Frame`, accounting for periodic boundary conditions.
+        The result is expressed in radians.
+        '''
+        angle = c_double()
+        self.ffi.chfl_frame_angle(
+            self, c_uint64(i), c_uint64(j), c_uint64(k), angle
+        )
+        return angle.value
+
+    def dihedral(self, i, j, k, m):
+        '''
+        Get the dihedral angle formed by the atoms at indexes ``i``, ``j``,
+        ``k`` and ``m`` in this :py:class:`Frame`, accounting for periodic
+        boundary conditions. The result is expressed in radians.
+        '''
+        dihedral = c_double()
+        self.ffi.chfl_frame_dihedral(
+            self, c_uint64(i), c_uint64(j), c_uint64(k), c_uint64(m), dihedral
+        )
+        return dihedral.value
 
     def set(self, name, value):
         '''

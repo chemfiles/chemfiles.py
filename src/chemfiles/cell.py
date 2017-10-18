@@ -132,3 +132,12 @@ class UnitCell(CxxPointer):
         volume = c_double()
         self.ffi.chfl_cell_volume(self, volume)
         return volume.value
+
+    def wrap(self, vector):
+        '''
+        Wrap a ``vector`` in this :py:class:`UnitCell`, and return the wrapped
+        vector.
+        '''
+        vector = chfl_vector3d(vector[0], vector[1], vector[2])
+        self.ffi.chfl_cell_wrap(self, vector)
+        return (vector[0], vector[1], vector[2])

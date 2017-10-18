@@ -57,6 +57,15 @@ class TestUnitCell(unittest.TestCase):
         cell = UnitCell(3, 4, 5, 100, 120, 130)
         self.assertEqual(cell.shape(), CellShape.Triclinic)
 
+    def test_wrap(self):
+        cell = UnitCell(3, 4, 5)
+
+        wrapped = cell.wrap((1, 5, -5.5))
+
+        self.assertEqual(wrapped[0], 1.0)
+        self.assertEqual(wrapped[1], 1.0)
+        self.assertEqual(wrapped[2], -0.5)
+
 
 if __name__ == '__main__':
     unittest.main()
