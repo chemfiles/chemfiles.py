@@ -4,7 +4,7 @@ import unittest
 import copy
 import numpy as np
 
-from chemfiles import Frame, UnitCell, Topology, Atom
+from chemfiles import Frame, UnitCell, Topology, Atom, ChemfilesError
 
 
 class TestFrame(unittest.TestCase):
@@ -132,6 +132,17 @@ class TestFrame(unittest.TestCase):
             self.assertEqual(atom.name(), "")
             i += 1
         self.assertEqual(i, 3)
+
+    def test_property(self):
+        frame = Frame()
+
+        frame.set("foo", 3)
+        self.assertEqual(frame.get("foo"), 3.0)
+
+        frame.set("foo", False)
+        self.assertEqual(frame.get("foo"), False)
+
+        self.assertRaises(ChemfilesError, frame.get, "bar")
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import copy
 
-from chemfiles import Atom
+from chemfiles import Atom, ChemfilesError
 
 
 class TestAtom(unittest.TestCase):
@@ -61,6 +61,17 @@ class TestAtom(unittest.TestCase):
     def test_atomic_number(self):
         self.assertEqual(Atom("He").atomic_number(), 2)
         self.assertEqual(Atom("H1").atomic_number(), 0)
+
+    def test_property(self):
+        atom = Atom("He")
+
+        atom.set("foo", 3)
+        self.assertEqual(atom.get("foo"), 3.0)
+
+        atom.set("foo", False)
+        self.assertEqual(atom.get("foo"), False)
+
+        self.assertRaises(ChemfilesError, atom.get, "bar")
 
 
 if __name__ == '__main__':

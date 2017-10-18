@@ -8,6 +8,7 @@ from .utils import CxxPointer
 from .atom import Atom
 from .topology import Topology
 from .cell import UnitCell
+from .property import Property
 
 
 class Frame(CxxPointer):
@@ -196,3 +197,20 @@ class Frame(CxxPointer):
         and dihedrals are guessed from the bonds.
         '''
         self.ffi.chfl_frame_guess_topology(self)
+
+    def set(self, name, value):
+        '''
+        Set a property of this frame, with the given ``name`` and ``value``.
+        The new value overwrite any pre-existing property with the same name.
+        '''
+        self.ffi.chfl_frame_set_property(
+            self, name.encode("utf8"), Property(value)
+        )
+
+    def get(self, name):
+        '''
+        Get a property of this frame with the given ``name``, or raise an error
+        if the property does not exists.
+        '''
+        ptr = self.ffi.chfl_frame_get_property(self, name.encode("utf8"))
+        return Property.from_ptr(ptr).get()

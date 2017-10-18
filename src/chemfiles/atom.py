@@ -3,6 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_double, c_uint64
 
 from .utils import CxxPointer, call_with_growing_buffer
+from .property import Property
 
 
 class Atom(CxxPointer):
@@ -119,3 +120,20 @@ class Atom(CxxPointer):
         number = c_uint64()
         self.ffi.chfl_atom_atomic_number(self, number)
         return number.value
+
+    def set(self, name, value):
+        '''
+        Set a property of this atom, with the given ``name`` and ``value``.
+        The new value overwrite any pre-existing property with the same name.
+        '''
+        self.ffi.chfl_atom_set_property(
+            self, name.encode("utf8"), Property(value)
+        )
+
+    def get(self, name):
+        '''
+        Get a property of this atom with the given ``name``, or raise an error
+        if the property does not exists.
+        '''
+        ptr = self.ffi.chfl_atom_get_property(self, name.encode("utf8"))
+        return Property.from_ptr(ptr).get()
