@@ -1,6 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import sys
+import numpy as np
 from ctypes import c_double, c_bool
 
 from .ffi import chfl_property_kind, chfl_vector3d
@@ -71,12 +72,7 @@ def _is_string(value):
 
 def _is_vector3d(value):
     try:
-        if not isinstance(value[0], (float, int)):
-            return False
-        if not isinstance(value[1], (float, int)):
-            return False
-        if not isinstance(value[2], (float, int)):
-            return False
-        return True
+        a = np.array(value, dtype="double")
+        return len(a) >= 3
     except:
         return False
