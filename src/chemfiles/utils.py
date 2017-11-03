@@ -5,7 +5,7 @@ from ctypes import create_string_buffer, c_uint64
 
 from .clib import _get_c_library
 
-__all__ = ["ChemfilesError", "set_warnings_callback"]
+__all__ = ["ChemfilesError", "set_warnings_callback", "add_configuration"]
 
 
 class ChemfilesWarning(UserWarning):
@@ -64,7 +64,11 @@ def set_warnings_callback(function):
     from .ffi import chfl_warning_callback
 
     def callback(message):
-        function(message.decode("utf8"))
+        try:
+            function(message.decode("utf8"))
+        except Exception as e:
+            message = "exception raised in warning callback: {}".format(e)
+            warnings.warn(message, ChemfilesWarning)
 
     global _CURRENT_CALLBACK
     _CURRENT_CALLBACK = chfl_warning_callback(callback)
