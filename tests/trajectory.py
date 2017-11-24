@@ -32,7 +32,8 @@ class TestTrajectory(unittest.TestCase):
 
         self.assertEqual(trajectory.nsteps(), 100)
 
-        frame = trajectory.read()
+        frame = Frame()
+        trajectory.read(frame)
         self.assertEqual(frame.natoms(), 297)
 
         positions = frame.positions()
