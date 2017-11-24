@@ -108,8 +108,12 @@ class Frame(CxxPointer):
         natoms = c_uint64()
         data = POINTER(chfl_vector_t)()
         self.ffi.chfl_frame_positions(self, data, natoms)
-        positions = np.ctypeslib.as_array(data, shape=(natoms.value,))
-        return positions.view(np.float64).reshape((natoms.value, 3))
+        natoms = natoms.value
+        if natoms != 0:
+            positions = np.ctypeslib.as_array(data, shape=(natoms,))
+            return positions.view(np.float64).reshape((natoms, 3))
+        else:
+            return np.array([[], [], []], dtype=np.float64)
 
     def velocities(self):
         '''
@@ -127,8 +131,12 @@ class Frame(CxxPointer):
         natoms = c_uint64()
         data = POINTER(chfl_vector_t)()
         self.ffi.chfl_frame_velocities(self, data, natoms)
-        velocities = np.ctypeslib.as_array(data, shape=(natoms.value,))
-        return velocities.view(np.float64).reshape((natoms.value, 3))
+        natoms = natoms.value
+        if natoms != 0:
+            positions = np.ctypeslib.as_array(data, shape=(natoms,))
+            return positions.view(np.float64).reshape((natoms, 3))
+        else:
+            return np.array([[], [], []], dtype=np.float64)
 
     def add_velocities(self):
         '''
