@@ -88,8 +88,7 @@ class TestTrajectory(unittest.TestCase):
     def test_protocols(self):
         with Trajectory(os.path.join("data", "water.xyz")) as trajectory:
             for frame in trajectory:
-                # Checking iterator protocol
-                pass
+                self.assertEqual(frame.natoms(), 297)
 
     def test_close(self):
         trajectory = Trajectory(os.path.join("data", "water.xyz"))
