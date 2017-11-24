@@ -58,6 +58,10 @@ class TestFrame(unittest.TestCase):
         positions[3, 2] = 42
         self.assertEqual(frame.positions()[3, 2], 42)
 
+        # Checking empty frame positions access
+        frame = Frame()
+        positions = frame.positions()
+
     def test_velocities(self):
         frame = Frame()
         frame.resize(4)
@@ -76,6 +80,11 @@ class TestFrame(unittest.TestCase):
 
         velocities[3, 2] = 42
         self.assertEqual(frame.velocities()[3, 2], 42)
+
+        # Checking empty frame velocities access
+        frame = Frame()
+        frame.add_velocities()
+        velocities = frame.velocities()
 
     def test_cell(self):
         frame = Frame()
