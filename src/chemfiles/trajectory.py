@@ -60,7 +60,7 @@ class Trajectory(CxxPointer):
         reuse the corresponding allocation.
         '''
         self._check_opened()
-        if not frame:
+        if frame is None:
             frame = Frame()
         self.ffi.chfl_trajectory_read(self, frame)
         return frame
