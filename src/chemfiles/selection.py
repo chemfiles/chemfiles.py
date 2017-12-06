@@ -5,7 +5,7 @@ from ctypes import c_uint64
 import numpy as np
 
 from .utils import CxxPointer, _call_with_growing_buffer
-from .ffi import chfl_match_t
+from .ffi import chfl_match
 
 
 class Selection(CxxPointer):
@@ -66,7 +66,7 @@ class Selection(CxxPointer):
         matching = c_uint64()
         self.ffi.chfl_selection_evaluate(self, frame, matching)
 
-        matches = np.zeros(matching.value, chfl_match_t)
+        matches = np.zeros(matching.value, chfl_match)
         self.ffi.chfl_selection_matches(self, matches, matching)
 
         size = self.size()

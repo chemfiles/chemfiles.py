@@ -51,8 +51,8 @@ class TestUnitCell(unittest.TestCase):
     def test_shape(self):
         cell = UnitCell(3, 4, 5)
         self.assertEqual(cell.shape(), CellShape.Orthorhombic)
-        cell.set_shape(CellShape.Infinite)
-        self.assertEqual(cell.shape(), CellShape.Infinite)
+        cell.set_shape(CellShape.Triclinic)
+        self.assertEqual(cell.shape(), CellShape.Triclinic)
 
         cell = UnitCell(3, 4, 5, 100, 120, 130)
         self.assertEqual(cell.shape(), CellShape.Triclinic)
