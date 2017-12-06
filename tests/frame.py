@@ -5,7 +5,7 @@ import copy
 import math
 import numpy as np
 
-from chemfiles import Frame, UnitCell, Topology, Atom, ChemfilesError
+from chemfiles import Frame, UnitCell, Topology, Atom, Residue, ChemfilesError
 
 
 class TestFrame(unittest.TestCase):
@@ -169,6 +169,52 @@ class TestFrame(unittest.TestCase):
         frame.add_atom(Atom(""), (-1, 1, 0))
 
         self.assertEqual(frame.dihedral(0, 1, 2, 3), math.pi)
+
+    def test_out_of_plane(self):
+        frame = Frame()
+        frame.add_atom(Atom(""), (1, 0, 0))
+        frame.add_atom(Atom(""), (0, 0, 0))
+        frame.add_atom(Atom(""), (0, 1, 0))
+        frame.add_atom(Atom(""), (0, 0, 3))
+
+        self.assertEqual(frame.out_of_plane(1, 3, 0, 2), 3.0)
+
+    def test_bonds(self):
+        frame = Frame()
+        frame.add_atom(Atom(""), (0, 0, 0))
+        frame.add_atom(Atom(""), (0, 0, 0))
+        frame.add_atom(Atom(""), (0, 0, 0))
+        frame.add_atom(Atom(""), (0, 0, 0))
+        frame.add_atom(Atom(""), (0, 0, 0))
+
+        frame.add_bond(0, 1)
+        frame.add_bond(3, 4)
+        frame.add_bond(2, 1)
+
+        self.assertEqual(
+            frame.topology().bonds().all(),
+            np.array([[0, 1], [1, 2], [3, 4]]).all()
+        )
+
+        frame.remove_bond(3, 4)
+        # Also try to remove non-existing bonds
+        frame.remove_bond(3, 4)
+        frame.remove_bond(0, 4)
+
+        self.assertEqual(
+            frame.topology().bonds().all(),
+            np.array([[0, 1], [1, 2]]).all()
+        )
+
+    def test_residues(self):
+        frame = Frame()
+        frame.add_residue(Residue("Foo"))
+        frame.add_residue(Residue("Foo"))
+        frame.add_residue(Residue("Foo"))
+
+        topology = frame.topology()
+        self.assertEqual(topology.residues_count(), 3)
+        self.assertEqual(topology.residue(0).name(), "Foo")
 
 
 if __name__ == '__main__':

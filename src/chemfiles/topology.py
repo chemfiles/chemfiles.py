@@ -151,6 +151,12 @@ class Topology(CxxPointer):
         self.ffi.chfl_topology_dihedrals_count(self, dihedrals)
         return dihedrals.value
 
+    def impropers_count(self):
+        '''Get the number of improper angles in this :py:class:`Topology`.'''
+        impropers = c_uint64()
+        self.ffi.chfl_topology_impropers_count(self, impropers)
+        return impropers.value
+
     def bonds(self):
         '''Get the list of bonds in this :py:class:`Topology`.'''
         n = self.bonds_count()
@@ -171,6 +177,13 @@ class Topology(CxxPointer):
         dihedrals = np.zeros((n, 4), np.uint64)
         self.ffi.chfl_topology_dihedrals(self, dihedrals, c_uint64(n))
         return dihedrals
+
+    def impropers(self):
+        '''Get the list of improper angles in this :py:class:`Topology`.'''
+        n = self.impropers_count()
+        impropers = np.zeros((n, 4), np.uint64)
+        self.ffi.chfl_topology_impropers(self, impropers, c_uint64(n))
+        return impropers
 
     def add_bond(self, i, j):
         '''

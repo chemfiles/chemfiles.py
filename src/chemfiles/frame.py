@@ -93,6 +93,32 @@ class Frame(CxxPointer):
         '''
         self.ffi.chfl_frame_remove(self, c_uint64(i))
 
+    def add_bond(self, i, j):
+        '''
+        Add a bond between the atoms at indexes ``i`` and ``j`` in this
+        :py:class:`Frame`'s topology.
+        '''
+        self.ffi.chfl_frame_add_bond(self, c_uint64(i), c_uint64(j))
+
+    def remove_bond(self, i, j):
+        '''
+        Remove any existing bond between the atoms at indexes ``i`` and ``j``
+        in this :py:class:`Frame`'s topology.
+
+        This function does nothing if there is no bond between ``i`` and ``j``.
+        '''
+        self.ffi.chfl_frame_remove_bond(self, c_uint64(i), c_uint64(j))
+
+    def add_residue(self, residue):
+        '''
+        Add the :py:class:`Residue` ``residue`` to this :py:class:`Frame`'s
+        topology.
+
+        The residue ``id`` must not already be in the topology, and the residue
+        must contain only atoms that are not already in another residue.
+        '''
+        self.ffi.chfl_frame_add_residue(self, residue)
+
     def positions(self):
         '''
         Get a view into the positions of this :py:class:`Frame`.
@@ -231,6 +257,21 @@ class Frame(CxxPointer):
             self, c_uint64(i), c_uint64(j), c_uint64(k), c_uint64(m), dihedral
         )
         return dihedral.value
+
+    def out_of_plane(self, i, j, k, m):
+        '''
+        Get the out of plane distance formed by the atoms at indexes ``i``,
+        ``j``, ``k`` and ``m`` in this :py:class:`Frame`, accounting for
+        periodic boundary conditions. The result is expressed in angstroms.
+
+        This is the distance betweent the atom j and the ikm plane. The j atom
+        is the center of the improper dihedral angle formed by i, j, k and m.
+        '''
+        distance = c_double()
+        self.ffi.chfl_frame_out_of_plane(
+            self, c_uint64(i), c_uint64(j), c_uint64(k), c_uint64(m), distance
+        )
+        return distance.value
 
     def set(self, name, value):
         '''

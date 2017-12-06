@@ -1,6 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_bool, c_uint64
+import numpy as np
 
 from .utils import CxxPointer, _call_with_growing_buffer
 
@@ -69,3 +70,10 @@ class Residue(CxxPointer):
     def add_atom(self, atom):
         '''Add the atom index ``atom`` in the :py:class:`Residue`.'''
         self.ffi.chfl_residue_add_atom(self, c_uint64(atom))
+
+    def atoms(self):
+        '''Get the indexes of the atoms in this :py:class:`Residue`.'''
+        n = len(self)
+        atoms = np.zeros(n, np.uint64)
+        self.ffi.chfl_residue_atoms(self, atoms, c_uint64(n))
+        return atoms

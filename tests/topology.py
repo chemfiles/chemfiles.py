@@ -52,6 +52,7 @@ class TestTopology(unittest.TestCase):
         self.assertEqual(topology.bonds_count(), 3)
         self.assertEqual(topology.angles_count(), 2)
         self.assertEqual(topology.dihedrals_count(), 1)
+        self.assertEqual(topology.impropers_count(), 0)
 
         self.assertEqual(
             topology.bonds().all(),
@@ -72,6 +73,18 @@ class TestTopology(unittest.TestCase):
         self.assertEqual(topology.bonds_count(), 2)
         self.assertEqual(topology.angles_count(), 1)
         self.assertEqual(topology.dihedrals_count(), 0)
+        self.assertEqual(topology.impropers_count(), 0)
+
+        topology.add_bond(1, 3)
+        self.assertEqual(topology.bonds_count(), 3)
+        self.assertEqual(topology.angles_count(), 3)
+        self.assertEqual(topology.dihedrals_count(), 0)
+        self.assertEqual(topology.impropers_count(), 1)
+
+        self.assertEqual(
+            topology.impropers().all(),
+            np.array([[0, 1, 2, 3]]).all()
+        )
 
     def test_out_of_bounds(self):
         topology = Topology()

@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import copy
+import numpy as np
 
 from chemfiles import Residue, ChemfilesError
 
@@ -41,6 +42,11 @@ class TestResidue(unittest.TestCase):
 
         self.assertTrue(residue.contains(3))
         self.assertFalse(residue.contains(6))
+
+        self.assertEqual(
+            residue.atoms().all(),
+            np.array([1, 3, 4]).all()
+        )
 
 
 if __name__ == '__main__':
