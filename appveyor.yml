@@ -28,11 +28,9 @@ install:
   - ps: .\scripts\setup-appveyor.ps1
 
 build_script:
-  - pip install enum34 numpy
-  - mkdir build
-  - cd build
-  - cmake %CMAKE_ARGUMENTS% ..
-  - cmake --build . --config "%configuration%" -- %BUILD_ARGUMENTS%
+  - pip install -r dev-requirements.txt
+  - pip install -r requirements.txt
+  - python setup.py develop -- %CMAKE_ARGUMENTS% -- %BUILD_ARGUMENTS%
 
 test_script:
-  - ctest --build-config "%configuration%" --timeout 300 --output-on-failure
+  - python -m unittest discover -s tests -p "*.py"

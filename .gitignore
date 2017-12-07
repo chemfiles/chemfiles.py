@@ -5,3 +5,4 @@ chemfiles.egg-info/
 MANIFEST
 chemfiles/lib/
 chemfiles/include/
+.coverage
