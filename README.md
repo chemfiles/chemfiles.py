@@ -25,31 +25,21 @@ conda install -c conda-forge chemfiles
 ### Source compilation
 
 You can install this python module from sources if you have all the
-[dependencies][installation] of the C++ chemfiles library installed on your
-computer.
+[dependencies] of the C++ chemfiles library installed on your computer.
 
 ```bash
 # To get the latest developement version:
 git clone https://github.com/chemfiles/chemfiles.py
 cd chemfiles.py
 git submodule update --init
-mkdir build
-cd build
-cmake .. <options>  # see below for configuration options.
-make
-# Optionally
-make test
-make install
+# Install developement dependencies
+pip install -r dev-requirements.txt
+pip install .
+# Optionally run the test suite
+tox
 ```
 
-You can use the same [configuration options][installation] as the C++ chemfiles
-library. Additionally, you may also want to specify which python interpreter and
-installation to use with `-DPYTHON_EXECUTABLE=/full/path/to/python`, and where
-to install the code with `-DCMAKE_INSTALL_PREFIX=<PREFIX>`. The C++ library will
-be installed to `PREFIX/lib/`; and the python code will be installed in
-`PREFIX/lib/python<x.y>/site-packages/`.
-
-[installation]: http://chemfiles.readthedocs.org/en/latest/installation.html
+[dependencies]: http://chemfiles.readthedocs.org/en/latest/installation.html
 
 ## Usage example
 

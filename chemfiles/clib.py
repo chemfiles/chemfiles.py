@@ -1,11 +1,8 @@
 # -* coding: utf-8 -*
 import os
 import sys
-import struct
 from ctypes import cdll, c_double, POINTER
 from ctypes import sizeof, c_voidp
-
-from .location import CHEMFILES_LOCATION, __file__ as location_file_path
 
 
 class FindChemfilesLibrary(object):
@@ -14,18 +11,8 @@ class FindChemfilesLibrary(object):
 
     def __call__(self):
         if self._cache is None:
-            check_dll(CHEMFILES_LOCATION)
-            try:
-                self._cache = cdll.LoadLibrary(CHEMFILES_LOCATION)
-            except OSError:
-                if location_file_path.endswith(".pyc"):
-                    path = location_file_path[:-1]
-                else:
-                    path = location_file_path
-                raise ImportError(
-                    "Could not find chemfiles c++ library. " +
-                    "Please check the path defined in " + path
-                )
+            path = _lib_path()
+            self._cache = cdll.LoadLibrary(path)
 
             from .ffi import set_interface
             from .ffi import CHFL_FRAME, CHFL_ATOM, chfl_vector3d
@@ -36,15 +23,33 @@ class FindChemfilesLibrary(object):
                 POINTER(CHFL_FRAME), POINTER(CHFL_ATOM),
                 chfl_vector3d, POINTER(c_double)
             ]
+
+            from .utils import _set_default_warning_callback
+            _set_default_warning_callback()
         return self._cache
 
 
-def check_dll(path):
-    if not sys.platform.startswith("win"):
-        return
-    if not os.path.isfile(path):
-        return
+def _lib_path():
+    root = os.path.dirname(__file__)
+    if sys.platform.startswith("darwin"):
+        return os.path.join(root, "lib", "libchemfiles.dylib")
+    elif sys.platform.startswith("linux"):
+        return os.path.join(root, "lib", "libchemfiles.so")
+    elif sys.platform.startswith("win"):
+        candidates = [
+            os.path.join(root, "bin", "libchemfiles.dll"),  # MinGW
+            os.path.join(root, "bin", "chemfiles.dll"),     # MSVC
+        ]
+        for path in candidates:
+            if os.path.isfile(path):
+                _check_dll(path)
+                return path
+        raise ImportError("Could not find chemfiles DLL")
+    else:
+        raise ImportError("Unknown platform. Please edit this file")
 
+
+def _check_dll(path):
     import struct
 
     IMAGE_FILE_MACHINE_I386 = 332

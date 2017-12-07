@@ -9,17 +9,18 @@ from chemfiles import Trajectory, Topology, Frame, UnitCell, Atom
 from chemfiles import ChemfilesError
 
 
+def get_data_path(data):
+    root = os.path.dirname(__file__)
+    return os.path.join(root, "data", data)
+
+
 class TestTrajectory(unittest.TestCase):
     def test_errors(self):
         self.assertRaises(
-            ChemfilesError,
-            Trajectory,
-            os.path.join("data", "not-here.xyz")
+            ChemfilesError, Trajectory, get_data_path("not-here.xyz")
         )
         self.assertRaises(
-            ChemfilesError,
-            Trajectory,
-            os.path.join("data", "empty.unknown")
+            ChemfilesError, Trajectory, get_data_path("empty.unknown")
         )
 
         with Trajectory("test-tmp.xyz", "w") as trajectory:
@@ -28,7 +29,7 @@ class TestTrajectory(unittest.TestCase):
         os.unlink("test-tmp.xyz")
 
     def test_read(self):
-        trajectory = Trajectory(os.path.join("data", "water.xyz"))
+        trajectory = Trajectory(get_data_path("water.xyz"))
 
         self.assertEqual(trajectory.nsteps(), 100)
 
@@ -82,17 +83,17 @@ class TestTrajectory(unittest.TestCase):
         frame = trajectory.read_step(10)
         self.assertEqual(frame.atom(10).name(), "Cs")
 
-        trajectory.set_topology(os.path.join("data", "topology.xyz"), "XYZ")
+        trajectory.set_topology(get_data_path("topology.xyz"), "XYZ")
         frame = trajectory.read()
         self.assertEqual(frame.atom(100).name(), "Rd")
 
     def test_protocols(self):
-        with Trajectory(os.path.join("data", "water.xyz")) as trajectory:
+        with Trajectory(get_data_path("water.xyz")) as trajectory:
             for frame in trajectory:
                 self.assertEqual(frame.natoms(), 297)
 
     def test_close(self):
-        trajectory = Trajectory(os.path.join("data", "water.xyz"))
+        trajectory = Trajectory(get_data_path("water.xyz"))
         trajectory.close()
         self.assertRaises(ChemfilesError, trajectory.read)
 

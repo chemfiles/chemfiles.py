@@ -1,2 +1,4 @@
+tox
+scikit-build
 sphinx
 sphinx_bootstrap_theme

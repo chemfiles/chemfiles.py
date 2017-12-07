@@ -8,6 +8,7 @@ from chemfiles import Trajectory, ChemfilesError
 
 class TestErrors(unittest.TestCase):
     def test_last_error(self):
+        chemfiles.utils._clear_errors()
         self.assertEqual(chemfiles.utils._last_error(), "")
 
         try:
