@@ -72,6 +72,8 @@ def _check_dll(path):
         raise ImportError("Python is 32-bit, but chemfiles.dll is not")
     elif sizeof(c_voidp) == 8 and machine != IMAGE_FILE_MACHINE_AMD64:
         raise ImportError("Python is 64-bit, but chemfiles.dll is not")
+    else:
+        raise ImportError("Could not determine pointer size of Python")
 
 
 _get_c_library = FindChemfilesLibrary()
