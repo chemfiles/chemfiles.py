@@ -1,5 +1,4 @@
 # -*- coding=utf-8 -*-
-import sys
 import chemfiles
 from skbuild import setup
 
@@ -26,7 +25,7 @@ setup(
     zip_safe=False,
     install_requires=requirements,
     setup_requires=["scikit-build"],
-    classifiers = [
+    classifiers=[
         "Development Status :: 4 - Beta",
         "Environment :: Console",
         "Intended Audience :: Developers",

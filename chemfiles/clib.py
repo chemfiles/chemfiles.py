@@ -4,6 +4,11 @@ import sys
 from ctypes import cdll, c_double, POINTER
 from ctypes import sizeof, c_voidp
 
+try:
+    from .external import EXTERNAL_CHEMFILES
+except ImportError:
+    EXTERNAL_CHEMFILES = False
+
 
 class FindChemfilesLibrary(object):
     def __init__(self):
@@ -30,6 +35,8 @@ class FindChemfilesLibrary(object):
 
 
 def _lib_path():
+    if EXTERNAL_CHEMFILES:
+        return EXTERNAL_CHEMFILES
     root = os.path.dirname(__file__)
     if sys.platform.startswith("darwin"):
         return os.path.join(root, "lib", "libchemfiles.dylib")
