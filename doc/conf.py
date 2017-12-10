@@ -3,8 +3,9 @@ import sys
 import os
 import sphinx_bootstrap_theme
 
-DOC_ROOT = os.path.abspath(os.path.dirname(__file__))
-sys.path.insert(1, os.path.join(DOC_ROOT, ".."))
+ROOT = os.path.abspath(os.path.dirname(__file__))
+sys.path.insert(1, ROOT)
+sys.path.insert(1, os.path.join(ROOT, ".."))
 
 # -- General configuration ------------------------------------------------
 
@@ -13,6 +14,7 @@ sys.path.insert(1, os.path.join(DOC_ROOT, ".."))
 # ones.
 extensions = [
     'sphinx.ext.autodoc',
+    'htmlhidden'
 ]
 autoclass_content = 'both'
 
@@ -24,7 +26,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'Python interface to chemfiles'
-copyright = u'2015, Guillaume Fraux — MPLv2 licence'
+copyright = u'2015-2017, Guillaume Fraux — BSD license'
 
 
 def version():
