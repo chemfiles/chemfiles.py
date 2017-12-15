@@ -2,7 +2,6 @@
 import os
 import sys
 from ctypes import cdll, c_double, POINTER
-from ctypes import sizeof, c_voidp
 
 try:
     from .external import EXTERNAL_CHEMFILES
@@ -58,6 +57,7 @@ def _lib_path():
 
 def _check_dll(path):
     import struct
+    import platform
 
     IMAGE_FILE_MACHINE_I386 = 332
     IMAGE_FILE_MACHINE_AMD64 = 34404
@@ -75,10 +75,13 @@ def _check_dll(path):
             header = fd.read(2)
             machine = struct.unpack("<H", header)[0]
 
-    if sizeof(c_voidp) == 4 and machine != IMAGE_FILE_MACHINE_I386:
-        raise ImportError("Python is 32-bit, but chemfiles.dll is not")
-    elif sizeof(c_voidp) == 8 and machine != IMAGE_FILE_MACHINE_AMD64:
-        raise ImportError("Python is 64-bit, but chemfiles.dll is not")
+    arch = platform.architecture()[0]
+    if arch == "32bit":
+        if machine != IMAGE_FILE_MACHINE_I386:
+            raise ImportError("Python is 32-bit, but chemfiles.dll is not")
+    elif arch == "64bit":
+        if machine != IMAGE_FILE_MACHINE_AMD64:
+            raise ImportError("Python is 64-bit, but chemfiles.dll is not")
     else:
         raise ImportError("Could not determine pointer size of Python")
 
