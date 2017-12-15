@@ -3,6 +3,4 @@ dist/
 chemfiles.egg-info/
 .tox/
 MANIFEST
-chemfiles/lib/
-chemfiles/include/
 .coverage

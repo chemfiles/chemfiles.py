@@ -6,6 +6,9 @@ if(NOT ${CHFL_PY_INTERNAL_CHEMFILES})
     find_package(chemfiles CONFIG QUIET 0.8)
 endif()
 
+file(REMOVE ${CMAKE_BINARY_DIR}/external.py)
+file(REMOVE ${CMAKE_BINARY_DIR}/external.pyc)
+
 if(${chemfiles_FOUND})
     set(CHEMFILES_VERSION "${chemfiles_VERSION}")
     get_target_property(CHEMFILES_TYPE chemfiles TYPE)
