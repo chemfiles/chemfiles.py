@@ -1,9 +1,12 @@
 # -*- coding=utf-8 -*-
 import chemfiles
+import sys
 from skbuild import setup
 
 with open('requirements.txt', 'r') as fp:
     requirements = list(filter(bool, (line.strip() for line in fp)))
+    if sys.hexversion >= 0x03040000:
+        requirements = list(filter(lambda r: r != "enum34", requirements))
 
 LONG_DESCRIPTION = """Chemfiles is a library for reading and writing molecular
 trajectory files. These files are created by your favorite theoretical chemistry
