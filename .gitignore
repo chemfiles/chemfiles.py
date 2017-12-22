@@ -1,4 +1,5 @@
 _skbuild/
+build/
 dist/
 chemfiles.egg-info/
 .tox/

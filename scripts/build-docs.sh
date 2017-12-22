@@ -1,4 +1,6 @@
-#!/bin/bash -xe
+#!/bin/bash
+
+set -xe
 
 # Get previous documentation
 git clone https://github.com/$TRAVIS_REPO_SLUG --branch gh-pages gh-pages
