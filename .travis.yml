@@ -33,6 +33,7 @@ script:
   - cd $TRAVIS_BUILD_DIR
   - pip install -r dev-requirements.txt
   - tox
+  - ./scripts/check-used-functions.py
   - ./scripts/build-docs.sh
   - |
     if ${EXTRA_WORK}; then
