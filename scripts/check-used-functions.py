@@ -1,32 +1,31 @@
 #!/usr/bin/env python
 """
-Check that all the functions defined in the chemfiles-sys crate are
-effectivelly used in the chemfiles binding.
+Check that all the functions defined in the C API are effectivelly used
 """
 import os
+import sys
 
-# Function not used by the Python API
-IGNORED = ["chfl_trajectory_set_topology_file", "chfl_trajectory_open"]
+IGNORED = ["chfl_version", "chfl_trajectory_open"]
 ROOT = os.path.dirname(os.path.dirname(__file__))
+ERROR = False
 
 
 def functions_list():
     functions = []
-    with open(os.path.join(ROOT, "src", "chemfiles", "ffi.py")) as fd:
+    with open(os.path.join(ROOT, "chemfiles", "ffi.py")) as fd:
         for line in fd:
             line = line.strip()
             if line.startswith("# Function"):
                 name = line.split('"')[1]
-                if name not in IGNORED:
-                    functions.append(name)
+                functions.append(name)
     return functions
 
 
 def read_all_source():
     source = ""
-    for (dirpath, _, pathes) in os.walk(os.path.join(ROOT, "src")):
+    for (dirpath, _, pathes) in os.walk(os.path.join(ROOT, "chemfiles")):
         for path in pathes:
-            if path != "ffi.py":
+            if path != "ffi.py" and path.endswith(".py"):
                 with open(os.path.join(ROOT, dirpath, path)) as fd:
                     source += fd.read()
     return source
@@ -34,11 +33,15 @@ def read_all_source():
 
 def check_functions(functions, source):
     for function in functions:
-        if function not in source:
+        if function not in source and function not in IGNORED:
             print("Missing: " + function)
+            global ERROR
+            ERROR = True
 
 
 if __name__ == '__main__':
     functions = functions_list()
     source = read_all_source()
     check_functions(functions, source)
+    if ERROR:
+        sys.exit(1)
