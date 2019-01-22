@@ -16,12 +16,8 @@ def get_data_path(data):
 
 class TestTrajectory(unittest.TestCase):
     def test_errors(self):
-        self.assertRaises(
-            ChemfilesError, Trajectory, get_data_path("not-here.xyz")
-        )
-        self.assertRaises(
-            ChemfilesError, Trajectory, get_data_path("empty.unknown")
-        )
+        self.assertRaises(ChemfilesError, Trajectory, get_data_path("not-here.xyz"))
+        self.assertRaises(ChemfilesError, Trajectory, get_data_path("empty.unknown"))
 
         with Trajectory("test-tmp.xyz", "w") as trajectory:
             self.assertRaises(ArgumentError, trajectory.write, None)
@@ -35,20 +31,18 @@ class TestTrajectory(unittest.TestCase):
 
         frame = Frame()
         trajectory.read(frame)
-        self.assertEqual(frame.natoms(), 297)
+        self.assertEqual(frame.atoms_count(), 297)
 
         positions = frame.positions()
         self.assertEqual(
-            positions[0].all(),
-            np.array([0.417219, 8.303366, 11.737172]).all()
+            positions[0].all(), np.array([0.417219, 8.303366, 11.737172]).all()
         )
         self.assertEqual(
-            positions[124].all(),
-            np.array([5.099554, -0.045104, 14.153846]).all()
+            positions[124].all(), np.array([5.099554, -0.045104, 14.153846]).all()
         )
 
         topology = frame.topology()
-        self.assertEqual(topology.natoms(), 297)
+        self.assertEqual(topology.atoms_count(), 297)
         self.assertEqual(topology.atom(0).name(), "O")
         self.assertEqual(topology.atom(1).name(), "H")
 
@@ -58,19 +52,17 @@ class TestTrajectory(unittest.TestCase):
 
         positions = frame.positions()
         self.assertEqual(
-            positions[0].all(),
-            np.array([0.761277, 8.106125, 10.622949]).all()
+            positions[0].all(), np.array([0.761277, 8.106125, 10.622949]).all()
         )
         self.assertEqual(
-            positions[124].all(),
-            np.array([5.13242, 0.079862, 14.194161]).all()
+            positions[124].all(), np.array([5.13242, 0.079862, 14.194161]).all()
         )
 
         topology = frame.topology()
-        self.assertEqual(topology.natoms(), 297)
+        self.assertEqual(topology.atoms_count(), 297)
         self.assertEqual(topology.bonds_count(), 0)
 
-        frame.guess_topology()
+        frame.guess_bonds()
         topology = frame.topology()
         self.assertEqual(topology.bonds_count(), 181)
         self.assertEqual(topology.angles_count(), 87)
@@ -90,7 +82,7 @@ class TestTrajectory(unittest.TestCase):
     def test_protocols(self):
         with Trajectory(get_data_path("water.xyz")) as trajectory:
             for frame in trajectory:
-                self.assertEqual(frame.natoms(), 297)
+                self.assertEqual(frame.atoms_count(), 297)
 
     def test_close(self):
         trajectory = Trajectory(get_data_path("water.xyz"))
@@ -123,5 +115,5 @@ X 1 2 3
         os.unlink("test-tmp.xyz")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

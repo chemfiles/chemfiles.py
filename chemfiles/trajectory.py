@@ -8,13 +8,13 @@ from .utils import ChemfilesError
 
 
 class Trajectory(CxxPointer):
-    '''
+    """
     A :py:class:`Trajectory` is a chemistry file on the hard drive. It is the
     main entry point of Chemfiles.
-    '''
+    """
 
     def __init__(self, path, mode="r", format=""):
-        '''
+        """
         Open the :py:class:`Trajectory` at the given ``path`` using the
         given ``mode`` and optional specific file ``format``.
 
@@ -25,7 +25,7 @@ class Trajectory(CxxPointer):
         the extension, or when there is not standard extension for this format.
         If `format` is an empty string, the format will be guessed from the
         file extension.
-        '''
+        """
         self.closed = False
         ptr = self.ffi.chfl_trajectory_with_format(
             path.encode("utf8"), mode.encode("utf8"), format.encode("utf8")
@@ -37,7 +37,7 @@ class Trajectory(CxxPointer):
             raise ChemfilesError("Can not use a closed Trajectory")
 
     def __del__(self):
-        if not self.closed and hasattr(self, 'ptr'):
+        if not self.closed and hasattr(self, "ptr"):
             self.close()
 
     def __enter__(self):
@@ -54,11 +54,11 @@ class Trajectory(CxxPointer):
             yield self.read_step(step, frame)
 
     def read(self, frame=None):
-        '''
+        """
         Read the next step of the :py:class:`Trajectory` and return the
         corresponding :py:class:`Frame`. If the ``frame`` parameter is given,
         reuse the corresponding allocation.
-        '''
+        """
         self._check_opened()
         if frame is None:
             frame = Frame()
@@ -66,11 +66,11 @@ class Trajectory(CxxPointer):
         return frame
 
     def read_step(self, step, frame=None):
-        '''
+        """
         Read a specific ``step`` in the :py:class:`Trajectory` and return the
         corresponding :py:class:`Frame`. If the ``frame`` parameter is given,
         reuse the corresponding allocation.
-        '''
+        """
         self._check_opened()
         if frame is None:
             frame = Frame()
@@ -78,12 +78,12 @@ class Trajectory(CxxPointer):
         return frame
 
     def write(self, frame):
-        '''Write a :py:class:`Frame` to the :py:class:`Trajectory`.'''
+        """Write a :py:class:`Frame` to the :py:class:`Trajectory`."""
         self._check_opened()
         self.ffi.chfl_trajectory_write(self, frame)
 
     def set_topology(self, topology, format=""):
-        '''
+        """
         Set the :py:class:`Topology` associated with a :py:class:`Trajectory`.
         This :py:class:`Topology` will be used when reading and writing the
         files, replacing any :py:class:`Topology` in the frames or files.
@@ -95,7 +95,7 @@ class Trajectory(CxxPointer):
         When reading from a file, if ``format`` is not the empty string, the
         code uses this file format instead of guessing it from the file
         extension.
-        '''
+        """
         self._check_opened()
         if isinstance(topology, Topology):
             self.ffi.chfl_trajectory_set_topology(self, topology)
@@ -105,29 +105,29 @@ class Trajectory(CxxPointer):
             )
 
     def set_cell(self, cell):
-        '''
+        """
         Set the :py:class:`UnitCell` associated with a :py:class:`Trajectory`.
         This :py:class:`UnitCell` will be used when reading and writing the
         files, replacing any :py:class:`UnitCell` in the frames or files.
-        '''
+        """
         self._check_opened()
         self.ffi.chfl_trajectory_set_cell(self, cell)
 
     def nsteps(self):
-        '''
+        """
         Get the number of steps (the number of frames) in a
         :py:class:`Trajectory`.
-        '''
+        """
         self._check_opened()
         nsteps = c_uint64()
         self.ffi.chfl_trajectory_nsteps(self, nsteps)
         return nsteps.value
 
     def close(self):
-        '''
+        """
         Close the :py:class:`Trajectory` and write any buffered content to the
         hard drive.
-        '''
+        """
         self._check_opened()
         self.closed = True
         self.ffi.chfl_trajectory_close(self)

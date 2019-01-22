@@ -18,7 +18,7 @@ class TestErrors(unittest.TestCase):
         self.assertEqual(
             chemfiles.utils._last_error(),
             "file at 'noextention' does not have an extension, provide a "
-            "format name to read it"
+            "format name to read it",
         )
 
         chemfiles.utils._clear_errors()
@@ -44,14 +44,14 @@ class TestWarnings(unittest.TestCase):
         self.assertEqual(
             LAST_MESSAGE,
             "file at 'noextention' does not have an extension, provide a "
-            "format name to read it"
+            "format name to read it",
         )
 
     def test_warning_with_exception(self):
         def callback(message):
             global LAST_MESSAGE
             LAST_MESSAGE = message
-            raise Exception(message)
+            raise Exception("test exception in callback")
 
         chemfiles.set_warnings_callback(callback)
 
@@ -63,9 +63,11 @@ class TestWarnings(unittest.TestCase):
         self.assertEqual(
             LAST_MESSAGE,
             "file at 'noextention' does not have an extension, provide a "
-            "format name to read it"
+            "format name to read it",
         )
 
+        chemfiles.utils._set_default_warning_callback()
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     unittest.main()

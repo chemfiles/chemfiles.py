@@ -13,17 +13,17 @@ class TestTopology(unittest.TestCase):
         topology.resize(4)
         cloned = copy.copy(topology)
 
-        self.assertEqual(topology.natoms(), 4)
-        self.assertEqual(cloned.natoms(), 4)
+        self.assertEqual(topology.atoms_count(), 4)
+        self.assertEqual(cloned.atoms_count(), 4)
 
         topology.resize(8)
-        self.assertEqual(topology.natoms(), 8)
-        self.assertEqual(cloned.natoms(), 4)
+        self.assertEqual(topology.atoms_count(), 8)
+        self.assertEqual(cloned.atoms_count(), 4)
 
     def test_size(self):
         topology = Topology()
 
-        self.assertEqual(topology.natoms(), 0)
+        self.assertEqual(topology.atoms_count(), 0)
         self.assertEqual(len(topology), 0)
 
         topology.add_atom(Atom("H"))

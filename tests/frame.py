@@ -13,24 +13,24 @@ class TestFrame(unittest.TestCase):
         frame = Frame()
         cloned = copy.copy(frame)
 
-        self.assertEqual(frame.natoms(), 0)
-        self.assertEqual(cloned.natoms(), 0)
+        self.assertEqual(frame.atoms_count(), 0)
+        self.assertEqual(cloned.atoms_count(), 0)
 
         frame.resize(6)
-        self.assertEqual(frame.natoms(), 6)
-        self.assertEqual(cloned.natoms(), 0)
+        self.assertEqual(frame.atoms_count(), 6)
+        self.assertEqual(cloned.atoms_count(), 0)
 
-    def test_natoms(self):
+    def test_atoms_count(self):
         frame = Frame()
-        self.assertEqual(frame.natoms(), 0)
+        self.assertEqual(frame.atoms_count(), 0)
         self.assertEqual(len(frame), 0)
 
         frame.resize(4)
-        self.assertEqual(frame.natoms(), 4)
+        self.assertEqual(frame.atoms_count(), 4)
         self.assertEqual(len(frame), 4)
 
         frame.remove(2)
-        self.assertEqual(frame.natoms(), 3)
+        self.assertEqual(frame.atoms_count(), 3)
         self.assertEqual(len(frame), 3)
 
     def test_add_atom(self):
@@ -48,10 +48,10 @@ class TestFrame(unittest.TestCase):
         frame = Frame()
         frame.resize(4)
 
-        expected = np.array([[1.0, 2.0, 3.0],
-                             [4.0, 5.0, 6.0],
-                             [7.0, 8.0, 9.0],
-                             [10.0, 11.0, 12.0]], np.float64)
+        expected = np.array(
+            [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0], [10.0, 11.0, 12.0]],
+            np.float64,
+        )
         positions = frame.positions()
         np.copyto(positions, expected)
         self.assertEqual(frame.positions().all(), expected.all())
@@ -71,10 +71,10 @@ class TestFrame(unittest.TestCase):
         frame.add_velocities()
         self.assertTrue(frame.has_velocities())
 
-        expected = np.array([[1.0, 2.0, 3.0],
-                             [4.0, 5.0, 6.0],
-                             [7.0, 8.0, 9.0],
-                             [10.0, 11.0, 12.0]], np.float64)
+        expected = np.array(
+            [[1.0, 2.0, 3.0], [4.0, 5.0, 6.0], [7.0, 8.0, 9.0], [10.0, 11.0, 12.0]],
+            np.float64,
+        )
         velocities = frame.velocities()
         np.copyto(velocities, expected)
         self.assertEqual(frame.velocities().all(), expected.all())
@@ -192,8 +192,7 @@ class TestFrame(unittest.TestCase):
         frame.add_bond(2, 1)
 
         self.assertEqual(
-            frame.topology().bonds().all(),
-            np.array([[0, 1], [1, 2], [3, 4]]).all()
+            frame.topology().bonds().all(), np.array([[0, 1], [1, 2], [3, 4]]).all()
         )
 
         frame.remove_bond(3, 4)
@@ -202,8 +201,7 @@ class TestFrame(unittest.TestCase):
         frame.remove_bond(0, 4)
 
         self.assertEqual(
-            frame.topology().bonds().all(),
-            np.array([[0, 1], [1, 2]]).all()
+            frame.topology().bonds().all(), np.array([[0, 1], [1, 2]]).all()
         )
 
     def test_residues(self):
@@ -217,5 +215,5 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(topology.residue(0).name(), "Foo")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

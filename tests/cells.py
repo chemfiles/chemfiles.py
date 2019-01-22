@@ -67,5 +67,5 @@ class TestUnitCell(unittest.TestCase):
         self.assertEqual(wrapped[2], -0.5)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

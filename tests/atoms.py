@@ -11,33 +11,33 @@ class TestAtom(unittest.TestCase):
         atom = Atom("He")
         cloned = copy.copy(atom)
 
-        self.assertEqual(atom.name(), 'He')
-        self.assertEqual(cloned.name(), 'He')
+        self.assertEqual(atom.name(), "He")
+        self.assertEqual(cloned.name(), "He")
 
         atom.set_name("Zn")
-        self.assertEqual(atom.name(), 'Zn')
-        self.assertEqual(cloned.name(), 'He')
+        self.assertEqual(atom.name(), "Zn")
+        self.assertEqual(cloned.name(), "He")
 
     def test_name(self):
         atom = Atom("He")
-        self.assertEqual(atom.name(), 'He')
-        self.assertEqual(atom.full_name(), 'Helium')
+        self.assertEqual(atom.name(), "He")
+        self.assertEqual(atom.full_name(), "Helium")
 
         atom.set_name("Zn")
-        self.assertEqual(atom.name(), 'Zn')
+        self.assertEqual(atom.name(), "Zn")
 
     def test_type(self):
         atom = Atom("He")
-        self.assertEqual(atom.type(), 'He')
-        self.assertEqual(atom.full_name(), 'Helium')
+        self.assertEqual(atom.type(), "He")
+        self.assertEqual(atom.full_name(), "Helium")
 
         atom.set_type("Zn")
-        self.assertEqual(atom.type(), 'Zn')
-        self.assertEqual(atom.full_name(), 'Zinc')
+        self.assertEqual(atom.type(), "Zn")
+        self.assertEqual(atom.full_name(), "Zinc")
 
         atom = Atom("He2", "H")
-        self.assertEqual(atom.name(), 'He2')
-        self.assertEqual(atom.type(), 'H')
+        self.assertEqual(atom.name(), "He2")
+        self.assertEqual(atom.type(), "H")
 
     def test_mass(self):
         atom = Atom("He")
@@ -74,5 +74,5 @@ class TestAtom(unittest.TestCase):
         self.assertRaises(ChemfilesError, atom.get, "bar")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

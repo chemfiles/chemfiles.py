@@ -20,15 +20,19 @@ class FindChemfilesLibrary(object):
 
             from .ffi import set_interface
             from .ffi import CHFL_FRAME, CHFL_ATOM, chfl_vector3d
+
             set_interface(self._cache)
             # We update the arguments here, as ctypes can not pass a NULL value
             # as the last parameter
             self._cache.chfl_frame_add_atom.argtypes = [
-                POINTER(CHFL_FRAME), POINTER(CHFL_ATOM),
-                chfl_vector3d, POINTER(c_double)
+                POINTER(CHFL_FRAME),
+                POINTER(CHFL_ATOM),
+                chfl_vector3d,
+                POINTER(c_double),
             ]
 
             from .utils import _set_default_warning_callback
+
             _set_default_warning_callback()
         return self._cache
 
@@ -44,7 +48,7 @@ def _lib_path():
     elif sys.platform.startswith("win"):
         candidates = [
             os.path.join(root, "bin", "libchemfiles.dll"),  # MinGW
-            os.path.join(root, "bin", "chemfiles.dll"),     # MSVC
+            os.path.join(root, "bin", "chemfiles.dll"),  # MSVC
         ]
         for path in candidates:
             if os.path.isfile(path):
@@ -63,7 +67,7 @@ def _check_dll(path):
     IMAGE_FILE_MACHINE_AMD64 = 34404
 
     machine = None
-    with open(path, 'rb') as fd:
+    with open(path, "rb") as fd:
         header = fd.read(2).decode(encoding="utf-8", errors="strict")
         if header != "MZ":
             raise ImportError(path + " is not a DLL")
