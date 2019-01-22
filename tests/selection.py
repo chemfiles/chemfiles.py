@@ -64,5 +64,5 @@ class TestSelection(unittest.TestCase):
         self.assertEqual([(0, 1, 2, 3)], res)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

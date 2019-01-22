@@ -37,5 +37,5 @@ class TestProperty(unittest.TestCase):
         self.assertRaises(ChemfilesError, Property, ArithmeticError)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -9,10 +9,10 @@ class universal_wheel(bdist_wheel):
     # Workaround until https://github.com/pypa/wheel/issues/185 is resolved
     def get_tag(self):
         tag = bdist_wheel.get_tag(self)
-        return ('py2.py3', "none") + tag[2:]
+        return ("py2.py3", "none") + tag[2:]
 
 
-with open('requirements.txt', 'r') as fp:
+with open("requirements.txt", "r") as fp:
     requirements = list(filter(bool, (line.strip() for line in fp)))
     if sys.hexversion >= 0x03040000:
         requirements = list(filter(lambda r: r != "enum34", requirements))
@@ -33,7 +33,7 @@ setup(
     license="BSD",
     keywords="chemistry computational cheminformatics files formats",
     url="http://github.com/chemfiles/chemfiles.py",
-    packages=['chemfiles'],
+    packages=["chemfiles"],
     zip_safe=False,
     install_requires=requirements,
     setup_requires=["scikit-build"],
@@ -50,8 +50,8 @@ setup(
         "Programming Language :: Python :: 3",
         "Topic :: Scientific/Engineering :: Chemistry",
         "Topic :: Software Development :: Libraries :: Python Modules",
-        "Topic :: Utilities"
+        "Topic :: Utilities",
     ],
     cmake_install_dir="chemfiles",
-    cmdclass={'bdist_wheel': universal_wheel},
+    cmdclass={"bdist_wheel": universal_wheel},
 )
