@@ -5,6 +5,7 @@ import copy
 
 from chemfiles import UnitCell, CellShape
 from chemfiles import ChemfilesError
+from utils import remove_warnings
 
 
 class TestUnitCell(unittest.TestCase):
@@ -30,7 +31,8 @@ class TestUnitCell(unittest.TestCase):
         self.assertEqual(cell.angles(), (90.0, 90.0, 90.0))
 
         self.assertEqual(cell.shape(), CellShape.Orthorhombic)
-        self.assertRaises(ChemfilesError, cell.set_angles, 80, 89, 110)
+        with remove_warnings:
+            self.assertRaises(ChemfilesError, cell.set_angles, 80, 89, 110)
 
         cell.set_shape(CellShape.Triclinic)
         cell.set_angles(80, 89, 110)

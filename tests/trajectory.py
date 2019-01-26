@@ -8,6 +8,8 @@ from ctypes import ArgumentError
 from chemfiles import Trajectory, Topology, Frame, UnitCell, Atom
 from chemfiles import ChemfilesError
 
+from utils import remove_warnings
+
 
 def get_data_path(data):
     root = os.path.dirname(__file__)
@@ -16,13 +18,14 @@ def get_data_path(data):
 
 class TestTrajectory(unittest.TestCase):
     def test_errors(self):
-        self.assertRaises(ChemfilesError, Trajectory, get_data_path("not-here.xyz"))
-        self.assertRaises(ChemfilesError, Trajectory, get_data_path("empty.unknown"))
+        with remove_warnings:
+            self.assertRaises(ChemfilesError, Trajectory, get_data_path("not-here.xyz"))
+            self.assertRaises(ChemfilesError, Trajectory, get_data_path("empty.unknown"))
 
-        with Trajectory("test-tmp.xyz", "w") as trajectory:
-            self.assertRaises(ArgumentError, trajectory.write, None)
+            with Trajectory("test-tmp.xyz", "w") as trajectory:
+                self.assertRaises(ArgumentError, trajectory.write, None)
 
-        os.unlink("test-tmp.xyz")
+            os.unlink("test-tmp.xyz")
 
     def test_read(self):
         trajectory = Trajectory(get_data_path("water.xyz"))

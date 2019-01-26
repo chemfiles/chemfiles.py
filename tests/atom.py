@@ -4,6 +4,7 @@ import unittest
 import copy
 
 from chemfiles import Atom, ChemfilesError
+from utils import remove_warnings
 
 
 class TestAtom(unittest.TestCase):
@@ -71,7 +72,8 @@ class TestAtom(unittest.TestCase):
         atom.set("foo", False)
         self.assertEqual(atom.get("foo"), False)
 
-        self.assertRaises(ChemfilesError, atom.get, "bar")
+        with remove_warnings:
+            self.assertRaises(ChemfilesError, atom.get, "bar")
 
 
 if __name__ == "__main__":

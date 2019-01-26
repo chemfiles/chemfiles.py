@@ -5,6 +5,7 @@ import copy
 import numpy as np
 
 from chemfiles import Residue, ChemfilesError
+from utils import remove_warnings
 
 
 class TestResidue(unittest.TestCase):
@@ -26,7 +27,8 @@ class TestResidue(unittest.TestCase):
 
     def test_id(self):
         residue = Residue("bar")
-        self.assertRaises(ChemfilesError, residue.id)
+        with remove_warnings:
+            self.assertRaises(ChemfilesError, residue.id)
 
         residue = Residue("bar", 45)
         self.assertEqual(residue.id(), 45)
