@@ -6,6 +6,7 @@ import math
 import numpy as np
 
 from chemfiles import Frame, UnitCell, Topology, Atom, Residue, ChemfilesError
+from utils import remove_warnings
 
 
 class TestFrame(unittest.TestCase):
@@ -143,7 +144,8 @@ class TestFrame(unittest.TestCase):
         frame.set("foo", False)
         self.assertEqual(frame.get("foo"), False)
 
-        self.assertRaises(ChemfilesError, frame.get, "bar")
+        with remove_warnings:
+            self.assertRaises(ChemfilesError, frame.get, "bar")
 
     def test_distance(self):
         frame = Frame()
