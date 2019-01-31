@@ -30,7 +30,7 @@ class Trajectory(CxxPointer):
         ptr = self.ffi.chfl_trajectory_with_format(
             path.encode("utf8"), mode.encode("utf8"), format.encode("utf8")
         )
-        super(Trajectory, self).__init__(ptr)
+        super(Trajectory, self).__init__(ptr, is_const=False)
 
     def _check_opened(self):
         if self.closed:

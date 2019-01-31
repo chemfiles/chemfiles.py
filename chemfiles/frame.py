@@ -24,7 +24,7 @@ class Frame(CxxPointer):
         Create an empty :py:class:`Frame` that will be resized by the runtime
         as needed.
         """
-        super(Frame, self).__init__(self.ffi.chfl_frame())
+        super(Frame, self).__init__(self.ffi.chfl_frame(), is_const=False)
 
     def __copy__(self):
         return Frame.from_ptr(self.ffi.chfl_frame_copy(self))
@@ -173,7 +173,11 @@ class Frame(CxxPointer):
         return velocities.value
 
     def cell(self):
-        """Get a copy of the :py:class:`UnitCell` of this :py:class:`Frame`."""
+        """
+        Get a mutable reference to the :py:class:`UnitCell` of this
+        :py:class:`Frame`. Any modification to the cell will be reflected in
+        the frame.
+        """
         return UnitCell.from_ptr(self.ffi.chfl_cell_from_frame(self))
 
     def set_cell(self, cell):
@@ -184,9 +188,10 @@ class Frame(CxxPointer):
 
     def topology(self):
         """
-        Get a copy of the :py:class:`Topology` of this :py:class:`Frame`.
+        Get read-only access to the :py:class:`Topology` of this
+        :py:class:`Frame`.
         """
-        return Topology.from_ptr(self.ffi.chfl_topology_from_frame(self))
+        return Topology.from_const_ptr(self.ffi.chfl_topology_from_frame(self))
 
     def set_topology(self, topology):
         """

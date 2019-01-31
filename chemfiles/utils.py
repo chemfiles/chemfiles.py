@@ -21,8 +21,47 @@ class ChemfilesError(BaseException):
 
 
 class CxxPointer(object):
+    def __init__(self, ptr, is_const=True):
+        _check_handle(ptr)
+        self.__ptr = ptr
+        self.__is_const = is_const
+        self._as_parameter_ = self.__ptr
+
+    def __del__(self):
+        """Free the memory associated with this instance"""
+        if hasattr(self, "__ptr"):
+            self.ffi.chfl_free(self)
+
+    @classmethod
+    def from_ptr(cls, ptr):
+        """Create a new instance from a mutable pointer"""
+        new = cls.__new__(cls)
+        super(cls, new).__init__(ptr, is_const=False)
+        return new
+
+    @classmethod
+    def from_const_ptr(cls, ptr):
+        """Create a new instance from a const pointer"""
+        new = cls.__new__(cls)
+        super(cls, new).__init__(ptr, is_const=True)
+        return new
+
+    @property
+    def ptr(self):
+        """Get the **mutable** C++ pointer for this object"""
+        if self.__is_const:
+            raise ChemfilesError("Trying to use a const pointer for mutable access")
+        else:
+            return self.__ptr
+
+    @property
+    def const_ptr(self):
+        """Get the **const** C++ pointer for this object"""
+        return self.__ptr
+
     @property
     def ffi(self):
+        """Allow to access the C interface from any instance of CxxPointer"""
         return _get_c_library()
 
     @classmethod
@@ -34,21 +73,6 @@ class CxxPointer(object):
                 "Can not pass " + parameter.__class__.__name__ + " as a " + cls.__name__
             )
         return parameter
-
-    def __init__(self, ptr):
-        _check_handle(ptr)
-        self.ptr = ptr
-        self._as_parameter_ = self.ptr
-
-    def __del__(self):
-        if hasattr(self, "ptr"):
-            self.ffi.chfl_free(self)
-
-    @classmethod
-    def from_ptr(cls, ptr):
-        new = cls.__new__(cls)
-        super(cls, new).__init__(ptr)
-        return new
 
 
 # Store a reference to the last logging callback, to preven Python from

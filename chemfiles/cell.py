@@ -57,7 +57,7 @@ class UnitCell(CxxPointer):
             ptr = self.ffi.chfl_cell(lenghts)
         else:
             ptr = self.ffi.chfl_cell_triclinic(lenghts, angles)
-        super(UnitCell, self).__init__(ptr)
+        super(UnitCell, self).__init__(ptr, is_const=False)
 
     def __copy__(self):
         return UnitCell.from_ptr(self.ffi.chfl_cell_copy(self))

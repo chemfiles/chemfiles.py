@@ -23,12 +23,10 @@ class Residue(CxxPointer):
             ptr = self.ffi.chfl_residue_with_id(name.encode("utf8"), c_uint64(resid))
         else:
             ptr = self.ffi.chfl_residue(name.encode("utf8"))
-        super(Residue, self).__init__(ptr)
+        super(Residue, self).__init__(ptr, is_const=False)
 
     def __copy__(self):
-        residue = self.__new__(Residue)
-        super(Residue, residue).__init__(self.ffi.chfl_residue_copy(self))
-        return residue
+        return Residue.from_ptr(self.ffi.chfl_residue_copy(self))
 
     def atoms_count(self):
         """Get the current number of atoms in the :py:class:`Residue`."""
