@@ -26,7 +26,7 @@ class Selection(CxxPointer):
         Create a new :py:class:`Selection` from the given ``selection`` string.
         """
         ptr = self.ffi.chfl_selection(selection.encode("utf8"))
-        super(Selection, self).__init__(ptr)
+        super(Selection, self).__init__(ptr, is_const=False)
 
     def __copy__(self):
         return Selection.from_ptr(self.ffi.chfl_selection_copy(self))

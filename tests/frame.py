@@ -97,6 +97,9 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(frame.cell().angles(), cell.angles())
         self.assertEqual(frame.cell().shape(), cell.shape())
 
+        frame.cell().set_lengths(3, 4, 5)
+        self.assertEqual(frame.cell().lengths(), (3, 4, 5))
+
     def test_topology(self):
         frame = Frame()
         frame.resize(2)

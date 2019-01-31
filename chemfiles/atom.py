@@ -23,10 +23,12 @@ class Atom(CxxPointer):
 
     def __init__(self, name, type=None):
         """
-        Create a new :py:class:`Atom` from a ``name``, and set the atom type
-        to ``name``.
+        Create a new :py:class:`Atom` with the given ``name``. If ``type`` is
+        present, use it as the atom type. Else the atom name is used as atom
+        type.
         """
-        super(Atom, self).__init__(self.ffi.chfl_atom(name.encode("utf8")))
+        ptr = self.ffi.chfl_atom(name.encode("utf8"))
+        super(Atom, self).__init__(ptr, is_const=False)
         if type:
             self.set_type(type)
 

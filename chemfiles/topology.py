@@ -17,7 +17,7 @@ class Topology(CxxPointer):
 
     def __init__(self):
         """Create a new empty :py:class:`Topology`."""
-        super(Topology, self).__init__(self.ffi.chfl_topology())
+        super(Topology, self).__init__(self.ffi.chfl_topology(), is_const=False)
 
     def __copy__(self):
         return Topology.from_ptr(self.ffi.chfl_topology_copy(self))
@@ -73,20 +73,22 @@ class Topology(CxxPointer):
 
     def residue(self, i):
         """
-        Get the :py:class:`Residue` at index ``i`` from this
-        :py:class:`Topology`.
+        Get read-only access to the :py:class:`Residue` at index ``i`` from this
+        :py:class:`Topology`. The residue index in the topology does not
+        necessarily match the residue id.
         """
         if i >= self.residues_count():
             raise IndexError(
                 "residue index ({}) out of range for this topology".format(i)
             )
-        return Residue.from_ptr(self.ffi.chfl_residue_from_topology(self, c_uint64(i)))
+        ptr = self.ffi.chfl_residue_from_topology(self, c_uint64(i))
+        return Residue.from_const_ptr(ptr)
 
     def residue_for_atom(self, i):
         """
-        Get the :py:class:`Residue` containing the atom at index ``i`` from
-        this :py:class:`Topology`. If the atom is not in a residue, this
-        function returns None.
+        Get read-only access to the :py:class:`Residue` containing the atom at
+        index ``i`` from this :py:class:`Topology`; or ``None`` if the atom is
+        not part of a residue.
         """
         if i >= self.atoms_count():
             raise IndexError(
@@ -94,7 +96,7 @@ class Topology(CxxPointer):
             )
         ptr = self.ffi.chfl_residue_for_atom(self, c_uint64(i))
         if ptr:
-            return Residue.from_ptr(ptr)
+            return Residue.from_const_ptr(ptr)
         else:
             return None
 

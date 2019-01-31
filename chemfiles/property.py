@@ -32,7 +32,7 @@ class Property(CxxPointer):
         else:
             raise ChemfilesError("can not create a Property with this value")
 
-        super(Property, self).__init__(ptr)
+        super(Property, self).__init__(ptr, is_const=False)
 
     def get(self):
         kind = chfl_property_kind()
