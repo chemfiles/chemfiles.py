@@ -53,5 +53,6 @@ setup(
         "Topic :: Utilities",
     ],
     cmake_install_dir="chemfiles",
+    cmake_args=['-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9'],
     cmdclass={"bdist_wheel": universal_wheel},
 )
