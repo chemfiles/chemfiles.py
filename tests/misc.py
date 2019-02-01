@@ -2,6 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import warnings
+import sys
 
 import chemfiles
 from chemfiles import Trajectory, ChemfilesError
@@ -12,7 +13,7 @@ class RemoveChemfilesWarnings(object):
         chemfiles.set_warnings_callback(lambda u: None)
 
     def __exit__(self, *args):
-        chemfiles.utils._set_default_warning_callback()
+        chemfiles.misc._set_default_warning_callback()
 
 
 remove_warnings = RemoveChemfilesWarnings()
@@ -20,8 +21,8 @@ remove_warnings = RemoveChemfilesWarnings()
 
 class TestErrors(unittest.TestCase):
     def test_last_error(self):
-        chemfiles.utils._clear_errors()
-        self.assertEqual(chemfiles.utils._last_error(), "")
+        chemfiles.misc._clear_errors()
+        self.assertEqual(chemfiles.misc._last_error(), "")
 
         try:
             with remove_warnings:
@@ -29,13 +30,13 @@ class TestErrors(unittest.TestCase):
         except ChemfilesError:
             pass
         self.assertEqual(
-            chemfiles.utils._last_error(),
+            chemfiles.misc._last_error(),
             "file at 'noextention' does not have an extension, provide a "
             "format name to read it",
         )
 
-        chemfiles.utils._clear_errors()
-        self.assertEqual(chemfiles.utils._last_error(), "")
+        chemfiles.misc._clear_errors()
+        self.assertEqual(chemfiles.misc._last_error(), "")
 
 
 LAST_MESSAGE = ""
@@ -60,7 +61,7 @@ class TestWarnings(unittest.TestCase):
             "format name to read it",
         )
 
-        chemfiles.utils._set_default_warning_callback()
+        chemfiles.misc._set_default_warning_callback()
 
     def test_warning_with_exception(self):
         def callback(message):
@@ -83,7 +84,7 @@ class TestWarnings(unittest.TestCase):
             "format name to read it",
         )
 
-        chemfiles.utils._set_default_warning_callback()
+        chemfiles.misc._set_default_warning_callback()
 
 
 if __name__ == "__main__":

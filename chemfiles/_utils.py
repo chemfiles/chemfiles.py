@@ -1,36 +1,39 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import warnings
+import sys
 from ctypes import create_string_buffer, c_uint64
 
 from .clib import _get_c_library
-
-__all__ = ["ChemfilesError", "set_warnings_callback", "add_configuration"]
-
-
-class ChemfilesWarning(UserWarning):
-    """Warnings from the Chemfiles runtime."""
-
-    pass
+from .misc import ChemfilesError, _last_error
 
 
-class ChemfilesError(BaseException):
-    """Exception class for errors in chemfiles"""
-
-    pass
+if sys.version_info >= (3, 0):
+    string_type = str
+else:
+    string_type = basestring
 
 
 class CxxPointer(object):
+    __frozen = False
+
     def __init__(self, ptr, is_const=True):
         _check_handle(ptr)
         self.__ptr = ptr
         self.__is_const = is_const
         self._as_parameter_ = self.__ptr
+        self.__frozen = True
 
     def __del__(self):
         """Free the memory associated with this instance"""
         if hasattr(self, "__ptr"):
             self.ffi.chfl_free(self)
+
+    def __setattr__(self, key, value):
+        if self.__frozen and not hasattr(self, key):
+            raise TypeError(
+                "Can not add new attributes to this {}".format(self.__class__.__name__)
+            )
+        object.__setattr__(self, key, value)
 
     @classmethod
     def from_ptr(cls, ptr):
@@ -75,58 +78,6 @@ class CxxPointer(object):
         return parameter
 
 
-# Store a reference to the last logging callback, to preven Python from
-# garbage-collecting it.
-_CURRENT_CALLBACK = None
-
-
-def set_warnings_callback(function):
-    """
-    Call `function` on every warning event. The callback should take a string
-    message and return nothing.
-
-    By default, warnings are send to python `warnings` module.
-    """
-    from .ffi import chfl_warning_callback
-
-    def callback(message):
-        try:
-            function(message.decode("utf8"))
-        except Exception as e:
-            message = "exception raised in warning callback: {}".format(e)
-            warnings.warn(message, ChemfilesWarning)
-
-    global _CURRENT_CALLBACK
-    _CURRENT_CALLBACK = chfl_warning_callback(callback)
-
-    _get_c_library().chfl_set_warning_callback(_CURRENT_CALLBACK)
-
-
-def add_configuration(path):
-    """
-    Read configuration data from the file at ``path``.
-
-    By default, chemfiles reads configuration from any file name `.chemfilesrc`
-    in the current directory or any parent directory. This function can be used
-    to add data from another configuration file.
-
-    This function will fail if there is no file at ``path``, or if the file is
-    incorectly formatted. Data from the new configuration file will overwrite
-    any existing data.
-    """
-    _get_c_library().chfl_add_configuration(path.encode("utf8"))
-
-
-def _last_error():
-    """Get the last error from the chemfiles runtime."""
-    return _get_c_library().chfl_last_error().decode("utf8")
-
-
-def _clear_errors():
-    """Clear any error message saved in the chemfiles runtime."""
-    return _get_c_library().chfl_clear_errors()
-
-
 def _check_return_code(status, _function, _arguments):
     """Check that the function call was OK, and raise an exception if needed"""
     if status.value != 0:
@@ -139,14 +90,6 @@ def _check_handle(handle):
         handle.contents
     except ValueError:
         raise ChemfilesError(_last_error())
-
-
-def _set_default_warning_callback():
-    set_warnings_callback(
-        # We need to set stacklevel=4 to get through the lambda =>
-        # adapatator => C++ code => Python binding => user code
-        lambda message: warnings.warn(message, ChemfilesWarning, stacklevel=4)
-    )
 
 
 def _call_with_growing_buffer(function, initial):

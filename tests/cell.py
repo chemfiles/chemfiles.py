@@ -5,7 +5,7 @@ import copy
 
 from chemfiles import UnitCell, CellShape
 from chemfiles import ChemfilesError
-from utils import remove_warnings
+from _utils import remove_warnings
 
 
 class TestUnitCell(unittest.TestCase):
@@ -13,51 +13,52 @@ class TestUnitCell(unittest.TestCase):
         cell = UnitCell(3, 4, 5)
         cloned = copy.copy(cell)
 
-        self.assertEqual(cell.lengths(), (3.0, 4.0, 5.0))
-        self.assertEqual(cloned.lengths(), (3.0, 4.0, 5.0))
+        self.assertEqual(cell.lengths, (3.0, 4.0, 5.0))
+        self.assertEqual(cloned.lengths, (3.0, 4.0, 5.0))
 
-        cell.set_lengths(10, 11, 12)
-        self.assertEqual(cell.lengths(), (10.0, 11.0, 12.0))
-        self.assertEqual(cloned.lengths(), (3.0, 4.0, 5.0))
+        cell.lengths = 10, 11, 12
+        self.assertEqual(cell.lengths, (10.0, 11.0, 12.0))
+        self.assertEqual(cloned.lengths, (3.0, 4.0, 5.0))
 
     def test_lengths(self):
         cell = UnitCell(3, 4, 5)
-        self.assertEqual(cell.lengths(), (3.0, 4.0, 5.0))
-        cell.set_lengths(10, 11, 12)
-        self.assertEqual(cell.lengths(), (10.0, 11.0, 12.0))
+        self.assertEqual(cell.lengths, (3.0, 4.0, 5.0))
+        cell.lengths = [10, 11, 12]
+        self.assertEqual(cell.lengths, (10.0, 11.0, 12.0))
 
     def test_angles(self):
         cell = UnitCell(3, 4, 5)
-        self.assertEqual(cell.angles(), (90.0, 90.0, 90.0))
+        self.assertEqual(cell.angles, (90.0, 90.0, 90.0))
 
-        self.assertEqual(cell.shape(), CellShape.Orthorhombic)
+        self.assertEqual(cell.shape, CellShape.Orthorhombic)
         with remove_warnings:
-            self.assertRaises(ChemfilesError, cell.set_angles, 80, 89, 110)
+            with self.assertRaises(ChemfilesError):
+                cell.angles = [80, 89, 110]
 
-        cell.set_shape(CellShape.Triclinic)
-        cell.set_angles(80, 89, 110)
-        self.assertEqual(cell.angles(), (80.0, 89.0, 110.0))
+        cell.shape = CellShape.Triclinic
+        cell.angles = [80, 89, 110]
+        self.assertEqual(cell.angles, (80.0, 89.0, 110.0))
 
     def test_volume(self):
         cell = UnitCell(3, 4, 5)
-        self.assertEqual(cell.volume(), 3 * 4 * 5)
+        self.assertEqual(cell.volume, 3 * 4 * 5)
 
     def test_matrix(self):
         cell = UnitCell(3, 4, 5)
         expected = [(3, 0, 0), (0, 4, 0), (0, 0, 5)]
-        matrix = cell.matrix()
+        matrix = cell.matrix
         for i in range(3):
             for j in range(3):
                 self.assertAlmostEqual(matrix[i][j], expected[i][j])
 
     def test_shape(self):
         cell = UnitCell(3, 4, 5)
-        self.assertEqual(cell.shape(), CellShape.Orthorhombic)
-        cell.set_shape(CellShape.Triclinic)
-        self.assertEqual(cell.shape(), CellShape.Triclinic)
+        self.assertEqual(cell.shape, CellShape.Orthorhombic)
+        cell.shape = CellShape.Triclinic
+        self.assertEqual(cell.shape, CellShape.Triclinic)
 
         cell = UnitCell(3, 4, 5, 100, 120, 130)
-        self.assertEqual(cell.shape(), CellShape.Triclinic)
+        self.assertEqual(cell.shape, CellShape.Triclinic)
 
     def test_wrap(self):
         cell = UnitCell(3, 4, 5)
