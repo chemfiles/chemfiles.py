@@ -4,7 +4,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_uint64
 import numpy as np
 
-from .utils import CxxPointer, _call_with_growing_buffer
+from ._utils import CxxPointer, _call_with_growing_buffer
 from .ffi import chfl_match
 
 
@@ -31,6 +31,7 @@ class Selection(CxxPointer):
     def __copy__(self):
         return Selection.from_ptr(self.ffi.chfl_selection_copy(self))
 
+    @property
     def size(self):
         """
         Get the size of this :py:class:`Selection`.
@@ -44,6 +45,7 @@ class Selection(CxxPointer):
         self.ffi.chfl_selection_size(self, size)
         return size.value
 
+    @property
     def string(self):
         """
         Get the selection string used to create this :py:class:`Selection`.
@@ -64,7 +66,7 @@ class Selection(CxxPointer):
         matches = np.zeros(matching.value, chfl_match)
         self.ffi.chfl_selection_matches(self, matches, matching)
 
-        size = self.size()
+        size = self.size
         result = []
         for match in matches:
             assert match[0] == size

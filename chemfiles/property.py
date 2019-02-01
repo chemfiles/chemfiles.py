@@ -5,8 +5,8 @@ import numpy as np
 from ctypes import c_double, c_bool
 
 from .ffi import chfl_property_kind, chfl_vector3d
-from .utils import CxxPointer, _call_with_growing_buffer
-from .utils import ChemfilesError
+from .misc import ChemfilesError
+from ._utils import CxxPointer, _call_with_growing_buffer, string_type
 
 
 class Property(CxxPointer):
@@ -24,13 +24,15 @@ class Property(CxxPointer):
             ptr = self.ffi.chfl_property_bool(c_bool(value))
         elif isinstance(value, (float, int)):
             ptr = self.ffi.chfl_property_double(c_double(value))
-        elif _is_string(value):
+        elif isinstance(value, string_type):
             ptr = self.ffi.chfl_property_string(value.encode("utf8"))
         elif _is_vector3d(value):
             value = chfl_vector3d(value[0], value[1], value[2])
             ptr = self.ffi.chfl_property_vector3d(value)
         else:
-            raise ChemfilesError("can not create a Property with this value")
+            raise ChemfilesError(
+                "can not create a Property with a value of type '{}'".format(type(value))
+            )
 
         super(Property, self).__init__(ptr, is_const=False)
 
@@ -57,13 +59,6 @@ class Property(CxxPointer):
             return value[0], value[1], value[2]
         else:
             raise ChemfilesError("unknown property kind, this is a bug")
-
-
-def _is_string(value):
-    if sys.version_info[0] == 3:
-        return isinstance(value, str)
-    else:
-        return isinstance(value, basestring)
 
 
 def _is_vector3d(value):

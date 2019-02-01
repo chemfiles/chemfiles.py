@@ -13,30 +13,32 @@ class TestTopology(unittest.TestCase):
         topology.resize(4)
         cloned = copy.copy(topology)
 
-        self.assertEqual(topology.atoms_count(), 4)
-        self.assertEqual(cloned.atoms_count(), 4)
+        self.assertEqual(len(topology.atoms), 4)
+        self.assertEqual(len(cloned.atoms), 4)
 
         topology.resize(8)
-        self.assertEqual(topology.atoms_count(), 8)
-        self.assertEqual(cloned.atoms_count(), 4)
+        self.assertEqual(len(topology.atoms), 8)
+        self.assertEqual(len(cloned.atoms), 4)
 
     def test_size(self):
         topology = Topology()
 
-        self.assertEqual(topology.atoms_count(), 0)
-        self.assertEqual(len(topology), 0)
+        self.assertEqual(len(topology.atoms), 0)
 
-        topology.add_atom(Atom("H"))
-        topology.add_atom(Atom("O"))
-        topology.add_atom(Atom("O"))
-        topology.add_atom(Atom("H"))
+        topology.atoms.append(Atom("H"))
+        topology.atoms.append(Atom("O"))
+        topology.atoms.append(Atom("O"))
+        topology.atoms.append(Atom("H"))
 
-        self.assertEqual(len(topology), 4)
+        self.assertEqual(len(topology.atoms), 4)
         topology.resize(8)
-        self.assertEqual(len(topology), 8)
+        self.assertEqual(len(topology.atoms), 8)
 
-        topology.remove(3)
-        self.assertEqual(len(topology), 7)
+        topology.atoms.remove(3)
+        self.assertEqual(len(topology.atoms), 7)
+
+        del topology.atoms[4]
+        self.assertEqual(len(topology.atoms), 6)
 
     def test_bonding(self):
         topology = Topology()
@@ -55,17 +57,17 @@ class TestTopology(unittest.TestCase):
         self.assertEqual(topology.impropers_count(), 0)
 
         self.assertEqual(
-            topology.bonds().all(),
+            topology.bonds.all(),
             np.array([[2, 3], [1, 2], [0, 1]]).all()
         )
 
         self.assertEqual(
-            topology.angles().all(),
+            topology.angles.all(),
             np.array([[0, 1, 2], [1, 2, 3]]).all()
         )
 
         self.assertEqual(
-            topology.dihedrals().all(),
+            topology.dihedrals.all(),
             np.array([[0, 1, 2, 3]]).all()
         )
 
@@ -82,7 +84,7 @@ class TestTopology(unittest.TestCase):
         self.assertEqual(topology.impropers_count(), 1)
 
         self.assertEqual(
-            topology.impropers().all(),
+            topology.impropers.all(),
             np.array([[0, 1, 2, 3]]).all()
         )
 
@@ -91,38 +93,43 @@ class TestTopology(unittest.TestCase):
         topology.resize(4)
 
         residue = Residue("")
-        residue.add_atom(1)
-        topology.add_residue(residue)
+        residue.atoms.append(1)
+        topology.residues.append(residue)
 
-        topology.atom(2)
-        topology.residue(0)
-        topology.residue_for_atom(1)
+        _ = topology.atoms[2]
+        _ = topology.residues[0]
+        _ = topology.residue_for_atom(1)
 
-        self.assertRaises(IndexError, topology.atom, 6)
-        self.assertRaises(IndexError, topology.residue, 6)
-        self.assertRaises(IndexError, topology.residue_for_atom, 6)
+        with self.assertRaises(IndexError):
+            _ = topology.atoms[6]
+
+        with self.assertRaises(IndexError):
+            _ = topology.residues[6]
+
+        with self.assertRaises(IndexError):
+            _ = topology.residue_for_atom(6)
 
     def test_residues(self):
         topology = Topology()
         topology.resize(6)
 
         residue = Residue('foo', 4)
-        residue.add_atom(3)
-        residue.add_atom(4)
-        topology.add_residue(residue)
+        residue.atoms.append(3)
+        residue.atoms.append(4)
+        topology.residues.append(residue)
 
         residue = Residue('bar', 67)
-        residue.add_atom(1)
-        residue.add_atom(2)
-        topology.add_residue(residue)
+        residue.atoms.append(1)
+        residue.atoms.append(2)
+        topology.residues.append(residue)
 
         self.assertEqual(topology.residue_for_atom(5), None)
 
-        first = topology.residue(0)
-        self.assertEqual(first.name(), 'foo')
+        first = topology.residues[0]
+        self.assertEqual(first.name, 'foo')
 
-        second = topology.residue(1)
-        self.assertEqual(second.name(), 'bar')
+        second = topology.residues[1]
+        self.assertEqual(second.name, 'bar')
 
         self.assertFalse(topology.residues_linked(first, second))
 
@@ -133,11 +140,9 @@ class TestTopology(unittest.TestCase):
         topology = Topology()
         topology.resize(6)
 
-        i = 0
-        for atom in topology:
-            self.assertEqual(atom.name(), "")
-            i += 1
-        self.assertEqual(i, 6)
+        for i, atom in enumerate(topology.atoms):
+            self.assertEqual(atom.name, "")
+        self.assertEqual(i, 5)
 
 
 if __name__ == '__main__':

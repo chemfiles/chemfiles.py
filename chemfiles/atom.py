@@ -2,7 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_double, c_uint64
 
-from .utils import CxxPointer, _call_with_growing_buffer
+from ._utils import CxxPointer, _call_with_growing_buffer, string_type
 from .property import Property
 
 
@@ -30,21 +30,24 @@ class Atom(CxxPointer):
         ptr = self.ffi.chfl_atom(name.encode("utf8"))
         super(Atom, self).__init__(ptr, is_const=False)
         if type:
-            self.set_type(type)
+            self.type = type
 
     def __copy__(self):
         return Atom.from_ptr(self.ffi.chfl_atom_copy(self))
 
+    @property
     def mass(self):
         """Get this :py:class:`Atom` mass, in atomic mass units."""
         mass = c_double()
         self.ffi.chfl_atom_mass(self, mass)
         return mass.value
 
-    def set_mass(self, mass):
+    @mass.setter
+    def mass(self, mass):
         """Set this :py:class:`Atom` mass, in atomic mass units."""
         self.ffi.chfl_atom_set_mass(self, c_double(mass))
 
+    @property
     def charge(self):
         """
         Get this :py:class:`Atom` charge, in number of the electron charge *e*.
@@ -53,32 +56,38 @@ class Atom(CxxPointer):
         self.ffi.chfl_atom_charge(self, charge)
         return charge.value
 
-    def set_charge(self, charge):
+    @charge.setter
+    def charge(self, charge):
         """
         Set this :py:class:`Atom` charge, in number of the electron charge *e*.
         """
         self.ffi.chfl_atom_set_charge(self, c_double(charge))
 
+    @property
     def name(self):
         """Get this :py:class:`Atom` name."""
         return _call_with_growing_buffer(
             lambda buffer, size: self.ffi.chfl_atom_name(self, buffer, size), initial=32
         )
 
-    def set_name(self, name):
+    @name.setter
+    def name(self, name):
         """Set this :py:class:`Atom` name to ``name``."""
         self.ffi.chfl_atom_set_name(self, name.encode("utf8"))
 
+    @property
     def type(self):
         """Get this :py:class:`Atom` type."""
         return _call_with_growing_buffer(
             lambda buffer, size: self.ffi.chfl_atom_type(self, buffer, size), initial=32
         )
 
-    def set_type(self, type):
+    @type.setter
+    def type(self, type):
         """Set this :py:class:`Atom` type to ``type``."""
         self.ffi.chfl_atom_set_type(self, type.encode("utf8"))
 
+    @property
     def full_name(self):
         """
         Try to get the full name of this :py:class:`Atom` from its type. For
@@ -90,6 +99,7 @@ class Atom(CxxPointer):
             initial=64,
         )
 
+    @property
     def vdw_radius(self):
         """
         Try to get the Van der Waals radius of this :py:class:`Atom` from its
@@ -99,6 +109,7 @@ class Atom(CxxPointer):
         self.ffi.chfl_atom_vdw_radius(self, radius)
         return radius.value
 
+    @property
     def covalent_radius(self):
         """
         Try to get the covalent radius of this :py:class:`Atom` from its type.
@@ -108,6 +119,7 @@ class Atom(CxxPointer):
         self.ffi.chfl_atom_covalent_radius(self, radius)
         return radius.value
 
+    @property
     def atomic_number(self):
         """
         Try to get the atomic number of this :py:class:`Atom` from its type. If
@@ -117,17 +129,29 @@ class Atom(CxxPointer):
         self.ffi.chfl_atom_atomic_number(self, number)
         return number.value
 
-    def set(self, name, value):
-        """
-        Set a property of this atom, with the given ``name`` and ``value``.
-        The new value overwrite any pre-existing property with the same name.
-        """
-        self.ffi.chfl_atom_set_property(self, name.encode("utf8"), Property(value))
+    def __iter__(self):
+        # Disable automatic iteration from __getitem__
+        raise TypeError("can not iterate over an atom")
 
-    def get(self, name):
+    def __getitem__(self, name):
         """
         Get a property of this atom with the given ``name``, or raise an error
         if the property does not exists.
         """
+        if not isinstance(name, string_type):
+            raise ChemfilesError(
+                "Invalid type {} for an atomic property name".format(type(name))
+            )
         ptr = self.ffi.chfl_atom_get_property(self, name.encode("utf8"))
         return Property.from_ptr(ptr).get()
+
+    def __setitem__(self, name, value):
+        """
+        Set a property of this atom, with the given ``name`` and ``value``.
+        The new value overwrite any pre-existing property with the same name.
+        """
+        if not isinstance(name, string_type):
+            raise ChemfilesError(
+                "Invalid type {} for an atomic property name".format(type(name))
+            )
+        self.ffi.chfl_atom_set_property(self, name.encode("utf8"), Property(value))

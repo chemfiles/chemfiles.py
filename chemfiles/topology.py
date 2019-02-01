@@ -3,9 +3,94 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_uint64, c_bool
 import numpy as np
 
-from .utils import CxxPointer
+from ._utils import CxxPointer
 from .atom import Atom
 from .residue import Residue
+
+
+class TopologyAtoms(object):
+    """Proxy object to get the atoms in a topology"""
+
+    def __init__(self, topology):
+        self.topology = topology
+
+    def __len__(self):
+        """Get the current number of atoms in this :py:class:`Topology`."""
+        count = c_uint64()
+        self.topology.ffi.chfl_topology_atoms_count(self.topology, count)
+        return count.value
+
+    def __getitem__(self, index):
+        """
+        Get a reference to the :py:class:`Atom` at the given ``index`` in the
+        associated :py:class:`Topology`.
+        """
+        if index >= len(self):
+            raise IndexError("atom index ({}) out of range for this topology".format(index))
+        else:
+            ptr = self.topology.ffi.chfl_atom_from_topology(self.topology, c_uint64(index))
+            return Atom.from_ptr(ptr)
+
+    def __iter__(self):
+        for i in range(len(self)):
+            yield self[i]
+
+    def __delitem__(self, index):
+        self.remove(index)
+
+    def remove(self, index):
+        """
+        Remove the :py:class:`Atom` atthe given ``index`` from the associated
+        :py:class:`Topology`.
+
+        This shifts all the atoms indexes after ``i`` by 1 (n becomes n-1).
+        """
+        self.topology.ffi.chfl_topology_remove(self.topology, c_uint64(index))
+
+    def append(self, atom):
+        """
+        Add a copy of the :py:class:`Atom` ``atom`` at the end of this
+        :py:class:`Topology`.
+        """
+        self.topology.ffi.chfl_topology_add_atom(self.topology, atom)
+
+
+class TopologyResidue(object):
+    """Proxy object to get the residues in a topology"""
+
+    def __init__(self, topology):
+        self.topology = topology
+
+    def __len__(self):
+        """Get the current number of residues in this :py:class:`Topology`."""
+        count = c_uint64()
+        self.topology.ffi.chfl_topology_residues_count(self.topology, count)
+        return count.value
+
+    def __getitem__(self, index):
+        """
+        Get read-only access to the :py:class:`Residue` at the given ``index``
+        from the associated :py:class:`Topology`. The residue index in the
+        topology does not necessarily match the residue id.
+        """
+        if index >= len(self):
+            raise IndexError("residue index ({}) out of range for this topology".format(index))
+        else:
+            ptr = self.topology.ffi.chfl_residue_from_topology(self.topology, c_uint64(index))
+            return Residue.from_const_ptr(ptr)
+
+    def __iter__(self):
+        for i in range(len(self)):
+            yield self[i]
+
+    def append(self, residue):
+        """
+        Add the :py:class:`Residue` ``residue`` to this :py:class:`Topology`.
+
+        The residue ``id`` must not already be in the topology, and the residue
+        must contain only atoms that are not already in another residue.
+        """
+        self.topology.ffi.chfl_topology_add_residue(self.topology, residue)
 
 
 class Topology(CxxPointer):
@@ -22,28 +107,9 @@ class Topology(CxxPointer):
     def __copy__(self):
         return Topology.from_ptr(self.ffi.chfl_topology_copy(self))
 
-    def __iter__(self):
-        for i in range(self.atoms_count()):
-            yield self.atom(i)
-
-    def atom(self, i):
-        """
-        Get a copy of the :py:class:`Atom` at index ``i`` from this
-        :py:class:`Topology`.
-        """
-        if i >= self.atoms_count():
-            raise IndexError("atom index ({}) out of range for this topology".format(i))
-        return Atom.from_ptr(self.ffi.chfl_atom_from_topology(self, c_uint64(i)))
-
-    def atoms_count(self):
-        """Get the number of atoms in this :py:class:`Topology`."""
-        count = c_uint64()
-        self.ffi.chfl_topology_atoms_count(self, count)
-        return count.value
-
-    def __len__(self):
-        """Get the number of atoms in this :py:class:`Topology`."""
-        return self.atoms_count()
+    @property
+    def atoms(self):
+        return TopologyAtoms(self)
 
     def resize(self, count):
         """
@@ -55,65 +121,25 @@ class Topology(CxxPointer):
         """
         self.ffi.chfl_topology_resize(self, count)
 
-    def add_atom(self, atom):
-        """
-        Add a copy of the :py:class:`Atom` ``atom`` at the end of this
-        :py:class:`Topology`.
-        """
-        self.ffi.chfl_topology_add_atom(self, atom)
+    @property
+    def residues(self):
+        return TopologyResidue(self)
 
-    def remove(self, i):
-        """
-        Remove the :py:class:`Atom` at index `i` from this
-        :py:class:`Topology`.
-
-        This shifts all the atoms indexes after ``i`` by 1 (n becomes n-1).
-        """
-        self.ffi.chfl_topology_remove(self, c_uint64(i))
-
-    def residue(self, i):
-        """
-        Get read-only access to the :py:class:`Residue` at index ``i`` from this
-        :py:class:`Topology`. The residue index in the topology does not
-        necessarily match the residue id.
-        """
-        if i >= self.residues_count():
-            raise IndexError(
-                "residue index ({}) out of range for this topology".format(i)
-            )
-        ptr = self.ffi.chfl_residue_from_topology(self, c_uint64(i))
-        return Residue.from_const_ptr(ptr)
-
-    def residue_for_atom(self, i):
+    def residue_for_atom(self, index):
         """
         Get read-only access to the :py:class:`Residue` containing the atom at
-        index ``i`` from this :py:class:`Topology`; or ``None`` if the atom is
-        not part of a residue.
+        the given ``index`` from this :py:class:`Topology`; or ``None`` if the
+        atom is not part of a residue.
         """
-        if i >= self.atoms_count():
+        if index >= len(self.atoms):
             raise IndexError(
-                "residue index ({}) out of range for this topology".format(i)
+                "residue index ({}) out of range for this topology".format(index)
             )
-        ptr = self.ffi.chfl_residue_for_atom(self, c_uint64(i))
+        ptr = self.ffi.chfl_residue_for_atom(self, c_uint64(index))
         if ptr:
             return Residue.from_const_ptr(ptr)
         else:
             return None
-
-    def residues_count(self):
-        """Get the number of residues in this :py:class:`Topology`."""
-        residues = c_uint64()
-        self.ffi.chfl_topology_residues_count(self, residues)
-        return residues.value
-
-    def add_residue(self, residue):
-        """
-        Add the :py:class:`Residue` ``residue`` to this :py:class:`Topology`.
-
-        The residue ``id`` must not already be in the topology, and the residue
-        must contain only atoms that are not already in another residue.
-        """
-        self.ffi.chfl_topology_add_residue(self, residue)
 
     def residues_linked(self, first, second):
         """
@@ -149,6 +175,7 @@ class Topology(CxxPointer):
         self.ffi.chfl_topology_impropers_count(self, impropers)
         return impropers.value
 
+    @property
     def bonds(self):
         """Get the list of bonds in this :py:class:`Topology`."""
         n = self.bonds_count()
@@ -156,6 +183,7 @@ class Topology(CxxPointer):
         self.ffi.chfl_topology_bonds(self, bonds, c_uint64(n))
         return bonds
 
+    @property
     def angles(self):
         """Get the list of angles in this :py:class:`Topology`."""
         n = self.angles_count()
@@ -163,6 +191,7 @@ class Topology(CxxPointer):
         self.ffi.chfl_topology_angles(self, angles, c_uint64(n))
         return angles
 
+    @property
     def dihedrals(self):
         """Get the list of dihedral angles in this :py:class:`Topology`."""
         n = self.dihedrals_count()
@@ -170,6 +199,7 @@ class Topology(CxxPointer):
         self.ffi.chfl_topology_dihedrals(self, dihedrals, c_uint64(n))
         return dihedrals
 
+    @property
     def impropers(self):
         """Get the list of improper angles in this :py:class:`Topology`."""
         n = self.impropers_count()

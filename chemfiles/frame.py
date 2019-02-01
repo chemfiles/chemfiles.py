@@ -3,12 +3,41 @@ from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
 from ctypes import c_uint64, c_bool, c_double, POINTER
 
+from ._utils import CxxPointer, string_type
+from .misc import ChemfilesError
 from .ffi import chfl_vector3d
-from .utils import CxxPointer
 from .atom import Atom
 from .topology import Topology
 from .cell import UnitCell
 from .property import Property
+
+
+class FrameAtoms(object):
+    """Proxy object to get the atoms in a frame"""
+
+    def __init__(self, frame):
+        self.frame = frame
+
+    def __len__(self):
+        """Get the current number of atoms in this :py:class:`Frame`."""
+        count = c_uint64()
+        self.frame.ffi.chfl_frame_atoms_count(self.frame, count)
+        return count.value
+
+    def __getitem__(self, index):
+        """
+        Get a reference to the :py:class:`Atom` at the given ``index`` in the
+        associated :py:class:`Frame`.
+        """
+        if index >= len(self):
+            raise IndexError("atom index ({}) out of range for this frame".format(index))
+        else:
+            ptr = self.frame.ffi.chfl_atom_from_frame(self.frame, c_uint64(index))
+            return Atom.from_ptr(ptr)
+
+    def __iter__(self):
+        for i in range(len(self)):
+            yield self[i]
 
 
 class Frame(CxxPointer):
@@ -29,28 +58,9 @@ class Frame(CxxPointer):
     def __copy__(self):
         return Frame.from_ptr(self.ffi.chfl_frame_copy(self))
 
-    def __iter__(self):
-        for i in range(self.atoms_count()):
-            yield self.atom(i)
-
-    def atom(self, i):
-        """
-        Get a copy of the :py:class:`Atom` at index ``i`` in this
-        :py:class:`Frame`.
-        """
-        if i >= self.atoms_count():
-            raise IndexError("atom index ({}) out of range for this frame".format(i))
-        return Atom.from_ptr(self.ffi.chfl_atom_from_frame(self, c_uint64(i)))
-
-    def atoms_count(self):
-        """Get the current number of atoms in this :py:class:`Frame`."""
-        count = c_uint64()
-        self.ffi.chfl_frame_atoms_count(self, count)
-        return count.value
-
-    def __len__(self):
-        """Get the current number of atoms in this :py:class:`Frame`."""
-        return self.atoms_count()
+    @property
+    def atoms(self):
+        return FrameAtoms(self)
 
     def resize(self, count):
         """
@@ -113,6 +123,7 @@ class Frame(CxxPointer):
         """
         self.ffi.chfl_frame_add_residue(self, residue)
 
+    @property
     def positions(self):
         """
         Get a view into the positions of this :py:class:`Frame`.
@@ -135,6 +146,7 @@ class Frame(CxxPointer):
         else:
             return np.array([[], [], []], dtype=np.float64)
 
+    @property
     def velocities(self):
         """
         Get a view into the velocities of this :py:class:`Frame`.
@@ -172,6 +184,7 @@ class Frame(CxxPointer):
         self.ffi.chfl_frame_has_velocities(self, velocities)
         return velocities.value
 
+    @property
     def cell(self):
         """
         Get a mutable reference to the :py:class:`UnitCell` of this
@@ -180,12 +193,14 @@ class Frame(CxxPointer):
         """
         return UnitCell.from_ptr(self.ffi.chfl_cell_from_frame(self))
 
-    def set_cell(self, cell):
+    @cell.setter
+    def cell(self, cell):
         """
         Set the :py:class:`UnitCell` of this :py:class:`Frame` to ``cell``.
         """
         self.ffi.chfl_frame_set_cell(self, cell)
 
+    @property
     def topology(self):
         """
         Get read-only access to the :py:class:`Topology` of this
@@ -193,12 +208,14 @@ class Frame(CxxPointer):
         """
         return Topology.from_const_ptr(self.ffi.chfl_topology_from_frame(self))
 
-    def set_topology(self, topology):
+    @topology.setter
+    def topology(self, topology):
         """
         Set the :py:class:`Topology` of this :py:class:`Frame` to ``topology``.
         """
         self.ffi.chfl_frame_set_topology(self, topology)
 
+    @property
     def step(self):
         """
         Get this :py:class:`Frame` step, i.e. the frame number in the
@@ -208,7 +225,8 @@ class Frame(CxxPointer):
         self.ffi.chfl_frame_step(self, step)
         return step.value
 
-    def set_step(self, step):
+    @step.setter
+    def step(self, step):
         """Set this :py:class:`Frame` step to ``step``."""
         self.ffi.chfl_frame_set_step(self, c_uint64(step))
 
@@ -268,17 +286,29 @@ class Frame(CxxPointer):
         )
         return distance.value
 
-    def set(self, name, value):
-        """
-        Set a property of this frame, with the given ``name`` and ``value``.
-        The new value overwrite any pre-existing property with the same name.
-        """
-        self.ffi.chfl_frame_set_property(self, name.encode("utf8"), Property(value))
+    def __iter__(self):
+        # Disable automatic iteration from __getitem__
+        raise TypeError("use Frame.atoms to iterate over a frame")
 
-    def get(self, name):
+    def __getitem__(self, name):
         """
         Get a property of this frame with the given ``name``, or raise an error
         if the property does not exists.
         """
+        if not isinstance(name, string_type):
+            raise ChemfilesError(
+                "Invalid type {} for a frame property name".format(type(name))
+            )
         ptr = self.ffi.chfl_frame_get_property(self, name.encode("utf8"))
         return Property.from_ptr(ptr).get()
+
+    def __setitem__(self, name, value):
+        """
+        Set a property of this frame, with the given ``name`` and ``value``.
+        The new value overwrite any pre-existing property with the same name.
+        """
+        if not isinstance(name, string_type):
+            raise ChemfilesError(
+                "Invalid type {} for a frame property name".format(type(name))
+            )
+        self.ffi.chfl_frame_set_property(self, name.encode("utf8"), Property(value))

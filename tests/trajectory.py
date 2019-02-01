@@ -8,7 +8,7 @@ from ctypes import ArgumentError
 from chemfiles import Trajectory, Topology, Frame, UnitCell, Atom
 from chemfiles import ChemfilesError
 
-from utils import remove_warnings
+from _utils import remove_warnings
 
 
 def get_data_path(data):
@@ -30,62 +30,57 @@ class TestTrajectory(unittest.TestCase):
     def test_read(self):
         trajectory = Trajectory(get_data_path("water.xyz"))
 
-        self.assertEqual(trajectory.nsteps(), 100)
+        self.assertEqual(trajectory.nsteps, 100)
 
         frame = Frame()
         trajectory.read(frame)
-        self.assertEqual(frame.atoms_count(), 297)
+        self.assertEqual(len(frame.atoms), 297)
 
-        positions = frame.positions()
         self.assertEqual(
-            positions[0].all(), np.array([0.417219, 8.303366, 11.737172]).all()
+            frame.positions[0].all(), np.array([0.417219, 8.303366, 11.737172]).all()
         )
         self.assertEqual(
-            positions[124].all(), np.array([5.099554, -0.045104, 14.153846]).all()
+            frame.positions[124].all(), np.array([5.099554, -0.045104, 14.153846]).all()
         )
 
-        topology = frame.topology()
-        self.assertEqual(topology.atoms_count(), 297)
-        self.assertEqual(topology.atom(0).name(), "O")
-        self.assertEqual(topology.atom(1).name(), "H")
+        self.assertEqual(len(frame.atoms), 297)
+        self.assertEqual(frame.atoms[0].name, "O")
+        self.assertEqual(frame.atoms[1].name, "H")
 
         trajectory.set_cell(UnitCell(30, 30, 30))
         trajectory.read_step(41, frame)
-        self.assertEqual(frame.cell().lengths(), (30.0, 30.0, 30.0))
+        self.assertEqual(frame.cell.lengths, (30.0, 30.0, 30.0))
 
-        positions = frame.positions()
         self.assertEqual(
-            positions[0].all(), np.array([0.761277, 8.106125, 10.622949]).all()
+            frame.positions[0].all(), np.array([0.761277, 8.106125, 10.622949]).all()
         )
         self.assertEqual(
-            positions[124].all(), np.array([5.13242, 0.079862, 14.194161]).all()
+            frame.positions[124].all(), np.array([5.13242, 0.079862, 14.194161]).all()
         )
 
-        topology = frame.topology()
-        self.assertEqual(topology.atoms_count(), 297)
-        self.assertEqual(topology.bonds_count(), 0)
+        self.assertEqual(len(frame.atoms), 297)
+        self.assertEqual(frame.topology.bonds_count(), 0)
 
         frame.guess_bonds()
-        topology = frame.topology()
-        self.assertEqual(topology.bonds_count(), 181)
-        self.assertEqual(topology.angles_count(), 87)
+        self.assertEqual(frame.topology.bonds_count(), 181)
+        self.assertEqual(frame.topology.angles_count(), 87)
 
         topology = Topology()
         for i in range(297):
-            topology.add_atom(Atom("Cs"))
+            topology.atoms.append(Atom("Cs"))
 
         trajectory.set_topology(topology)
         frame = trajectory.read_step(10)
-        self.assertEqual(frame.atom(10).name(), "Cs")
+        self.assertEqual(frame.atoms[10].name, "Cs")
 
         trajectory.set_topology(get_data_path("topology.xyz"), "XYZ")
         frame = trajectory.read()
-        self.assertEqual(frame.atom(100).name(), "Rd")
+        self.assertEqual(frame.atoms[100].name, "Rd")
 
     def test_protocols(self):
         with Trajectory(get_data_path("water.xyz")) as trajectory:
             for frame in trajectory:
-                self.assertEqual(frame.atoms_count(), 297)
+                self.assertEqual(len(frame.atoms), 297)
 
     def test_close(self):
         trajectory = Trajectory(get_data_path("water.xyz"))
@@ -94,14 +89,9 @@ class TestTrajectory(unittest.TestCase):
 
     def test_write(self):
         frame = Frame()
-        frame.resize(4)
-        positions = frame.positions()
-        topology = Topology()
         for i in range(4):
-            positions[i] = [1, 2, 3]
-            topology.add_atom(Atom("X"))
+            frame.add_atom(Atom("X"), [1, 2, 3])
 
-        frame.set_topology(topology)
         with Trajectory("test-tmp.xyz", "w") as fd:
             fd.write(frame)
 

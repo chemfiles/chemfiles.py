@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_double, ARRAY
 from enum import IntEnum
 
-from .utils import CxxPointer
+from ._utils import CxxPointer
 from .ffi import chfl_cellshape, chfl_vector3d
 
 
@@ -62,33 +62,40 @@ class UnitCell(CxxPointer):
     def __copy__(self):
         return UnitCell.from_ptr(self.ffi.chfl_cell_copy(self))
 
+    @property
     def lengths(self):
         """Get the three lenghts of this :py:class:`UnitCell`, in Angstroms."""
         lengths = chfl_vector3d(0, 0, 0)
         self.ffi.chfl_cell_lengths(self, lengths)
         return lengths[0], lengths[1], lengths[2]
 
-    def set_lengths(self, a, b, c):
+    @lengths.setter
+    def lengths(self, lengths):
         """
-        Set the three lenghts of this :py:class:`UnitCell` to ``a``, ``b`` and
-        ``c``. These values should be in Angstroms.
+        Set the three lenghts of this :py:class:`UnitCell` to ``lengths``. The
+        values should be in Angstroms.
         """
+        a, b, c = lengths
         self.ffi.chfl_cell_set_lengths(self, chfl_vector3d(a, b, c))
 
+    @property
     def angles(self):
         """Get the three angles of this :py:class:`UnitCell`, in degrees."""
         angles = chfl_vector3d(0, 0, 0)
         self.ffi.chfl_cell_angles(self, angles)
         return angles[0], angles[1], angles[2]
 
-    def set_angles(self, alpha, beta, gamma):
+    @angles.setter
+    def angles(self, angles):
         """
         Set the three angles of this :py:class:`UnitCell` to ``alpha``,
         ``beta`` and ``gamma``. These values should be in degrees. Setting
         angles is only possible for ``CellShape.Triclinic`` cells.
         """
+        alpha, beta, gamma = angles
         self.ffi.chfl_cell_set_angles(self, chfl_vector3d(alpha, beta, gamma))
 
+    @property
     def matrix(self):
         """
         Get this :py:class:`UnitCell` matricial representation.
@@ -111,16 +118,19 @@ class UnitCell(CxxPointer):
             (m[2][0], m[2][1], m[2][2]),
         ]
 
+    @property
     def shape(self):
         """Get the shape of this :py:class:`UnitCell`."""
         shape = chfl_cellshape()
         self.ffi.chfl_cell_shape(self, shape)
         return CellShape(shape.value)
 
-    def set_shape(self, shape):
+    @shape.setter
+    def shape(self, shape):
         """Set the shape of this :py:class:`UnitCell` to ``shape``."""
         self.ffi.chfl_cell_set_shape(self, chfl_cellshape(shape))
 
+    @property
     def volume(self):
         """Get the volume of this :py:class:`UnitCell`."""
         volume = c_double()

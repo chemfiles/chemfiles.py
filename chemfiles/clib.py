@@ -31,7 +31,7 @@ class FindChemfilesLibrary(object):
                 POINTER(c_double),
             ]
 
-            from .utils import _set_default_warning_callback
+            from .misc import _set_default_warning_callback
 
             _set_default_warning_callback()
         return self._cache

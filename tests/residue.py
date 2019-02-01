@@ -5,47 +5,53 @@ import copy
 import numpy as np
 
 from chemfiles import Residue, ChemfilesError
-from utils import remove_warnings
+from _utils import remove_warnings
 
 
 class TestResidue(unittest.TestCase):
     def test_copy(self):
         residue = Residue("bar")
-        residue.add_atom(7)
+        residue.atoms.append(7)
         cloned = copy.copy(residue)
 
-        self.assertEqual(residue.atoms_count(), 1)
-        self.assertEqual(cloned.atoms_count(), 1)
+        self.assertEqual(len(residue.atoms), 1)
+        self.assertEqual(len(cloned.atoms), 1)
 
-        residue.add_atom(2)
-        self.assertEqual(residue.atoms_count(), 2)
-        self.assertEqual(cloned.atoms_count(), 1)
+        residue.atoms.append(2)
+        self.assertEqual(len(residue.atoms), 2)
+        self.assertEqual(len(cloned.atoms), 1)
 
     def test_name(self):
         residue = Residue("bar")
-        self.assertEqual(residue.name(), "bar")
+        self.assertEqual(residue.name, "bar")
 
     def test_id(self):
         residue = Residue("bar")
         with remove_warnings:
-            self.assertRaises(ChemfilesError, residue.id)
+            with self.assertRaises(ChemfilesError):
+                _ = residue.id
 
         residue = Residue("bar", 45)
-        self.assertEqual(residue.id(), 45)
+        self.assertEqual(residue.id, 45)
 
     def test_atoms(self):
         residue = Residue("")
-        residue.add_atom(3)
-        residue.add_atom(4)
-        residue.add_atom(1)
+        residue.atoms.append(3)
+        residue.atoms.append(4)
+        residue.atoms.append(1)
 
-        self.assertEqual(residue.atoms_count(), 3)
-        self.assertEqual(len(residue), 3)
+        self.assertEqual(len(residue.atoms), 3)
+        self.assertTrue(3 in residue.atoms)
+        self.assertFalse(6 in residue.atoms)
 
-        self.assertTrue(residue.contains(3))
-        self.assertFalse(residue.contains(6))
+        self.assertEqual(list(residue.atoms), [1, 3, 4])
 
-        self.assertEqual(residue.atoms().all(), np.array([1, 3, 4]).all())
+        atoms = residue.atoms
+        _ = atoms[0]
+        # Check for __contains__ with a cache
+        self.assertTrue(atoms.indexes is not None)
+        self.assertTrue(3 in atoms)
+        self.assertFalse(6 in atoms)
 
 
 if __name__ == "__main__":
