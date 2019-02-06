@@ -1,11 +1,11 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
-from ctypes import c_uint64, c_bool, c_double, POINTER
+from ctypes import c_uint64, c_bool, c_double, c_char_p, POINTER
 
 from ._utils import CxxPointer, string_type
 from .misc import ChemfilesError
-from .ffi import chfl_vector3d
+from .ffi import chfl_vector3d, chfl_bond_order
 from .atom import Atom
 from .topology import Topology
 from .cell import UnitCell
@@ -97,12 +97,17 @@ class Frame(CxxPointer):
         """
         self.ffi.chfl_frame_remove(self, c_uint64(i))
 
-    def add_bond(self, i, j):
+    def add_bond(self, i, j, order=None):
         """
         Add a bond between the atoms at indexes ``i`` and ``j`` in this
-        :py:class:`Frame`'s topology.
+        :py:class:`Frame`'s topology, optionally setting the bond ``order``.
         """
-        self.ffi.chfl_frame_add_bond(self, c_uint64(i), c_uint64(j))
+        if order is None:
+            self.ffi.chfl_frame_add_bond(self, c_uint64(i), c_uint64(j))
+        else:
+            self.ffi.chfl_frame_bond_with_order(
+                self, c_uint64(i), c_uint64(j), chfl_bond_order(order)
+            )
 
     def remove_bond(self, i, j):
         """
@@ -312,3 +317,17 @@ class Frame(CxxPointer):
                 "Invalid type {} for a frame property name".format(type(name))
             )
         self.ffi.chfl_frame_set_property(self, name.encode("utf8"), Property(value))
+
+    def properties_count(self):
+        """Get the number of properties in this frame."""
+        count = c_uint64()
+        self.ffi.chfl_frame_properties_count(self, count)
+        return count.value
+
+    def list_properties(self):
+        """Get the name of all properties in this frame."""
+        count = self.properties_count()
+        StringArray = c_char_p * count
+        names = StringArray()
+        self.ffi.chfl_frame_list_properties(self, names, count)
+        return list(map(lambda n: n.decode("utf8"), names))

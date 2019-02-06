@@ -31,6 +31,7 @@ class TestTrajectory(unittest.TestCase):
         trajectory = Trajectory(get_data_path("water.xyz"))
 
         self.assertEqual(trajectory.nsteps, 100)
+        self.assertEqual(trajectory.path, get_data_path("water.xyz"))
 
         frame = Frame()
         trajectory.read(frame)

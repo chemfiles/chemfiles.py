@@ -19,6 +19,10 @@ class TestAtom(unittest.TestCase):
         self.assertEqual(atom.name, "Zn")
         self.assertEqual(cloned.name, "He")
 
+    def test_very_long_name(self):
+        atom = Atom("He" * 128)
+        self.assertEqual(atom.name, "He" * 128)
+
     def test_name(self):
         atom = Atom("He")
         self.assertEqual(atom.name, "He")
@@ -74,7 +78,12 @@ class TestAtom(unittest.TestCase):
 
         with remove_warnings:
             with self.assertRaises(ChemfilesError):
-                atom["bar"]
+                _ = atom["bar"]
+
+        atom["bar"] = "baz"
+
+        self.assertEqual(atom.properties_count(), 2)
+        self.assertEqual(atom.list_properties(), ["bar", "foo"])
 
 
 if __name__ == "__main__":

@@ -1,6 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_uint64
+import ctypes
+from ctypes import c_uint64, c_char_p
 
 from ._utils import CxxPointer
 from .frame import Frame, Topology
@@ -123,6 +124,14 @@ class Trajectory(CxxPointer):
         nsteps = c_uint64()
         self.ffi.chfl_trajectory_nsteps(self, nsteps)
         return nsteps.value
+
+    @property
+    def path(self):
+        """Get the path used to open this  :py:class:`Trajectory`."""
+        self.__check_opened()
+        path = c_char_p()
+        self.ffi.chfl_trajectory_path(self, path)
+        return path.value.decode('utf-8')
 
     def close(self):
         """

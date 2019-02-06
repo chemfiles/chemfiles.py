@@ -5,7 +5,8 @@ import copy
 import math
 import numpy as np
 
-from chemfiles import Frame, UnitCell, Topology, Atom, Residue, ChemfilesError, CellShape
+from chemfiles import Frame, UnitCell, Topology, Atom, Residue, ChemfilesError
+from chemfiles import BondOrder, CellShape
 from _utils import remove_warnings
 
 
@@ -139,7 +140,12 @@ class TestFrame(unittest.TestCase):
 
         with remove_warnings:
             with self.assertRaises(ChemfilesError):
-                frame["bar"]
+                _ = frame["bar"]
+
+        frame["bar"] = "baz"
+
+        self.assertEqual(frame.properties_count(), 2)
+        self.assertEqual(frame.list_properties(), ["bar", "foo"])
 
     def test_distance(self):
         frame = Frame()
@@ -185,10 +191,15 @@ class TestFrame(unittest.TestCase):
 
         frame.add_bond(0, 1)
         frame.add_bond(3, 4)
-        frame.add_bond(2, 1)
+        frame.add_bond(2, 1, BondOrder.Qintuplet)
 
         self.assertEqual(
             frame.topology.bonds.all(), np.array([[0, 1], [1, 2], [3, 4]]).all()
+        )
+
+        self.assertEqual(
+            frame.topology.bonds_orders,
+            [BondOrder.Unknown, BondOrder.Qintuplet, BondOrder.Unknown]
         )
 
         frame.remove_bond(3, 4)
