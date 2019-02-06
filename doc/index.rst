@@ -37,27 +37,12 @@ You can also install this python module from sources if you have all the
     git clone https://github.com/chemfiles/chemfiles.py
     cd chemfiles.py
     git submodule update --init
-    mkdir build
-    cd build
-    cmake <CMAKE_OPTIONS> ..
-    make
-    make install
-
-The cmake options are the same one as the c++ library, you can find them `here
-<build-options_>`_. Additionally, there are some options to configure the Python
-interface:
-
-+------------------------------------------+---------------------+------------------------------+
-| Option                                   | Default value       | Effect/Informations          |
-+==========================================+=====================+==============================+
-| ``-DCHFL_PY_BUILD_DOCUMENTATION=ON|OFF`` | ``OFF``             | Build the python docs.       |
-+------------------------------------------+---------------------+------------------------------+
-| ``-DCHFL_PY_INTERNAL_CHEMFILES=ON|OFF``  | ``OFF``             | Force usage of the internal  |
-|                                          |                     | chemfiles instead of the     |
-|                                          |                     | system one.                  |
-+------------------------------------------+---------------------+------------------------------+
-
-.. _build-options: http://chemfiles.org/chemfiles/latest/installation.html#build-steps
+    # Install development dependencies
+    pip install -r dev-requirements.txt
+    # Install chemfiles
+    pip install .
+    # Optionally run the test suite
+    tox
 
 User documentation
 ^^^^^^^^^^^^^^^^^^
