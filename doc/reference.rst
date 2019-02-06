@@ -13,7 +13,7 @@ Chemfiles uses exceptions for error handling, throwing
 :py:class:`ChemfilesError <chemfiles.errors.ChemfilesError>` when an
 error occurs.
 
-.. automodule:: chemfiles.utils
+.. automodule:: chemfiles.misc
     :members:
 
 Trajectory class
@@ -42,6 +42,9 @@ UnitCell class
 
 Topology class
 --------------
+
+.. autoclass:: BondOrder
+    :members:
 
 .. autoclass:: Topology
     :members:

@@ -28,12 +28,13 @@ You can install this python module from sources if you have all the
 [dependencies] of the C++ chemfiles library installed on your computer.
 
 ```bash
-# To get the latest developement version:
+# To get the latest development version:
 git clone https://github.com/chemfiles/chemfiles.py
 cd chemfiles.py
 git submodule update --init
-# Install developement dependencies
+# Install development dependencies
 pip install -r dev-requirements.txt
+# Install chemfiles
 pip install .
 # Optionally run the test suite
 tox
