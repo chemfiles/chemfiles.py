@@ -53,6 +53,24 @@ class TestResidue(unittest.TestCase):
         self.assertTrue(3 in atoms)
         self.assertFalse(6 in atoms)
 
+    def test_property(self):
+        residue = Residue("ALA")
+
+        residue["foo"] = 3
+        self.assertEqual(residue["foo"], 3.0)
+
+        residue["foo"] = False
+        self.assertEqual(residue["foo"], False)
+
+        with remove_warnings:
+            with self.assertRaises(ChemfilesError):
+                _ = residue["bar"]
+
+        residue["bar"] = "baz"
+
+        self.assertEqual(residue.properties_count(), 2)
+        self.assertEqual(residue.list_properties(), ["bar", "foo"])
+
 
 if __name__ == "__main__":
     unittest.main()

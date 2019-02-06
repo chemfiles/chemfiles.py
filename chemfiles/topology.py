@@ -1,11 +1,37 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_uint64, c_bool
+from enum import IntEnum
 import numpy as np
 
 from ._utils import CxxPointer
+from .ffi import chfl_bond_order
 from .atom import Atom
 from .residue import Residue
+
+
+class BondOrder(IntEnum):
+    """
+    Possible bond orders are:
+
+    - ``BondOrder.Unknown``: the bond order is not specified
+    - ``BondOrder.Single``: bond order for single bond
+    - ``BondOrder.Double``: bond order for double bond
+    - ``BondOrder.Triple``: bond order for triple bond
+    - ``BondOrder.Quadruple``: bond order for quadruple bond (present in some metals)
+    - ``BondOrder.Qintuplet``: bond order for qintuplet bond (present in some metals)
+    - ``BondOrder.Amide``: bond order for amide bond
+    - ``BondOrder.Aromatic``: bond order for aromatic bond
+    """
+
+    Unknown = chfl_bond_order.CHFL_BOND_UNKNOWN
+    Single = chfl_bond_order.CHFL_BOND_SINGLE
+    Double = chfl_bond_order.CHFL_BOND_DOUBLE
+    Triple = chfl_bond_order.CHFL_BOND_TRIPLE
+    Quadruple = chfl_bond_order.CHFL_BOND_QUADRUPLE
+    Qintuplet = chfl_bond_order.CHFL_BOND_QINTUPLET
+    Amide = chfl_bond_order.CHFL_BOND_AMIDE
+    Aromatic = chfl_bond_order.CHFL_BOND_AROMATIC
 
 
 class TopologyAtoms(object):
@@ -178,41 +204,64 @@ class Topology(CxxPointer):
     @property
     def bonds(self):
         """Get the list of bonds in this :py:class:`Topology`."""
-        n = self.bonds_count()
-        bonds = np.zeros((n, 2), np.uint64)
-        self.ffi.chfl_topology_bonds(self, bonds, c_uint64(n))
+        count = self.bonds_count()
+        bonds = np.zeros((count, 2), np.uint64)
+        self.ffi.chfl_topology_bonds(self, bonds, c_uint64(count))
         return bonds
+
+    def bonds_order(self, i, j):
+        """
+        Get the bonds order corresponding to the bond between atoms i and j
+        """
+        order = chfl_bond_order()
+        self.ffi.chfl_topology_bond_order(self, c_uint64(i), c_uint64(j), order)
+        return BondOrder(order.value)
+
+    @property
+    def bonds_orders(self):
+        """
+        Get the list of bonds order for each bond in this :py:class:`Topology`.
+        """
+        count = self.bonds_count()
+        orders = np.zeros(count, chfl_bond_order)
+        self.ffi.chfl_topology_bond_orders(self, orders, c_uint64(count))
+        return list(map(BondOrder, orders))
 
     @property
     def angles(self):
         """Get the list of angles in this :py:class:`Topology`."""
-        n = self.angles_count()
-        angles = np.zeros((n, 3), np.uint64)
-        self.ffi.chfl_topology_angles(self, angles, c_uint64(n))
+        count = self.angles_count()
+        angles = np.zeros((count, 3), np.uint64)
+        self.ffi.chfl_topology_angles(self, angles, c_uint64(count))
         return angles
 
     @property
     def dihedrals(self):
         """Get the list of dihedral angles in this :py:class:`Topology`."""
-        n = self.dihedrals_count()
-        dihedrals = np.zeros((n, 4), np.uint64)
-        self.ffi.chfl_topology_dihedrals(self, dihedrals, c_uint64(n))
+        count = self.dihedrals_count()
+        dihedrals = np.zeros((count, 4), np.uint64)
+        self.ffi.chfl_topology_dihedrals(self, dihedrals, c_uint64(count))
         return dihedrals
 
     @property
     def impropers(self):
         """Get the list of improper angles in this :py:class:`Topology`."""
-        n = self.impropers_count()
-        impropers = np.zeros((n, 4), np.uint64)
-        self.ffi.chfl_topology_impropers(self, impropers, c_uint64(n))
+        count = self.impropers_count()
+        impropers = np.zeros((count, 4), np.uint64)
+        self.ffi.chfl_topology_impropers(self, impropers, c_uint64(count))
         return impropers
 
-    def add_bond(self, i, j):
+    def add_bond(self, i, j, order=None):
         """
         Add a bond between the atoms at indexes ``i`` and ``j`` in this
-        :py:class:`Topology`.
+        :py:class:`Topology`, optionally setting the bond ``order``.
         """
-        self.ffi.chfl_topology_add_bond(self, c_uint64(i), c_uint64(j))
+        if order is None:
+            self.ffi.chfl_topology_add_bond(self, c_uint64(i), c_uint64(j))
+        else:
+            self.ffi.chfl_topology_bond_with_order(
+                self, c_uint64(i), c_uint64(j), chfl_bond_order(order)
+            )
 
     def remove_bond(self, i, j):
         """

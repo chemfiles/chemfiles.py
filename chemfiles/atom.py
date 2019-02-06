@@ -1,6 +1,6 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_double, c_uint64
+from ctypes import c_double, c_uint64, c_char_p
 
 from ._utils import CxxPointer, _call_with_growing_buffer, string_type
 from .property import Property
@@ -155,3 +155,17 @@ class Atom(CxxPointer):
                 "Invalid type {} for an atomic property name".format(type(name))
             )
         self.ffi.chfl_atom_set_property(self, name.encode("utf8"), Property(value))
+
+    def properties_count(self):
+        """Get the number of properties in this atom."""
+        count = c_uint64()
+        self.ffi.chfl_atom_properties_count(self, count)
+        return count.value
+
+    def list_properties(self):
+        """Get the name of all properties in this atom."""
+        count = self.properties_count()
+        StringArray = c_char_p * count
+        names = StringArray()
+        self.ffi.chfl_atom_list_properties(self, names, count)
+        return list(map(lambda n: n.decode("utf8"), names))

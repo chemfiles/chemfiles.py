@@ -1,9 +1,10 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_bool, c_uint64
+from ctypes import c_bool, c_uint64, c_char_p
 import numpy as np
 
-from ._utils import CxxPointer, _call_with_growing_buffer
+from ._utils import CxxPointer, _call_with_growing_buffer, string_type
+from .property import Property
 
 
 class ResidueAtoms(object):
@@ -95,3 +96,44 @@ class Residue(CxxPointer):
     @property
     def atoms(self):
         return ResidueAtoms(self)
+
+    def __iter__(self):
+        # Disable automatic iteration from __getitem__
+        raise TypeError("can not iterate over a residue")
+
+    def __getitem__(self, name):
+        """
+        Get a property of this residude with the given ``name``, or raise an
+        error if the property does not exists.
+        """
+        if not isinstance(name, string_type):
+            raise ChemfilesError(
+                "Invalid type {} for a residue property name".format(type(name))
+            )
+        ptr = self.ffi.chfl_residue_get_property(self, name.encode("utf8"))
+        return Property.from_ptr(ptr).get()
+
+    def __setitem__(self, name, value):
+        """
+        Set a property of this residue, with the given ``name`` and ``value``.
+        The new value overwrite any pre-existing property with the same name.
+        """
+        if not isinstance(name, string_type):
+            raise ChemfilesError(
+                "Invalid type {} for a residue property name".format(type(name))
+            )
+        self.ffi.chfl_residue_set_property(self, name.encode("utf8"), Property(value))
+
+    def properties_count(self):
+        """Get the number of properties in this residue."""
+        count = c_uint64()
+        self.ffi.chfl_residue_properties_count(self, count)
+        return count.value
+
+    def list_properties(self):
+        """Get the name of all properties in this residue."""
+        count = self.properties_count()
+        StringArray = c_char_p * count
+        names = StringArray()
+        self.ffi.chfl_residue_list_properties(self, names, count)
+        return list(map(lambda n: n.decode("utf8"), names))

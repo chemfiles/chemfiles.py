@@ -4,7 +4,8 @@ import unittest
 import copy
 import numpy as np
 
-from chemfiles import Topology, Atom, Residue
+from chemfiles import Topology, Atom, Residue, BondOrder, ChemfilesError
+from _utils import remove_warnings
 
 
 class TestTopology(unittest.TestCase):
@@ -40,49 +41,78 @@ class TestTopology(unittest.TestCase):
         del topology.atoms[4]
         self.assertEqual(len(topology.atoms), 6)
 
-    def test_bonding(self):
+    def test_bonds(self):
         topology = Topology()
         topology.resize(4)
         self.assertEqual(topology.bonds_count(), 0)
-        self.assertEqual(topology.angles_count(), 0)
-        self.assertEqual(topology.dihedrals_count(), 0)
 
         topology.add_bond(0, 1)
         topology.add_bond(1, 2)
         topology.add_bond(2, 3)
 
         self.assertEqual(topology.bonds_count(), 3)
-        self.assertEqual(topology.angles_count(), 2)
-        self.assertEqual(topology.dihedrals_count(), 1)
-        self.assertEqual(topology.impropers_count(), 0)
-
         self.assertEqual(
             topology.bonds.all(),
             np.array([[2, 3], [1, 2], [0, 1]]).all()
         )
 
+        topology.remove_bond(2, 3)
+        self.assertEqual(topology.bonds_count(), 2)
+
+        self.assertEqual(topology.bonds_order(0, 1), BondOrder.Unknown)
+        self.assertEqual(topology.bonds_order(1, 2), BondOrder.Unknown)
+
+        with remove_warnings:
+            with self.assertRaises(ChemfilesError):
+                _ = topology.bonds_order(1, 3)
+
+        topology.add_bond(2, 3, BondOrder.Aromatic)
+        self.assertEqual(topology.bonds_order(2, 3), BondOrder.Aromatic)
+        self.assertEqual(
+            topology.bonds_orders,
+            [BondOrder.Unknown, BondOrder.Unknown, BondOrder.Aromatic]
+        )
+
+    def test_angles(self):
+        topology = Topology()
+        topology.resize(4)
+        self.assertEqual(topology.angles_count(), 0)
+
+        topology.add_bond(0, 1)
+        topology.add_bond(1, 2)
+        topology.add_bond(2, 3)
+
+        self.assertEqual(topology.angles_count(), 2)
         self.assertEqual(
             topology.angles.all(),
             np.array([[0, 1, 2], [1, 2, 3]]).all()
         )
 
+    def test_dihedrals(self):
+        topology = Topology()
+        topology.resize(4)
+        self.assertEqual(topology.dihedrals_count(), 0)
+
+        topology.add_bond(0, 1)
+        topology.add_bond(1, 2)
+        topology.add_bond(2, 3)
+
+        self.assertEqual(topology.dihedrals_count(), 1)
         self.assertEqual(
             topology.dihedrals.all(),
             np.array([[0, 1, 2, 3]]).all()
         )
 
-        topology.remove_bond(2, 3)
-        self.assertEqual(topology.bonds_count(), 2)
-        self.assertEqual(topology.angles_count(), 1)
-        self.assertEqual(topology.dihedrals_count(), 0)
+    def test_impropers(self):
+        topology = Topology()
+        topology.resize(4)
         self.assertEqual(topology.impropers_count(), 0)
 
+        topology.add_bond(1, 0)
+        topology.add_bond(1, 2)
         topology.add_bond(1, 3)
-        self.assertEqual(topology.bonds_count(), 3)
-        self.assertEqual(topology.angles_count(), 3)
-        self.assertEqual(topology.dihedrals_count(), 0)
-        self.assertEqual(topology.impropers_count(), 1)
 
+        self.assertEqual(topology.impropers_count(), 1)
         self.assertEqual(
             topology.impropers.all(),
             np.array([[0, 1, 2, 3]]).all()
