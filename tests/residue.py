@@ -69,7 +69,7 @@ class TestResidue(unittest.TestCase):
         residue["bar"] = "baz"
 
         self.assertEqual(residue.properties_count(), 2)
-        self.assertEqual(residue.list_properties(), ["bar", "foo"])
+        self.assertEqual(set(residue.list_properties()), {"bar", "foo"})
 
 
 if __name__ == "__main__":

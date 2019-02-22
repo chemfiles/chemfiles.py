@@ -83,7 +83,7 @@ class TestAtom(unittest.TestCase):
         atom["bar"] = "baz"
 
         self.assertEqual(atom.properties_count(), 2)
-        self.assertEqual(atom.list_properties(), ["bar", "foo"])
+        self.assertEqual(set(atom.list_properties()), {"bar", "foo"})
 
 
 if __name__ == "__main__":
