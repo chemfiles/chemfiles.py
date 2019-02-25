@@ -174,6 +174,14 @@ class TestTopology(unittest.TestCase):
             self.assertEqual(atom.name, "")
         self.assertEqual(i, 5)
 
+        topology.residues.append(Residue("foo"))
+        topology.residues.append(Residue("foo"))
+        topology.residues.append(Residue("foo"))
+
+        for i, residue in enumerate(topology.residues):
+            self.assertEqual(residue.name, "foo")
+        self.assertEqual(i, 2)
+
 
 if __name__ == '__main__':
     unittest.main()

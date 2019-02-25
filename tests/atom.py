@@ -80,6 +80,17 @@ class TestAtom(unittest.TestCase):
             with self.assertRaises(ChemfilesError):
                 _ = atom["bar"]
 
+            with self.assertRaises(ChemfilesError):
+                atom[3] = "test"
+
+            with self.assertRaises(ChemfilesError):
+                _ = atom[3]
+
+        # Check that enabling indexing/__getitem__ did not enable iteration
+        with self.assertRaises(TypeError):
+            for i in atom:
+                pass
+
         atom["bar"] = "baz"
 
         self.assertEqual(atom.properties_count(), 2)

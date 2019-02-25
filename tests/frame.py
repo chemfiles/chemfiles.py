@@ -142,6 +142,17 @@ class TestFrame(unittest.TestCase):
             with self.assertRaises(ChemfilesError):
                 _ = frame["bar"]
 
+            with self.assertRaises(ChemfilesError):
+                frame[3] = "test"
+
+            with self.assertRaises(ChemfilesError):
+                _ = frame[3]
+
+        # Check that enabling indexing/__getitem__ did not enable iteration
+        with self.assertRaises(TypeError):
+            for i in frame:
+                pass
+
         frame["bar"] = "baz"
 
         self.assertEqual(frame.properties_count(), 2)

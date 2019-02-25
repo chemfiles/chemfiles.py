@@ -48,8 +48,9 @@ class TestResidue(unittest.TestCase):
 
         atoms = residue.atoms
         _ = atoms[0]
-        # Check for __contains__ with a cache
+        # Check the atomic cache
         self.assertTrue(atoms.indexes is not None)
+        self.assertEqual(len(atoms), 3)
         self.assertTrue(3 in atoms)
         self.assertFalse(6 in atoms)
 
@@ -65,6 +66,17 @@ class TestResidue(unittest.TestCase):
         with remove_warnings:
             with self.assertRaises(ChemfilesError):
                 _ = residue["bar"]
+
+            with self.assertRaises(ChemfilesError):
+                residue[3] = "test"
+
+            with self.assertRaises(ChemfilesError):
+                _ = residue[3]
+
+        # Check that enabling indexing/__getitem__ did not enable iteration
+        with self.assertRaises(TypeError):
+            for i in residue:
+                pass
 
         residue["bar"] = "baz"
 

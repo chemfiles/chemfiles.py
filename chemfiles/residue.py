@@ -4,6 +4,7 @@ from ctypes import c_bool, c_uint64, c_char_p
 import numpy as np
 
 from ._utils import CxxPointer, _call_with_growing_buffer, string_type
+from .misc import ChemfilesError
 from .property import Property
 
 
@@ -18,7 +19,7 @@ class ResidueAtoms(object):
     def __len__(self):
         """Get the current number of atoms in this :py:class:`Residue`."""
         if self.indexes is not None:
-            return len(indexes)
+            return len(self.indexes)
         else:
             count = c_uint64()
             self.residue.ffi.chfl_residue_atoms_count(self.residue, count)
