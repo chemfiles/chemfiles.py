@@ -38,10 +38,12 @@ class TestTrajectory(unittest.TestCase):
         self.assertEqual(len(frame.atoms), 297)
 
         self.assertEqual(
-            frame.positions[0].all(), np.array([0.417219, 8.303366, 11.737172]).all()
+            frame.positions[0].all(),
+            np.array([0.417219, 8.303366, 11.737172]).all()
         )
         self.assertEqual(
-            frame.positions[124].all(), np.array([5.099554, -0.045104, 14.153846]).all()
+            frame.positions[124].all(),
+            np.array([5.099554, -0.045104, 14.153846]).all()
         )
 
         self.assertEqual(len(frame.atoms), 297)
@@ -53,10 +55,12 @@ class TestTrajectory(unittest.TestCase):
         self.assertEqual(frame.cell.lengths, (30.0, 30.0, 30.0))
 
         self.assertEqual(
-            frame.positions[0].all(), np.array([0.761277, 8.106125, 10.622949]).all()
+            frame.positions[0].all(),
+            np.array([0.761277, 8.106125, 10.622949]).all()
         )
         self.assertEqual(
-            frame.positions[124].all(), np.array([5.13242, 0.079862, 14.194161]).all()
+            frame.positions[124].all(),
+            np.array([5.13242, 0.079862, 14.194161]).all()
         )
 
         self.assertEqual(len(frame.atoms), 297)

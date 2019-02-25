@@ -3,6 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_double, c_uint64, c_char_p
 
 from ._utils import CxxPointer, _call_with_growing_buffer, string_type
+from .misc import ChemfilesError
 from .property import Property
 
 
