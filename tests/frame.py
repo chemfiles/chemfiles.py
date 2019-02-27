@@ -11,6 +11,14 @@ from _utils import remove_warnings
 
 
 class TestFrame(unittest.TestCase):
+    def test_repr(self):
+        frame = Frame()
+        self.assertEqual(frame.__repr__(), "Frame with 0 atoms")
+        frame.resize(4)
+        self.assertEqual(frame.__repr__(), "Frame with 4 atoms")
+
+        self.assertEqual(frame.atoms.__repr__(), "[Atom(''), Atom(''), Atom(''), Atom('')]")
+
     def test_copy(self):
         frame = Frame()
         cloned = copy.copy(frame)

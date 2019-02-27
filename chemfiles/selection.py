@@ -31,6 +31,9 @@ class Selection(CxxPointer):
     def __copy__(self):
         return Selection.from_ptr(self.ffi.chfl_selection_copy(self))
 
+    def __repr__(self):
+        return "Selection('{}')".format(self.string)
+
     @property
     def size(self):
         """

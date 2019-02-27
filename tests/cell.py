@@ -9,6 +9,10 @@ from _utils import remove_warnings
 
 
 class TestUnitCell(unittest.TestCase):
+    def test_repr(self):
+        self.assertEqual(UnitCell(3, 4, 5).__repr__(), "UnitCell(3.0, 4.0, 5.0, 90.0, 90.0, 90.0)")
+        self.assertEqual(UnitCell(3, 4, 5, 89.015, 120, 112).__repr__(), "UnitCell(3.0, 4.0, 5.0, 89.015, 120.0, 112.0)")
+
     def test_copy(self):
         cell = UnitCell(3, 4, 5)
         cloned = copy.copy(cell)

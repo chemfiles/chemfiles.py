@@ -17,6 +17,19 @@ def get_data_path(data):
 
 
 class TestTrajectory(unittest.TestCase):
+    def test_repr(self):
+        with Trajectory(get_data_path("topology.xyz")) as trajectory:
+            expected = "Trajectory('" + get_data_path("topology.xyz") + "', 'r', '')"
+            self.assertEqual(trajectory.__repr__(), expected)
+
+        with Trajectory(get_data_path("topology.xyz"), "r", "XYZ") as trajectory:
+            expected = "Trajectory('" + get_data_path("topology.xyz") + "', 'r', 'XYZ')"
+            self.assertEqual(trajectory.__repr__(), expected)
+
+        with Trajectory("test-tmp.xyz", "w") as trajectory:
+            self.assertEqual(trajectory.__repr__(), "Trajectory('test-tmp.xyz', 'w', '')")
+        os.unlink("test-tmp.xyz")
+
     def test_errors(self):
         with remove_warnings:
             self.assertRaises(ChemfilesError, Trajectory, get_data_path("not-here.xyz"))

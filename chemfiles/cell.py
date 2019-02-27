@@ -62,6 +62,9 @@ class UnitCell(CxxPointer):
     def __copy__(self):
         return UnitCell.from_ptr(self.ffi.chfl_cell_copy(self))
 
+    def __repr__(self):
+        return "UnitCell({}, {}, {}, {}, {}, {})".format(*(self.lengths + self.angles))
+
     @property
     def lengths(self):
         """Get the three lenghts of this :py:class:`UnitCell`, in Angstroms."""
