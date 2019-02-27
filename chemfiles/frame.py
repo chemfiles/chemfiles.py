@@ -39,6 +39,9 @@ class FrameAtoms(object):
         for i in range(len(self)):
             yield self[i]
 
+    def __repr__(self):
+        return "[" + ", ".join([atom.__repr__() for atom in self]) + "]"
+
 
 class Frame(CxxPointer):
     """
@@ -57,6 +60,9 @@ class Frame(CxxPointer):
 
     def __copy__(self):
         return Frame.from_ptr(self.ffi.chfl_frame_copy(self))
+
+    def __repr__(self):
+        return "Frame with {} atoms".format(len(self.atoms))
 
     @property
     def atoms(self):

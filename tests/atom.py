@@ -8,6 +8,10 @@ from _utils import remove_warnings
 
 
 class TestAtom(unittest.TestCase):
+    def test_repr(self):
+        self.assertEqual(Atom("He").__repr__(), "Atom('He')")
+        self.assertEqual(Atom("He-3", "He").__repr__(), "Atom('He-3', 'He')")
+
     def test_copy(self):
         atom = Atom("He")
         cloned = copy.copy(atom)

@@ -27,18 +27,21 @@ class Trajectory(CxxPointer):
         If `format` is an empty string, the format will be guessed from the
         file extension.
         """
-        self.closed = False
+        self.__closed = False
+        # Store mode and format for __repr__
+        self.__mode = mode
+        self.__format = format
         ptr = self.ffi.chfl_trajectory_with_format(
             path.encode("utf8"), mode.encode("utf8"), format.encode("utf8")
         )
         super(Trajectory, self).__init__(ptr, is_const=False)
 
     def __check_opened(self):
-        if self.closed:
+        if self.__closed:
             raise ChemfilesError("Can not use a closed Trajectory")
 
     def __del__(self):
-        if not self.closed and hasattr(self, "ptr"):
+        if not self.__closed and hasattr(self, "__ptr"):
             self.close()
 
     def __enter__(self):
@@ -52,6 +55,9 @@ class Trajectory(CxxPointer):
         self.__check_opened()
         for step in range(self.nsteps):
             yield self.read_step(step)
+
+    def __repr__(self):
+        return "Trajectory('{}', '{}', '{}')".format(self.path, self.__mode, self.__format)
 
     def read(self):
         """
@@ -134,5 +140,5 @@ class Trajectory(CxxPointer):
         hard drive.
         """
         self.__check_opened()
-        self.closed = True
+        self.__closed = True
         self.ffi.chfl_trajectory_close(self)

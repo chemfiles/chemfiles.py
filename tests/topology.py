@@ -9,6 +9,18 @@ from _utils import remove_warnings
 
 
 class TestTopology(unittest.TestCase):
+    def test_repr(self):
+        topology = Topology()
+        self.assertEqual(topology.__repr__(), "Topology with 0 atoms")
+        topology.resize(4)
+        self.assertEqual(topology.__repr__(), "Topology with 4 atoms")
+
+        self.assertEqual(topology.atoms.__repr__(), "[Atom(''), Atom(''), Atom(''), Atom('')]")
+
+        topology.residues.append(Residue("ALA"))
+        topology.residues.append(Residue("ARG"))
+        self.assertEqual(topology.residues.__repr__(), "[Residue('ALA') with 0 atoms, Residue('ARG') with 0 atoms]")
+
     def test_copy(self):
         topology = Topology()
         topology.resize(4)

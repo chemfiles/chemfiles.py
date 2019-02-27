@@ -51,6 +51,9 @@ class ResidueAtoms(object):
         for i in range(len(self)):
             yield self[i]
 
+    def __repr__(self):
+        return "[" + ", ".join([i.__repr__() for i in self]) + "]"
+
     def append(self, atom):
         """Add the atom index ``atom`` in the :py:class:`Residue`."""
         self.residue.ffi.chfl_residue_add_atom(self.residue, c_uint64(atom))
@@ -79,6 +82,9 @@ class Residue(CxxPointer):
 
     def __copy__(self):
         return Residue.from_ptr(self.ffi.chfl_residue_copy(self))
+
+    def __repr__(self):
+        return "Residue('{}') with {} atoms".format(self.name, len(self.atoms))
 
     @property
     def name(self):

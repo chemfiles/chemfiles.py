@@ -22,6 +22,9 @@ def testing_frame():
 
 
 class TestSelection(unittest.TestCase):
+    def test_repr(self):
+        self.assertEqual(Selection("name H").__repr__(), "Selection('name H')")
+
     def test_copy(self):
         # Just checking that we can call copy.copy on a selction
         selection = Selection("name H")

@@ -9,6 +9,18 @@ from _utils import remove_warnings
 
 
 class TestResidue(unittest.TestCase):
+    def test_repr(self):
+        residue = Residue("ALA")
+        self.assertEqual(residue.__repr__(), "Residue('ALA') with 0 atoms")
+        residue.atoms.append(3)
+        residue.atoms.append(4)
+        self.assertEqual(residue.__repr__(), "Residue('ALA') with 2 atoms")
+
+        self.assertEqual(residue.atoms.__repr__(), "[3, 4]")
+
+        residue = Residue("ARG", 34)
+        self.assertEqual(residue.__repr__(), "Residue('ARG') with 0 atoms")
+
     def test_copy(self):
         residue = Residue("bar")
         residue.atoms.append(7)

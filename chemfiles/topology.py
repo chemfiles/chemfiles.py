@@ -64,6 +64,9 @@ class TopologyAtoms(object):
     def __delitem__(self, index):
         self.remove(index)
 
+    def __repr__(self):
+        return "[" + ", ".join([atom.__repr__() for atom in self]) + "]"
+
     def remove(self, index):
         """
         Remove the :py:class:`Atom` atthe given ``index`` from the associated
@@ -81,7 +84,7 @@ class TopologyAtoms(object):
         self.topology.ffi.chfl_topology_add_atom(self.topology, atom)
 
 
-class TopologyResidue(object):
+class TopologyResidues(object):
     """Proxy object to get the residues in a topology"""
 
     def __init__(self, topology):
@@ -109,6 +112,9 @@ class TopologyResidue(object):
         for i in range(len(self)):
             yield self[i]
 
+    def __repr__(self):
+        return "[" + ", ".join([residue.__repr__() for residue in self]) + "]"
+
     def append(self, residue):
         """
         Add the :py:class:`Residue` ``residue`` to this :py:class:`Topology`.
@@ -133,6 +139,9 @@ class Topology(CxxPointer):
     def __copy__(self):
         return Topology.from_ptr(self.ffi.chfl_topology_copy(self))
 
+    def __repr__(self):
+        return "Topology with {} atoms".format(len(self.atoms))
+
     @property
     def atoms(self):
         return TopologyAtoms(self)
@@ -149,7 +158,7 @@ class Topology(CxxPointer):
 
     @property
     def residues(self):
-        return TopologyResidue(self)
+        return TopologyResidues(self)
 
     def residue_for_atom(self, index):
         """

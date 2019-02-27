@@ -36,6 +36,14 @@ class Atom(CxxPointer):
     def __copy__(self):
         return Atom.from_ptr(self.ffi.chfl_atom_copy(self))
 
+    def __repr__(self):
+        name = self.name
+        type = self.type
+        if type == name:
+            return "Atom('{}')".format(name)
+        else:
+            return "Atom('{}', '{}')".format(name, type)
+
     @property
     def mass(self):
         """Get this :py:class:`Atom` mass, in atomic mass units."""
