@@ -33,8 +33,7 @@ class TestTrajectory(unittest.TestCase):
         self.assertEqual(trajectory.nsteps, 100)
         self.assertEqual(trajectory.path, get_data_path("water.xyz"))
 
-        frame = Frame()
-        trajectory.read(frame)
+        frame = trajectory.read()
         self.assertEqual(len(frame.atoms), 297)
 
         self.assertEqual(
@@ -51,7 +50,7 @@ class TestTrajectory(unittest.TestCase):
         self.assertEqual(frame.atoms[1].name, "H")
 
         trajectory.set_cell(UnitCell(30, 30, 30))
-        trajectory.read_step(41, frame)
+        frame = trajectory.read_step(41)
         self.assertEqual(frame.cell.lengths, (30.0, 30.0, 30.0))
 
         self.assertEqual(
