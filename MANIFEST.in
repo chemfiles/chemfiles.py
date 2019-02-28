@@ -1,3 +1,8 @@
 recursive-include chemfiles *
 recursive-include lib *
+prune lib/tests
+prune lib/doc
 include requirements.txt
+include CMakeLists.txt
+include README.md
+global-exclude *.pyc
