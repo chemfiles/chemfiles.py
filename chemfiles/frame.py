@@ -169,8 +169,8 @@ class Frame(CxxPointer):
         self.ffi.chfl_frame_velocities(self, data, count)
         count = count.value
         if count != 0:
-            positions = np.ctypeslib.as_array(data, shape=(count,))
-            return positions.view(np.float64).reshape((count, 3))
+            velocities = np.ctypeslib.as_array(data, shape=(count,))
+            return velocities.view(np.float64).reshape((count, 3))
         else:
             return np.array([[], [], []], dtype=np.float64)
 

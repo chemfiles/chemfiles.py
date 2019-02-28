@@ -50,31 +50,26 @@ class Trajectory(CxxPointer):
 
     def __iter__(self):
         self.__check_opened()
-        frame = Frame()
         for step in range(self.nsteps):
-            yield self.read_step(step, frame)
+            yield self.read_step(step)
 
-    def read(self, frame=None):
+    def read(self):
         """
         Read the next step of the :py:class:`Trajectory` and return the
-        corresponding :py:class:`Frame`. If the ``frame`` parameter is given,
-        reuse the corresponding allocation.
+        corresponding :py:class:`Frame`.
         """
         self.__check_opened()
-        if frame is None:
-            frame = Frame()
+        frame = Frame()
         self.ffi.chfl_trajectory_read(self, frame)
         return frame
 
-    def read_step(self, step, frame=None):
+    def read_step(self, step):
         """
         Read a specific ``step`` in the :py:class:`Trajectory` and return the
-        corresponding :py:class:`Frame`. If the ``frame`` parameter is given,
-        reuse the corresponding allocation.
+        corresponding :py:class:`Frame`.
         """
         self.__check_opened()
-        if frame is None:
-            frame = Frame()
+        frame = Frame()
         self.ffi.chfl_trajectory_read_step(self, c_uint64(step), frame)
         return frame
 
