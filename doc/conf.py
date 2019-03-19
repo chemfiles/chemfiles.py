@@ -40,6 +40,7 @@ def version():
         version += "-dev"
     return (version, release)
 
+
 version, release = version()
 
 # List of patterns, relative to source directory, that match files and
@@ -55,6 +56,21 @@ pygments_style = 'sphinx'
 # a list of builtin themes.
 html_theme = 'bootstrap'
 html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
+
+# Add any paths that contain templates here, relative to this directory.
+templates_path = [os.path.join(ROOT, "templates")]
+
+html_theme_options = {
+    'navbar_site_name': "Navigation",
+    'navbar_pagenav': False,
+    'source_link_position': None,
+    'bootswatch_theme': "flatly",
+    'bootstrap_version': "3",
+}
+
+html_sidebars = {
+    '**': ['sidebar-toc.html', 'searchbox.html']
+}
 
 # Output file base name for HTML help builder.
 htmlhelp_basename = 'chemfiles.py'

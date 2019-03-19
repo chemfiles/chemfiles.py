@@ -51,7 +51,14 @@ This section contains example of how to use ``chemfiles``, and the complete
 interface reference for all the types and subroutines in chemfiles.
 
 .. toctree::
-   :maxdepth: 2
+    :maxdepth: 2
 
-   tutorials
-   reference
+    tutorials
+    reference/index
+    reference/atom
+    reference/residue
+    reference/topology
+    reference/cell
+    reference/frame
+    reference/trajectory
+    reference/selection
