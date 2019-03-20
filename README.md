@@ -5,6 +5,11 @@
 [![Code coverage](http://codecov.io/github/chemfiles/chemfiles.py/coverage.svg?branch=master)](http://codecov.io/github/chemfiles/chemfiles.py?branch=master)
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://chemfiles.github.io/chemfiles.py/)
 
+Chemfiles is a library for reading and writing molecular trajectory files. These
+files are created by your favorite theoretical chemistry program, and contains
+information about atomic or residues names and positions. Chemfiles offers
+abstraction on top of these formats, and a consistent interface for loading and
+saving data to these files.
 
 This repository contains the Python binding for the chemfiles library. This
 binding is created with the ctypes module, calling directly the C interface of
@@ -13,14 +18,19 @@ Numpy.
 
 ## Installation
 
-### Using Conda
-
-Using the [`conda`](http://conda.pydata.org/docs/) package manager is the
-preferred way to install the chemfiles Python module.
+You can use your favorite package manager ([`conda`] or [`pip`]) to install
+pre-built versions of Chemfiles, that support Linux/Windows/macOS, and Python
+2.7 and 3.
 
 ```
+# Using pip
+pip install chemfiles
+# Using conda
 conda install -c conda-forge chemfiles
 ```
+
+[`conda`]: http://conda.pydata.org/docs/
+[`pip`]: https://docs.python.org/3.5/installing/index.html
 
 ### Source compilation
 

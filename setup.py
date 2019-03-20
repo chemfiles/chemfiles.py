@@ -12,25 +12,27 @@ class universal_wheel(bdist_wheel):
         return ("py2.py3", "none") + tag[2:]
 
 
-with open("requirements.txt", "r") as fp:
-    requirements = list(filter(bool, (line.strip() for line in fp)))
+with open("requirements.txt", "r") as fd:
+    requirements = list(filter(bool, (line.strip() for line in fd)))
     if sys.hexversion >= 0x03040000:
         requirements = list(filter(lambda r: r != "enum34", requirements))
 
-LONG_DESCRIPTION = """Chemfiles is a library for reading and writing molecular
-trajectory files. These files are created by your favorite theoretical chemistry
-program, and contains informations about atomic or residues names and positions.
-Chemfiles offers abstraction on top of these formats, and a consistent interface
-for loading and saving data to these files."""
+
+long_description = ""
+with open("README.md", "r") as fd:
+    for line in fd:
+        # remove github badges
+        if not line.startswith("[!["):
+            long_description += line
 
 setup(
     name="chemfiles",
-    long_description=LONG_DESCRIPTION,
+    long_description=long_description,
+    long_description_content_type="text/markdown",
     version=chemfiles.__version__,
     author="Guillaume Fraux",
     author_email="luthaf@luthaf.fr",
     description="Read and write chemistry trajectory files",
-    license="BSD",
     keywords="chemistry computational cheminformatics files formats",
     url="http://github.com/chemfiles/chemfiles.py",
     packages=["chemfiles"],
@@ -42,7 +44,7 @@ setup(
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: Mozilla Public License 2.0 (MPL 2.0)",
+        "License :: OSI Approved :: BSD License",
         "Operating System :: MacOS :: MacOS X",
         "Operating System :: Microsoft :: Windows",
         "Operating System :: Unix",
