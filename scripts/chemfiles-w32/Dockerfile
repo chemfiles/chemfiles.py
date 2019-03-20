@@ -6,7 +6,7 @@ RUN cd /usr/src/mxe \
 ENV CMAKE_TOOLCHAIN_FILE /usr/src/mxe/usr/i686-w64-mingw32.static.posix/share/cmake/mxe-conf.cmake
 RUN echo 'set(CMAKE_CROSSCOMPILING_EMULATOR "/usr/bin/wine")' >> ${CMAKE_TOOLCHAIN_FILE}
 RUN cd /usr/local/bin \
-  && rm cmake cpack \
+  && rm -rf cmake cpack \
   && ln -s /usr/src/mxe/usr/bin/i686-w64-mingw32.static.posix-cmake cmake \
   && ln -s /usr/src/mxe/usr/bin/i686-w64-mingw32.static.posix-cpack cpack
 
