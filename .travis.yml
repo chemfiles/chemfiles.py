@@ -1,9 +1,15 @@
 language: python
 sudo: false
-python:
-  - "2.7"
-  - "3.5"
-  - "3.6"
+
+matrix:
+  include:
+    - python: 2.7
+    - python: 3.5
+    - python: 3.6
+    - python: 3.7
+      dist: xenial
+      sudo: true
+
 os:
   - linux
 addons:
@@ -51,11 +57,11 @@ deploy:
     local_dir: gh-pages
     on:
         branch: master
-        python: "3.5"
+        python: "3.7"
   - provider: pages
     skip_cleanup: true
     github_token: $GH_TOKEN
     local_dir: gh-pages
     on:
         tags: true
-        python: "3.5"
+        python: "3.7"
