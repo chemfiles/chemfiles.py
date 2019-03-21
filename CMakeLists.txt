@@ -1,9 +1,13 @@
 cmake_minimum_required(VERSION 2.8.12)
 
+# Prevent CMake from looking for a C and a C++ compilers, as we might not
+# need them. They will be search for if using the internal chemfiles
+project(chemfiles-python NONE)
+
 option(CHFL_PY_INTERNAL_CHEMFILES "Use the internal version of chemfiles" OFF)
 
 if(NOT ${CHFL_PY_INTERNAL_CHEMFILES})
-    find_package(chemfiles CONFIG QUIET 0.8)
+    find_package(chemfiles CONFIG QUIET 0.9)
 endif()
 
 file(REMOVE ${CMAKE_BINARY_DIR}/external.py)
