@@ -1,8 +1,8 @@
 Topology class
 --------------
 
-.. autoclass:: BondOrder
+.. autoclass:: chemfiles.BondOrder
     :members:
 
-.. autoclass:: Topology
+.. autoclass:: chemfiles.Topology
     :members:
