@@ -1,5 +1,5 @@
 Frame class
 -----------
 
-.. autoclass:: Frame
+.. autoclass:: chemfiles.Frame
     :members:

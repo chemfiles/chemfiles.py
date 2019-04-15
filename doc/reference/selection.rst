@@ -1,5 +1,5 @@
 Selection class
 ---------------
 
-.. autoclass:: Selection
+.. autoclass:: chemfiles.Selection
     :members:

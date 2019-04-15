@@ -1,5 +1,5 @@
 Atom class
 ----------
 
-.. autoclass:: Atom
+.. autoclass:: chemfiles.Atom
     :members:

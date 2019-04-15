@@ -1,8 +1,8 @@
 UnitCell class
 --------------
 
-.. autoclass:: CellShape
+.. autoclass:: chemfiles.CellShape
     :members:
 
-.. autoclass:: UnitCell
+.. autoclass:: chemfiles.UnitCell
     :members:

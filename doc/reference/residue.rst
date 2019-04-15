@@ -1,5 +1,5 @@
 Residue class
 -------------
 
-.. autoclass:: Residue
+.. autoclass:: chemfiles.Residue
     :members:
