@@ -4,7 +4,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_uint64
 import numpy as np
 
-from ._utils import CxxPointer, _call_with_growing_buffer
+from .utils import CxxPointer, _call_with_growing_buffer
 from .ffi import chfl_match
 
 
@@ -29,7 +29,7 @@ class Selection(CxxPointer):
         super(Selection, self).__init__(ptr, is_const=False)
 
     def __copy__(self):
-        return Selection.from_ptr(self.ffi.chfl_selection_copy(self))
+        return Selection.from_mutable_ptr(self.ffi.chfl_selection_copy(self.ptr))
 
     def __repr__(self):
         return "Selection('{}')".format(self.string)
@@ -45,7 +45,7 @@ class Selection(CxxPointer):
         'four' and 'dihedral' contextes.
         """
         size = c_uint64()
-        self.ffi.chfl_selection_size(self, size)
+        self.ffi.chfl_selection_size(self.ptr, size)
         return size.value
 
     @property
@@ -54,7 +54,8 @@ class Selection(CxxPointer):
         Get the selection string used to create this :py:class:`Selection`.
         """
         return _call_with_growing_buffer(
-            lambda buff, n: self.ffi.chfl_selection_string(self, buff, n), initial=128
+            lambda buffer, size: self.ffi.chfl_selection_string(self.ptr, buffer, size),
+            initial=128
         )
 
     def evaluate(self, frame):
@@ -64,10 +65,10 @@ class Selection(CxxPointer):
         of tuples of indexes.
         """
         matching = c_uint64()
-        self.ffi.chfl_selection_evaluate(self, frame, matching)
+        self.ffi.chfl_selection_evaluate(self.mut_ptr, frame.ptr, matching)
 
         matches = np.zeros(matching.value, chfl_match)
-        self.ffi.chfl_selection_matches(self, matches, matching)
+        self.ffi.chfl_selection_matches(self.mut_ptr, matches, matching)
 
         size = self.size
         result = []

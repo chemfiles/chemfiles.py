@@ -36,7 +36,7 @@ class TestTrajectory(unittest.TestCase):
             self.assertRaises(ChemfilesError, Trajectory, get_data_path("empty.unknown"))
 
             with Trajectory("test-tmp.xyz", "w") as trajectory:
-                self.assertRaises(ArgumentError, trajectory.write, None)
+                self.assertRaises(AttributeError, trajectory.write, None)
 
             os.unlink("test-tmp.xyz")
 

@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import ctypes
 from ctypes import c_uint64, c_char_p
 
-from ._utils import CxxPointer
+from .utils import CxxPointer
 from .frame import Frame, Topology
 from .misc import ChemfilesError
 
@@ -66,7 +66,7 @@ class Trajectory(CxxPointer):
         """
         self.__check_opened()
         frame = Frame()
-        self.ffi.chfl_trajectory_read(self, frame)
+        self.ffi.chfl_trajectory_read(self.mut_ptr, frame.mut_ptr)
         return frame
 
     def read_step(self, step):
@@ -76,13 +76,13 @@ class Trajectory(CxxPointer):
         """
         self.__check_opened()
         frame = Frame()
-        self.ffi.chfl_trajectory_read_step(self, c_uint64(step), frame)
+        self.ffi.chfl_trajectory_read_step(self.mut_ptr, c_uint64(step), frame.mut_ptr)
         return frame
 
     def write(self, frame):
         """Write a :py:class:`Frame` to the :py:class:`Trajectory`."""
         self.__check_opened()
-        self.ffi.chfl_trajectory_write(self, frame)
+        self.ffi.chfl_trajectory_write(self.mut_ptr, frame.ptr)
 
     def set_topology(self, topology, format=""):
         """
@@ -100,10 +100,10 @@ class Trajectory(CxxPointer):
         """
         self.__check_opened()
         if isinstance(topology, Topology):
-            self.ffi.chfl_trajectory_set_topology(self, topology)
+            self.ffi.chfl_trajectory_set_topology(self.mut_ptr, topology.ptr)
         else:
             self.ffi.chfl_trajectory_topology_file(
-                self, topology.encode("utf8"), format.encode("utf8")
+                self.mut_ptr, topology.encode("utf8"), format.encode("utf8")
             )
 
     def set_cell(self, cell):
@@ -113,7 +113,7 @@ class Trajectory(CxxPointer):
         files, replacing any :py:class:`UnitCell` in the frames or files.
         """
         self.__check_opened()
-        self.ffi.chfl_trajectory_set_cell(self, cell)
+        self.ffi.chfl_trajectory_set_cell(self.mut_ptr, cell.ptr)
 
     @property
     def nsteps(self):
@@ -123,7 +123,7 @@ class Trajectory(CxxPointer):
         """
         self.__check_opened()
         nsteps = c_uint64()
-        self.ffi.chfl_trajectory_nsteps(self, nsteps)
+        self.ffi.chfl_trajectory_nsteps(self.mut_ptr, nsteps)
         return nsteps.value
 
     @property
@@ -131,7 +131,7 @@ class Trajectory(CxxPointer):
         """Get the path used to open this  :py:class:`Trajectory`."""
         self.__check_opened()
         path = c_char_p()
-        self.ffi.chfl_trajectory_path(self, path)
+        self.ffi.chfl_trajectory_path(self.ptr, path)
         return path.value.decode('utf-8')
 
     def close(self):
@@ -141,4 +141,4 @@ class Trajectory(CxxPointer):
         """
         self.__check_opened()
         self.__closed = True
-        self.ffi.chfl_trajectory_close(self)
+        self.ffi.chfl_trajectory_close(self.ptr)

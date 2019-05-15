@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_double, ARRAY
 from enum import IntEnum
 
-from ._utils import CxxPointer
+from .utils import CxxPointer
 from .ffi import chfl_cellshape, chfl_vector3d
 
 
@@ -60,7 +60,7 @@ class UnitCell(CxxPointer):
         super(UnitCell, self).__init__(ptr, is_const=False)
 
     def __copy__(self):
-        return UnitCell.from_ptr(self.ffi.chfl_cell_copy(self))
+        return UnitCell.from_mutable_ptr(self.ffi.chfl_cell_copy(self.ptr))
 
     def __repr__(self):
         return "UnitCell({}, {}, {}, {}, {}, {})".format(*(self.lengths + self.angles))
@@ -69,7 +69,7 @@ class UnitCell(CxxPointer):
     def lengths(self):
         """Get the three lenghts of this :py:class:`UnitCell`, in Angstroms."""
         lengths = chfl_vector3d(0, 0, 0)
-        self.ffi.chfl_cell_lengths(self, lengths)
+        self.ffi.chfl_cell_lengths(self.ptr, lengths)
         return lengths[0], lengths[1], lengths[2]
 
     @lengths.setter
@@ -79,13 +79,13 @@ class UnitCell(CxxPointer):
         values should be in Angstroms.
         """
         a, b, c = lengths
-        self.ffi.chfl_cell_set_lengths(self, chfl_vector3d(a, b, c))
+        self.ffi.chfl_cell_set_lengths(self.mut_ptr, chfl_vector3d(a, b, c))
 
     @property
     def angles(self):
         """Get the three angles of this :py:class:`UnitCell`, in degrees."""
         angles = chfl_vector3d(0, 0, 0)
-        self.ffi.chfl_cell_angles(self, angles)
+        self.ffi.chfl_cell_angles(self.ptr, angles)
         return angles[0], angles[1], angles[2]
 
     @angles.setter
@@ -96,7 +96,7 @@ class UnitCell(CxxPointer):
         angles is only possible for ``CellShape.Triclinic`` cells.
         """
         alpha, beta, gamma = angles
-        self.ffi.chfl_cell_set_angles(self, chfl_vector3d(alpha, beta, gamma))
+        self.ffi.chfl_cell_set_angles(self.mut_ptr, chfl_vector3d(alpha, beta, gamma))
 
     @property
     def matrix(self):
@@ -114,7 +114,7 @@ class UnitCell(CxxPointer):
             |  0     0    c_z |
         """
         m = ARRAY(chfl_vector3d, 3)()
-        self.ffi.chfl_cell_matrix(self, m)
+        self.ffi.chfl_cell_matrix(self.ptr, m)
         return [
             (m[0][0], m[0][1], m[0][2]),
             (m[1][0], m[1][1], m[1][2]),
@@ -125,19 +125,19 @@ class UnitCell(CxxPointer):
     def shape(self):
         """Get the shape of this :py:class:`UnitCell`."""
         shape = chfl_cellshape()
-        self.ffi.chfl_cell_shape(self, shape)
+        self.ffi.chfl_cell_shape(self.ptr, shape)
         return CellShape(shape.value)
 
     @shape.setter
     def shape(self, shape):
         """Set the shape of this :py:class:`UnitCell` to ``shape``."""
-        self.ffi.chfl_cell_set_shape(self, chfl_cellshape(shape))
+        self.ffi.chfl_cell_set_shape(self.mut_ptr, chfl_cellshape(shape))
 
     @property
     def volume(self):
         """Get the volume of this :py:class:`UnitCell`."""
         volume = c_double()
-        self.ffi.chfl_cell_volume(self, volume)
+        self.ffi.chfl_cell_volume(self.ptr, volume)
         return volume.value
 
     def wrap(self, vector):
@@ -146,5 +146,5 @@ class UnitCell(CxxPointer):
         vector.
         """
         vector = chfl_vector3d(vector[0], vector[1], vector[2])
-        self.ffi.chfl_cell_wrap(self, vector)
+        self.ffi.chfl_cell_wrap(self.ptr, vector)
         return (vector[0], vector[1], vector[2])

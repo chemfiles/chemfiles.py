@@ -110,9 +110,6 @@ class TestFrame(unittest.TestCase):
         topology.atoms.append(Atom("Ar"))
 
         frame.topology = topology
-        self.assertEqual(frame.topology.atoms[0].name, "Zn")
-        self.assertEqual(frame.topology.atoms[1].name, "Ar")
-
         self.assertEqual(frame.atoms[0].name, "Zn")
         self.assertEqual(frame.atoms[1].name, "Ar")
 
