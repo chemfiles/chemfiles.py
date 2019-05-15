@@ -15,18 +15,17 @@ else:
 
 class CxxPointer(object):
     __frozen = False
+    __ptr = 0
 
     def __init__(self, ptr, is_const=True):
-        _check_handle(ptr)
         self.__ptr = ptr
         self.__is_const = is_const
-        self._as_parameter_ = self.__ptr
         self.__frozen = True
+        _check_handle(ptr)
 
     def __del__(self):
         """Free the memory associated with this instance"""
-        if hasattr(self, "__ptr"):
-            self.ffi.chfl_free(self)
+        self.ffi.chfl_free(self)
 
     def __setattr__(self, key, value):
         if self.__frozen and not hasattr(self, key):
@@ -48,6 +47,11 @@ class CxxPointer(object):
         new = cls.__new__(cls)
         super(cls, new).__init__(ptr, is_const=True)
         return new
+
+    @property
+    def _as_parameter_(self):
+        """used by ctypes when passing self as parameter to a FFI function"""
+        return self.const_ptr
 
     @property
     def ptr(self):
