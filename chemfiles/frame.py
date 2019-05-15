@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
 from ctypes import c_uint64, c_bool, c_double, c_char_p, POINTER
 
-from ._utils import CxxPointer, string_type
+from .utils import CxxPointer, string_type
 from .misc import ChemfilesError
 from .ffi import chfl_vector3d, chfl_bond_order
 from .atom import Atom
@@ -21,7 +21,7 @@ class FrameAtoms(object):
     def __len__(self):
         """Get the current number of atoms in this :py:class:`Frame`."""
         count = c_uint64()
-        self.frame.ffi.chfl_frame_atoms_count(self.frame, count)
+        self.frame.ffi.chfl_frame_atoms_count(self.frame.ptr, count)
         return count.value
 
     def __getitem__(self, index):
@@ -32,8 +32,8 @@ class FrameAtoms(object):
         if index >= len(self):
             raise IndexError("atom index ({}) out of range for this frame".format(index))
         else:
-            ptr = self.frame.ffi.chfl_atom_from_frame(self.frame, c_uint64(index))
-            return Atom.from_ptr(ptr)
+            ptr = self.frame.ffi.chfl_atom_from_frame(self.frame.mut_ptr, c_uint64(index))
+            return Atom.from_mutable_ptr(ptr)
 
     def __iter__(self):
         for i in range(len(self)):
@@ -59,7 +59,7 @@ class Frame(CxxPointer):
         super(Frame, self).__init__(self.ffi.chfl_frame(), is_const=False)
 
     def __copy__(self):
-        return Frame.from_ptr(self.ffi.chfl_frame_copy(self))
+        return Frame.from_mutable_ptr(self.ffi.chfl_frame_copy(self.ptr))
 
     def __repr__(self):
         return "Frame with {} atoms".format(len(self.atoms))
@@ -78,7 +78,7 @@ class Frame(CxxPointer):
         previous data is conserved. This function conserve the presence or
         absence of velocities.
         """
-        self.ffi.chfl_frame_resize(self, c_uint64(count))
+        self.ffi.chfl_frame_resize(self.mut_ptr, c_uint64(count))
 
     def add_atom(self, atom, position, velocity=None):
         """
@@ -91,7 +91,7 @@ class Frame(CxxPointer):
         position = chfl_vector3d(position[0], position[1], position[2])
         if velocity:
             velocity = chfl_vector3d(velocity[0], velocity[1], velocity[2])
-        self.ffi.chfl_frame_add_atom(self, atom, position, velocity)
+        self.ffi.chfl_frame_add_atom(self.mut_ptr, atom.ptr, position, velocity)
 
     def remove(self, i):
         """
@@ -101,7 +101,7 @@ class Frame(CxxPointer):
         obtained using :py:func:`Frame.positions` or
         :py:func:`Frame.velocities`.
         """
-        self.ffi.chfl_frame_remove(self, c_uint64(i))
+        self.ffi.chfl_frame_remove(self.mut_ptr, c_uint64(i))
 
     def add_bond(self, i, j, order=None):
         """
@@ -109,10 +109,10 @@ class Frame(CxxPointer):
         :py:class:`Frame`'s topology, optionally setting the bond ``order``.
         """
         if order is None:
-            self.ffi.chfl_frame_add_bond(self, c_uint64(i), c_uint64(j))
+            self.ffi.chfl_frame_add_bond(self.mut_ptr, c_uint64(i), c_uint64(j))
         else:
             self.ffi.chfl_frame_bond_with_order(
-                self, c_uint64(i), c_uint64(j), chfl_bond_order(order)
+                self.mut_ptr, c_uint64(i), c_uint64(j), chfl_bond_order(order)
             )
 
     def remove_bond(self, i, j):
@@ -122,7 +122,7 @@ class Frame(CxxPointer):
 
         This function does nothing if there is no bond between ``i`` and ``j``.
         """
-        self.ffi.chfl_frame_remove_bond(self, c_uint64(i), c_uint64(j))
+        self.ffi.chfl_frame_remove_bond(self.mut_ptr, c_uint64(i), c_uint64(j))
 
     def add_residue(self, residue):
         """
@@ -132,7 +132,7 @@ class Frame(CxxPointer):
         The residue ``id`` must not already be in the topology, and the residue
         must contain only atoms that are not already in another residue.
         """
-        self.ffi.chfl_frame_add_residue(self, residue)
+        self.ffi.chfl_frame_add_residue(self.mut_ptr, residue.ptr)
 
     @property
     def positions(self):
@@ -149,7 +149,7 @@ class Frame(CxxPointer):
         """
         count = c_uint64()
         data = POINTER(chfl_vector3d)()
-        self.ffi.chfl_frame_positions(self, data, count)
+        self.ffi.chfl_frame_positions(self.mut_ptr, data, count)
         count = count.value
         if count != 0:
             positions = np.ctypeslib.as_array(data, shape=(count,))
@@ -172,7 +172,7 @@ class Frame(CxxPointer):
         """
         count = c_uint64()
         data = POINTER(chfl_vector3d)()
-        self.ffi.chfl_frame_velocities(self, data, count)
+        self.ffi.chfl_frame_velocities(self.mut_ptr, data, count)
         count = count.value
         if count != 0:
             velocities = np.ctypeslib.as_array(data, shape=(count,))
@@ -187,12 +187,12 @@ class Frame(CxxPointer):
         The velocities are initialized to zero. If the frame already contains
         velocities, this function does nothing.
         """
-        self.ffi.chfl_frame_add_velocities(self)
+        self.ffi.chfl_frame_add_velocities(self.mut_ptr)
 
     def has_velocities(self):
         """Check if this :py:class:`Frame` contains velocity."""
         velocities = c_bool()
-        self.ffi.chfl_frame_has_velocities(self, velocities)
+        self.ffi.chfl_frame_has_velocities(self.ptr, velocities)
         return velocities.value
 
     @property
@@ -202,14 +202,14 @@ class Frame(CxxPointer):
         :py:class:`Frame`. Any modification to the cell will be reflected in
         the frame.
         """
-        return UnitCell.from_ptr(self.ffi.chfl_cell_from_frame(self))
+        return UnitCell.from_mutable_ptr(self.ffi.chfl_cell_from_frame(self.mut_ptr))
 
     @cell.setter
     def cell(self, cell):
         """
         Set the :py:class:`UnitCell` of this :py:class:`Frame` to ``cell``.
         """
-        self.ffi.chfl_frame_set_cell(self, cell)
+        self.ffi.chfl_frame_set_cell(self.mut_ptr, cell.ptr)
 
     @property
     def topology(self):
@@ -217,14 +217,14 @@ class Frame(CxxPointer):
         Get read-only access to the :py:class:`Topology` of this
         :py:class:`Frame`.
         """
-        return Topology.from_const_ptr(self.ffi.chfl_topology_from_frame(self))
+        return Topology.from_const_ptr(self.ffi.chfl_topology_from_frame(self.ptr))
 
     @topology.setter
     def topology(self, topology):
         """
         Set the :py:class:`Topology` of this :py:class:`Frame` to ``topology``.
         """
-        self.ffi.chfl_frame_set_topology(self, topology)
+        self.ffi.chfl_frame_set_topology(self.mut_ptr, topology.ptr)
 
     @property
     def step(self):
@@ -233,13 +233,13 @@ class Frame(CxxPointer):
         trajectory.
         """
         step = c_uint64()
-        self.ffi.chfl_frame_step(self, step)
+        self.ffi.chfl_frame_step(self.ptr, step)
         return step.value
 
     @step.setter
     def step(self, step):
         """Set this :py:class:`Frame` step to ``step``."""
-        self.ffi.chfl_frame_set_step(self, c_uint64(step))
+        self.ffi.chfl_frame_set_step(self.mut_ptr, c_uint64(step))
 
     def guess_bonds(self):
         """
@@ -248,7 +248,7 @@ class Frame(CxxPointer):
         The bonds are guessed using a distance-based algorithm, and then angles
         and dihedrals are guessed from the bonds.
         """
-        self.ffi.chfl_frame_guess_bonds(self)
+        self.ffi.chfl_frame_guess_bonds(self.mut_ptr)
 
     def distance(self, i, j):
         """
@@ -257,7 +257,7 @@ class Frame(CxxPointer):
         result is expressed in angstroms.
         """
         distance = c_double()
-        self.ffi.chfl_frame_distance(self, c_uint64(i), c_uint64(j), distance)
+        self.ffi.chfl_frame_distance(self.ptr, c_uint64(i), c_uint64(j), distance)
         return distance.value
 
     def angle(self, i, j, k):
@@ -267,7 +267,7 @@ class Frame(CxxPointer):
         The result is expressed in radians.
         """
         angle = c_double()
-        self.ffi.chfl_frame_angle(self, c_uint64(i), c_uint64(j), c_uint64(k), angle)
+        self.ffi.chfl_frame_angle(self.ptr, c_uint64(i), c_uint64(j), c_uint64(k), angle)
         return angle.value
 
     def dihedral(self, i, j, k, m):
@@ -278,7 +278,7 @@ class Frame(CxxPointer):
         """
         dihedral = c_double()
         self.ffi.chfl_frame_dihedral(
-            self, c_uint64(i), c_uint64(j), c_uint64(k), c_uint64(m), dihedral
+            self.ptr, c_uint64(i), c_uint64(j), c_uint64(k), c_uint64(m), dihedral
         )
         return dihedral.value
 
@@ -293,7 +293,7 @@ class Frame(CxxPointer):
         """
         distance = c_double()
         self.ffi.chfl_frame_out_of_plane(
-            self, c_uint64(i), c_uint64(j), c_uint64(k), c_uint64(m), distance
+            self.ptr, c_uint64(i), c_uint64(j), c_uint64(k), c_uint64(m), distance
         )
         return distance.value
 
@@ -310,8 +310,8 @@ class Frame(CxxPointer):
             raise ChemfilesError(
                 "Invalid type {} for a frame property name".format(type(name))
             )
-        ptr = self.ffi.chfl_frame_get_property(self, name.encode("utf8"))
-        return Property.from_ptr(ptr).get()
+        ptr = self.ffi.chfl_frame_get_property(self.ptr, name.encode("utf8"))
+        return Property.from_mutable_ptr(ptr).get()
 
     def __setitem__(self, name, value):
         """
@@ -322,12 +322,15 @@ class Frame(CxxPointer):
             raise ChemfilesError(
                 "Invalid type {} for a frame property name".format(type(name))
             )
-        self.ffi.chfl_frame_set_property(self, name.encode("utf8"), Property(value))
+        property = Property(value)
+        self.ffi.chfl_frame_set_property(
+            self.mut_ptr, name.encode("utf8"), property.ptr
+        )
 
     def properties_count(self):
         """Get the number of properties in this frame."""
         count = c_uint64()
-        self.ffi.chfl_frame_properties_count(self, count)
+        self.ffi.chfl_frame_properties_count(self.ptr, count)
         return count.value
 
     def list_properties(self):
@@ -335,5 +338,5 @@ class Frame(CxxPointer):
         count = self.properties_count()
         StringArray = c_char_p * count
         names = StringArray()
-        self.ffi.chfl_frame_list_properties(self, names, count)
+        self.ffi.chfl_frame_list_properties(self.ptr, names, count)
         return list(map(lambda n: n.decode("utf8"), names))

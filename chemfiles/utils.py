@@ -25,7 +25,7 @@ class CxxPointer(object):
 
     def __del__(self):
         """Free the memory associated with this instance"""
-        self.ffi.chfl_free(self)
+        self.ffi.chfl_free(self.ptr)
 
     def __setattr__(self, key, value):
         if self.__frozen and not hasattr(self, key):
@@ -35,7 +35,7 @@ class CxxPointer(object):
         object.__setattr__(self, key, value)
 
     @classmethod
-    def from_ptr(cls, ptr):
+    def from_mutable_ptr(cls, ptr):
         """Create a new instance from a mutable pointer"""
         new = cls.__new__(cls)
         super(cls, new).__init__(ptr, is_const=False)
@@ -49,12 +49,7 @@ class CxxPointer(object):
         return new
 
     @property
-    def _as_parameter_(self):
-        """used by ctypes when passing self as parameter to a FFI function"""
-        return self.const_ptr
-
-    @property
-    def ptr(self):
+    def mut_ptr(self):
         """Get the **mutable** C++ pointer for this object"""
         if self.__is_const:
             raise ChemfilesError("Trying to use a const pointer for mutable access")
@@ -62,7 +57,7 @@ class CxxPointer(object):
             return self.__ptr
 
     @property
-    def const_ptr(self):
+    def ptr(self):
         """Get the **const** C++ pointer for this object"""
         return self.__ptr
 

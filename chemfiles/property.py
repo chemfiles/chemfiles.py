@@ -6,7 +6,7 @@ from ctypes import c_double, c_bool
 
 from .ffi import chfl_property_kind, chfl_vector3d
 from .misc import ChemfilesError
-from ._utils import CxxPointer, _call_with_growing_buffer, string_type
+from .utils import CxxPointer, _call_with_growing_buffer, string_type
 
 
 class Property(CxxPointer):
@@ -38,24 +38,24 @@ class Property(CxxPointer):
 
     def get(self):
         kind = chfl_property_kind()
-        self.ffi.chfl_property_get_kind(self, kind)
+        self.ffi.chfl_property_get_kind(self.ptr, kind)
         if kind.value == chfl_property_kind.CHFL_PROPERTY_BOOL:
             value = c_bool()
-            self.ffi.chfl_property_get_bool(self, value)
+            self.ffi.chfl_property_get_bool(self.ptr, value)
             return value.value
         if kind.value == chfl_property_kind.CHFL_PROPERTY_DOUBLE:
             value = c_double()
-            self.ffi.chfl_property_get_double(self, value)
+            self.ffi.chfl_property_get_double(self.ptr, value)
             return value.value
         if kind.value == chfl_property_kind.CHFL_PROPERTY_STRING:
 
             def callback(buffer, size):
-                self.ffi.chfl_property_get_string(self, buffer, size)
+                self.ffi.chfl_property_get_string(self.ptr, buffer, size)
 
             return _call_with_growing_buffer(callback, initial=32)
         if kind.value == chfl_property_kind.CHFL_PROPERTY_VECTOR3D:
             value = chfl_vector3d()
-            self.ffi.chfl_property_get_vector3d(self, value)
+            self.ffi.chfl_property_get_vector3d(self.ptr, value)
             return value[0], value[1], value[2]
         else:
             raise ChemfilesError("unknown property kind, this is a bug")
@@ -65,5 +65,5 @@ def _is_vector3d(value):
     try:
         a = np.array(value, dtype="double")
         return len(a) >= 3
-    except:
+    except Exception:
         return False

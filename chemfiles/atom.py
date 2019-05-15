@@ -2,7 +2,7 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_double, c_uint64, c_char_p
 
-from ._utils import CxxPointer, _call_with_growing_buffer, string_type
+from .utils import CxxPointer, _call_with_growing_buffer, string_type
 from .misc import ChemfilesError
 from .property import Property
 
@@ -34,7 +34,7 @@ class Atom(CxxPointer):
             self.type = type
 
     def __copy__(self):
-        return Atom.from_ptr(self.ffi.chfl_atom_copy(self))
+        return Atom.from_mutable_ptr(self.ffi.chfl_atom_copy(self.ptr))
 
     def __repr__(self):
         name = self.name
@@ -48,13 +48,13 @@ class Atom(CxxPointer):
     def mass(self):
         """Get this :py:class:`Atom` mass, in atomic mass units."""
         mass = c_double()
-        self.ffi.chfl_atom_mass(self, mass)
+        self.ffi.chfl_atom_mass(self.ptr, mass)
         return mass.value
 
     @mass.setter
     def mass(self, mass):
         """Set this :py:class:`Atom` mass, in atomic mass units."""
-        self.ffi.chfl_atom_set_mass(self, c_double(mass))
+        self.ffi.chfl_atom_set_mass(self.mut_ptr, c_double(mass))
 
     @property
     def charge(self):
@@ -62,7 +62,7 @@ class Atom(CxxPointer):
         Get this :py:class:`Atom` charge, in number of the electron charge *e*.
         """
         charge = c_double()
-        self.ffi.chfl_atom_charge(self, charge)
+        self.ffi.chfl_atom_charge(self.ptr, charge)
         return charge.value
 
     @charge.setter
@@ -70,31 +70,33 @@ class Atom(CxxPointer):
         """
         Set this :py:class:`Atom` charge, in number of the electron charge *e*.
         """
-        self.ffi.chfl_atom_set_charge(self, c_double(charge))
+        self.ffi.chfl_atom_set_charge(self.mut_ptr, c_double(charge))
 
     @property
     def name(self):
         """Get this :py:class:`Atom` name."""
         return _call_with_growing_buffer(
-            lambda buffer, size: self.ffi.chfl_atom_name(self, buffer, size), initial=32
+            lambda buffer, size: self.ffi.chfl_atom_name(self.ptr, buffer, size),
+            initial=32
         )
 
     @name.setter
     def name(self, name):
         """Set this :py:class:`Atom` name to ``name``."""
-        self.ffi.chfl_atom_set_name(self, name.encode("utf8"))
+        self.ffi.chfl_atom_set_name(self.mut_ptr, name.encode("utf8"))
 
     @property
     def type(self):
         """Get this :py:class:`Atom` type."""
         return _call_with_growing_buffer(
-            lambda buffer, size: self.ffi.chfl_atom_type(self, buffer, size), initial=32
+            lambda buffer, size: self.ffi.chfl_atom_type(self.ptr, buffer, size),
+            initial=32
         )
 
     @type.setter
     def type(self, type):
         """Set this :py:class:`Atom` type to ``type``."""
-        self.ffi.chfl_atom_set_type(self, type.encode("utf8"))
+        self.ffi.chfl_atom_set_type(self.mut_ptr, type.encode("utf8"))
 
     @property
     def full_name(self):
@@ -104,7 +106,7 @@ class Atom(CxxPointer):
         found, returns the empty string.
         """
         return _call_with_growing_buffer(
-            lambda buff, size: self.ffi.chfl_atom_full_name(self, buff, size),
+            lambda buffer, size: self.ffi.chfl_atom_full_name(self.ptr, buffer, size),
             initial=64,
         )
 
@@ -115,7 +117,7 @@ class Atom(CxxPointer):
         type. If the radius can not be found, returns 0.
         """
         radius = c_double()
-        self.ffi.chfl_atom_vdw_radius(self, radius)
+        self.ffi.chfl_atom_vdw_radius(self.ptr, radius)
         return radius.value
 
     @property
@@ -125,7 +127,7 @@ class Atom(CxxPointer):
         If the radius can not be found, returns 0.
         """
         radius = c_double()
-        self.ffi.chfl_atom_covalent_radius(self, radius)
+        self.ffi.chfl_atom_covalent_radius(self.ptr, radius)
         return radius.value
 
     @property
@@ -135,7 +137,7 @@ class Atom(CxxPointer):
         the atomic number can not be found, returns 0.
         """
         number = c_uint64()
-        self.ffi.chfl_atom_atomic_number(self, number)
+        self.ffi.chfl_atom_atomic_number(self.ptr, number)
         return number.value
 
     def __iter__(self):
@@ -151,8 +153,8 @@ class Atom(CxxPointer):
             raise ChemfilesError(
                 "Invalid type {} for an atomic property name".format(type(name))
             )
-        ptr = self.ffi.chfl_atom_get_property(self, name.encode("utf8"))
-        return Property.from_ptr(ptr).get()
+        ptr = self.ffi.chfl_atom_get_property(self.ptr, name.encode("utf8"))
+        return Property.from_mutable_ptr(ptr).get()
 
     def __setitem__(self, name, value):
         """
@@ -161,14 +163,17 @@ class Atom(CxxPointer):
         """
         if not isinstance(name, string_type):
             raise ChemfilesError(
-                "Invalid type {} for an atomic property name".format(type(name))
+                "invalid type {} for a property name".format(type(name))
             )
-        self.ffi.chfl_atom_set_property(self, name.encode("utf8"), Property(value))
+        property = Property(value)
+        self.ffi.chfl_atom_set_property(
+            self.mut_ptr, name.encode("utf8"), property.ptr
+        )
 
     def properties_count(self):
         """Get the number of properties in this atom."""
         count = c_uint64()
-        self.ffi.chfl_atom_properties_count(self, count)
+        self.ffi.chfl_atom_properties_count(self.ptr, count)
         return count.value
 
     def list_properties(self):
@@ -176,5 +181,5 @@ class Atom(CxxPointer):
         count = self.properties_count()
         StringArray = c_char_p * count
         names = StringArray()
-        self.ffi.chfl_atom_list_properties(self, names, count)
+        self.ffi.chfl_atom_list_properties(self.ptr, names, count)
         return list(map(lambda n: n.decode("utf8"), names))
