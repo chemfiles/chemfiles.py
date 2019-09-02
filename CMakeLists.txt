@@ -34,7 +34,7 @@ else()
     if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/CMakeLists.txt")
         message(FATAL_ERROR
             "The git submodule for chemfiles is not initalized.\n"
-            "Please run `git submodule update --init."
+            "Please run `git submodule update --init`"
         )
     endif()
 
