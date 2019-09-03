@@ -14,3 +14,6 @@ for frame in trajectory:
     for i in reversed(sorted(to_remove)):
         frame.remove(i)
     output.write(frame)
+
+trajectory.close()
+output.close()

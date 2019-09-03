@@ -4,14 +4,12 @@
 #!/usr/bin/env python
 from chemfiles import Trajectory
 
-trajectory = Trajectory("filename.xyz")
-frame = trajectory.read()
+with Trajectory("filename.xyz") as trajectory:
+    frame = trajectory.read()
 
 less_than_five = []
-positions = frame.positions()
-
-for i in range(len(frame)):
-    if positions[i, 0] < 5:
+for i in range(len(frame.atoms)):
+    if frame.positions[i, 0] < 5:
         less_than_five.append(i)
 
 print("Atoms with x < 5: ")

@@ -28,28 +28,20 @@ Then we open a Trajectory and read the first frame:
    :language: python
    :lines: 7-8
 
-We can now create a list to store the indices of the atoms with ``x < 5``, and
-get the positions of the atoms in the frame with the :py:func:`Frame.positions`
-function
+Iterating through the atoms in the frame, we store the indices of the atoms with
+``x < 5`` in a list. ``len(frame.atoms)`` gives the number of atoms in the
+frame, which is also the size of the ``frame.positions`` array. This array is a
+numpy array which shape is ``(len(frame), 3)``.
 
 .. literalinclude:: ../examples/indexes.py
    :language: python
-   :lines: 10-11
+   :lines: 10-13
 
-Iterating through the atoms in the frame, we get the ones matching our
-condition. ``len(frame)`` gives the number of atoms in the frame, which is also
-the size of the ``positions`` array. This array is a numpy array which shape is
-``(len(frame), 3)``.
+We can then print our results
 
 .. literalinclude:: ../examples/indexes.py
    :language: python
-   :lines: 13-15
-
-And finally we can print our results
-
-.. literalinclude:: ../examples/indexes.py
-   :language: python
-   :lines: 17-19
+   :lines: 15-17
 
 .. htmlhidden::
     :toggle: Click here to see the whole program
@@ -62,7 +54,7 @@ And finally we can print our results
 For more information about reading frame in a trajectory, see the following
 functions:
 
-- :py:func:`Trajectory.nsteps` gives the number of frame in a Trajectory.
+- :py:attr:`Trajectory.nsteps` is the number of frame in a Trajectory.
 - :py:func:`Trajectory.read_step` to directlty read a given step.
 - :py:func:`Trajectory.set_cell` and :py:func:`Trajectory.set_topology` to
   specify an unit cell or a topology for all frames in a trajectory.
@@ -98,7 +90,7 @@ We can then set the atomic positions:
 
 .. literalinclude:: ../examples/generate.py
    :language: python
-   :lines: 20-23
+   :lines: 20-22
 
 Another possibility is to directly add atoms to the frame. Here we define a
 second molecule representing carbon dioxyde. :py:func:`Frame.add_atom` takes
@@ -106,20 +98,20 @@ two arguments: the atom, and the position of the atom as a 3-element list
 
 .. literalinclude:: ../examples/generate.py
    :language: python
-   :lines: 25-29
+   :lines: 24-28
 
 Finally, we can set the :py:class:`UnitCell` associated with this frame.
 
 .. literalinclude:: ../examples/generate.py
    :language: python
-   :lines: 31
+   :lines: 30
 
 Now that our frame is constructed, it is time to write it to a file. For that,
 we open a trajectory in write (``'w'``) mode, and write to it.
 
 .. literalinclude:: ../examples/generate.py
    :language: python
-   :lines: 33-34
+   :lines: 32-33
 
 .. htmlhidden::
     :toggle: Click here to see the whole program
@@ -176,12 +168,19 @@ frame.
    :language: python
    :lines: 14-15
 
-Finally, we can write the cleaned frame to the output file, and start the next
+We can then write the cleaned frame to the output file, and start the next
 iteration.
 
 .. literalinclude:: ../examples/select.py
    :language: python
    :lines: 16
+
+Finally, we close the input and output files to ensure that all the written data
+is flushed to the disk.
+
+.. literalinclude:: ../examples/select.py
+   :language: python
+   :lines: 18-19
 
 .. htmlhidden::
     :toggle: Click here to see the whole program
