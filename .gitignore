@@ -5,3 +5,4 @@ chemfiles.egg-info/
 .tox/
 MANIFEST
 .coverage
+*.pyc
