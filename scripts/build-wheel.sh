@@ -21,7 +21,7 @@ fi
 if [[ "$IMAGE" == "macos" ]]; then
     clean_build
     export MACOSX_DEPLOYMENT_TARGET=10.9
-    python setup.py bdist_wheel --plat-name macosx_10_9_x86_64
+    python setup.py bdist_wheel --plat-name macosx-10.9-x86_64
     exit 0
 fi
 
