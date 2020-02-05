@@ -114,10 +114,10 @@ class TestTrajectory(unittest.TestCase):
 
         expected_content = """4
 Written by the chemfiles library
-X 1.0 2.0 3.0
-X 1.0 2.0 3.0
-X 1.0 2.0 3.0
-X 1.0 2.0 3.0
+X 1 2 3
+X 1 2 3
+X 1 2 3
+X 1 2 3
 """
         with open("test-tmp.xyz") as fd:
             self.assertEqual(fd.read(), expected_content)
