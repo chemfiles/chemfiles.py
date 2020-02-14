@@ -29,7 +29,7 @@ class Selection(CxxPointer):
         super(Selection, self).__init__(ptr, is_const=False)
 
     def __copy__(self):
-        return Selection.from_mutable_ptr(self.ffi.chfl_selection_copy(self.ptr))
+        return Selection.from_mutable_ptr(None, self.ffi.chfl_selection_copy(self.ptr))
 
     def __repr__(self):
         return "Selection('{}')".format(self.string)

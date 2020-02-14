@@ -14,12 +14,23 @@ else:
 
 
 class CxxPointer(object):
+    # Used to prevent adding new attributes to chemfiles objects
     __frozen = False
+    # C++ allocated pointer
     __ptr = 0
+    # Is the C++ pointer a const pointer? This is reauired since const and
+    # non-const pointers have the same ABI, but modifying an object through
+    # a const pointer is UB and should be prevented
+    __is_const = False
+    # None for newly allocated objects, or a CxxPointer instance for objects
+    # living inside another object (typically atoms inside a frame, or
+    # residue in a topology).
+    __origin = None
 
-    def __init__(self, ptr, is_const=True):
+    def __init__(self, ptr, is_const=True, origin=None):
         self.__ptr = ptr
         self.__is_const = is_const
+        self.__origin = origin
         self.__frozen = True
         _check_handle(ptr)
 
@@ -35,24 +46,24 @@ class CxxPointer(object):
         object.__setattr__(self, key, value)
 
     @classmethod
-    def from_mutable_ptr(cls, ptr):
+    def from_mutable_ptr(cls, origin, ptr):
         """Create a new instance from a mutable pointer"""
         new = cls.__new__(cls)
-        super(cls, new).__init__(ptr, is_const=False)
+        super(cls, new).__init__(ptr, is_const=False, origin=origin)
         return new
 
     @classmethod
-    def from_const_ptr(cls, ptr):
+    def from_const_ptr(cls, origin, ptr):
         """Create a new instance from a const pointer"""
         new = cls.__new__(cls)
-        super(cls, new).__init__(ptr, is_const=True)
+        super(cls, new).__init__(ptr, is_const=True, origin=origin)
         return new
 
     @property
     def mut_ptr(self):
         """Get the **mutable** C++ pointer for this object"""
         if self.__is_const:
-            raise ChemfilesError("Trying to use a const pointer for mutable access")
+            raise ChemfilesError("Trying to use a const pointer for mutable access, this is a bug")
         else:
             return self.__ptr
 
