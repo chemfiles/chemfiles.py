@@ -33,7 +33,7 @@ class FrameAtoms(object):
             raise IndexError("atom index ({}) out of range for this frame".format(index))
         else:
             ptr = self.frame.ffi.chfl_atom_from_frame(self.frame.mut_ptr, c_uint64(index))
-            return Atom.from_mutable_ptr(ptr)
+            return Atom.from_mutable_ptr(self, ptr)
 
     def __iter__(self):
         for i in range(len(self)):
@@ -59,7 +59,7 @@ class Frame(CxxPointer):
         super(Frame, self).__init__(self.ffi.chfl_frame(), is_const=False)
 
     def __copy__(self):
-        return Frame.from_mutable_ptr(self.ffi.chfl_frame_copy(self.ptr))
+        return Frame.from_mutable_ptr(None, self.ffi.chfl_frame_copy(self.ptr))
 
     def __repr__(self):
         return "Frame with {} atoms".format(len(self.atoms))
@@ -202,7 +202,7 @@ class Frame(CxxPointer):
         :py:class:`Frame`. Any modification to the cell will be reflected in
         the frame.
         """
-        return UnitCell.from_mutable_ptr(self.ffi.chfl_cell_from_frame(self.mut_ptr))
+        return UnitCell.from_mutable_ptr(self, self.ffi.chfl_cell_from_frame(self.mut_ptr))
 
     @cell.setter
     def cell(self, cell):
@@ -217,7 +217,7 @@ class Frame(CxxPointer):
         Get read-only access to the :py:class:`Topology` of this
         :py:class:`Frame`.
         """
-        return Topology.from_const_ptr(self.ffi.chfl_topology_from_frame(self.ptr))
+        return Topology.from_const_ptr(self, self.ffi.chfl_topology_from_frame(self.ptr))
 
     @topology.setter
     def topology(self, topology):
@@ -311,7 +311,7 @@ class Frame(CxxPointer):
                 "Invalid type {} for a frame property name".format(type(name))
             )
         ptr = self.ffi.chfl_frame_get_property(self.ptr, name.encode("utf8"))
-        return Property.from_mutable_ptr(ptr).get()
+        return Property.from_mutable_ptr(self, ptr).get()
 
     def __setitem__(self, name, value):
         """

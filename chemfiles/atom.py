@@ -34,7 +34,7 @@ class Atom(CxxPointer):
             self.type = type
 
     def __copy__(self):
-        return Atom.from_mutable_ptr(self.ffi.chfl_atom_copy(self.ptr))
+        return Atom.from_mutable_ptr(None, self.ffi.chfl_atom_copy(self.ptr))
 
     def __repr__(self):
         name = self.name
@@ -154,7 +154,7 @@ class Atom(CxxPointer):
                 "Invalid type {} for an atomic property name".format(type(name))
             )
         ptr = self.ffi.chfl_atom_get_property(self.ptr, name.encode("utf8"))
-        return Property.from_mutable_ptr(ptr).get()
+        return Property.from_mutable_ptr(self, ptr).get()
 
     def __setitem__(self, name, value):
         """

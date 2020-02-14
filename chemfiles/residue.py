@@ -81,7 +81,7 @@ class Residue(CxxPointer):
         super(Residue, self).__init__(ptr, is_const=False)
 
     def __copy__(self):
-        return Residue.from_mutable_ptr(self.ffi.chfl_residue_copy(self.ptr))
+        return Residue.from_mutable_ptr(None, self.ffi.chfl_residue_copy(self.ptr))
 
     def __repr__(self):
         return "Residue('{}') with {} atoms".format(self.name, len(self.atoms))
@@ -119,7 +119,7 @@ class Residue(CxxPointer):
                 "Invalid type {} for a residue property name".format(type(name))
             )
         ptr = self.ffi.chfl_residue_get_property(self.ptr, name.encode("utf8"))
-        return Property.from_mutable_ptr(ptr).get()
+        return Property.from_mutable_ptr(self, ptr).get()
 
     def __setitem__(self, name, value):
         """

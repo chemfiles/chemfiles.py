@@ -55,7 +55,7 @@ class TopologyAtoms(object):
             raise IndexError("atom index ({}) out of range for this topology".format(index))
         else:
             ptr = self.topology.ffi.chfl_atom_from_topology(self.topology.mut_ptr, c_uint64(index))
-            return Atom.from_mutable_ptr(ptr)
+            return Atom.from_mutable_ptr(self, ptr)
 
     def __iter__(self):
         for i in range(len(self)):
@@ -106,7 +106,7 @@ class TopologyResidues(object):
             raise IndexError("residue index ({}) out of range for this topology".format(index))
         else:
             ptr = self.topology.ffi.chfl_residue_from_topology(self.topology.ptr, c_uint64(index))
-            return Residue.from_const_ptr(ptr)
+            return Residue.from_const_ptr(self, ptr)
 
     def __iter__(self):
         for i in range(len(self)):
@@ -137,14 +137,22 @@ class Topology(CxxPointer):
         super(Topology, self).__init__(self.ffi.chfl_topology(), is_const=False)
 
     def __copy__(self):
-        return Topology.from_mutable_ptr(self.ffi.chfl_topology_copy(self.ptr))
+        return Topology.from_mutable_ptr(None, self.ffi.chfl_topology_copy(self.ptr))
 
     def __repr__(self):
         return "Topology with {} atoms".format(len(self.atoms))
 
     @property
     def atoms(self):
-        return TopologyAtoms(self)
+        # late import to break circular dependency
+        from .frame import FrameAtoms
+
+        # if the topology comes from a frame, allow accessing atoms as
+        # frame.topology.atoms anyway
+        if self._CxxPointer__is_const:
+            return FrameAtoms(self._CxxPointer__origin)
+        else:
+            return TopologyAtoms(self)
 
     def resize(self, count):
         """
@@ -172,7 +180,7 @@ class Topology(CxxPointer):
             )
         ptr = self.ffi.chfl_residue_for_atom(self.ptr, c_uint64(index))
         if ptr:
-            return Residue.from_const_ptr(ptr)
+            return Residue.from_const_ptr(self, ptr)
         else:
             return None
 

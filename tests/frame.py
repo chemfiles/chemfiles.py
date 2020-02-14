@@ -134,6 +134,10 @@ class TestFrame(unittest.TestCase):
             self.assertEqual(atom.name, "")
         self.assertEqual(i, 2)
 
+        for i, atom in enumerate(frame.topology.atoms):
+            self.assertEqual(atom.name, "")
+        self.assertEqual(i, 2)
+
     def test_property(self):
         frame = Frame()
 
