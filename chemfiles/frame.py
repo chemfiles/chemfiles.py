@@ -93,15 +93,15 @@ class Frame(CxxPointer):
             velocity = chfl_vector3d(velocity[0], velocity[1], velocity[2])
         self.ffi.chfl_frame_add_atom(self.mut_ptr, atom.ptr, position, velocity)
 
-    def remove(self, i):
+    def remove(self, index):
         """
-        Remove the atom at index ``i`` in this :py:class:`Frame`.
+        Remove the atom at the given ``index`` in this :py:class:`Frame`.
 
-        This modify all the atoms indexes after ``i``, and invalidate any array
-        obtained using :py:func:`Frame.positions` or
-        :py:func:`Frame.velocities`.
+        This shifts all the atoms indexes larger than ``index`` by 1  (``n``
+        becomes ``n - 1``); and invalidate any array obtained using
+        :py:func:`Frame.positions` or :py:func:`Frame.velocities`.
         """
-        self.ffi.chfl_frame_remove(self.mut_ptr, c_uint64(i))
+        self.ffi.chfl_frame_remove(self.mut_ptr, c_uint64(index))
 
     def add_bond(self, i, j, order=None):
         """
@@ -229,7 +229,7 @@ class Frame(CxxPointer):
     @property
     def step(self):
         """
-        Get this :py:class:`Frame` step, i.e. the frame number in the
+        Get the step of this :py:class:`Frame`, i.e. the frame number in the
         trajectory.
         """
         step = c_uint64()
@@ -237,9 +237,9 @@ class Frame(CxxPointer):
         return step.value
 
     @step.setter
-    def step(self, step):
-        """Set this :py:class:`Frame` step to ``step``."""
-        self.ffi.chfl_frame_set_step(self.mut_ptr, c_uint64(step))
+    def step(self, value):
+        """Set the step for this :py:class:`Frame` to the given ``value``."""
+        self.ffi.chfl_frame_set_step(self.mut_ptr, c_uint64(value))
 
     def guess_bonds(self):
         """
@@ -252,9 +252,9 @@ class Frame(CxxPointer):
 
     def distance(self, i, j):
         """
-        Get the distance between the atoms at indexes ``i`` and ``j`` in this
-        :py:class:`Frame`, accounting for periodic boundary conditions. The
-        result is expressed in angstroms.
+        Get the distance (in Ångströms) between the atoms at indexes ``i`` and
+        ``j`` in this :py:class:`Frame`, taking periodic boundary conditions
+        into account.
         """
         distance = c_double()
         self.ffi.chfl_frame_distance(self.ptr, c_uint64(i), c_uint64(j), distance)
@@ -262,9 +262,9 @@ class Frame(CxxPointer):
 
     def angle(self, i, j, k):
         """
-        Get the angle formed by the atoms at indexes ``i``, ``j`` and ``k`` in
-        this :py:class:`Frame`, accounting for periodic boundary conditions.
-        The result is expressed in radians.
+        Get the angle (in radians) formed by the atoms at indexes ``i``, ``j``
+        and ``k`` in this :py:class:`Frame`, taking periodic boundary conditions
+        into account.
         """
         angle = c_double()
         self.ffi.chfl_frame_angle(self.ptr, c_uint64(i), c_uint64(j), c_uint64(k), angle)
@@ -272,9 +272,9 @@ class Frame(CxxPointer):
 
     def dihedral(self, i, j, k, m):
         """
-        Get the dihedral angle formed by the atoms at indexes ``i``, ``j``,
-        ``k`` and ``m`` in this :py:class:`Frame`, accounting for periodic
-        boundary conditions. The result is expressed in radians.
+        Get the dihedral angle (in radians) formed by the atoms at indexes
+        ``i``, ``j``, ``k`` and ``m`` in this :py:class:`Frame`, taking periodic
+        boundary conditions into account.
         """
         dihedral = c_double()
         self.ffi.chfl_frame_dihedral(
@@ -284,9 +284,9 @@ class Frame(CxxPointer):
 
     def out_of_plane(self, i, j, k, m):
         """
-        Get the out of plane distance formed by the atoms at indexes ``i``,
-        ``j``, ``k`` and ``m`` in this :py:class:`Frame`, accounting for
-        periodic boundary conditions. The result is expressed in angstroms.
+        Get the out of plane distance (in Ångströms) formed by the atoms at
+        indexes ``i``, ``j``, ``k`` and ``m`` in this :py:class:`Frame`, taking
+        periodic boundary conditions into account.
 
         This is the distance betweent the atom j and the ikm plane. The j atom
         is the center of the improper dihedral angle formed by i, j, k and m.

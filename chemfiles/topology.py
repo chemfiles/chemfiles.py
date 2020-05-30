@@ -69,10 +69,11 @@ class TopologyAtoms(object):
 
     def remove(self, index):
         """
-        Remove the :py:class:`Atom` atthe given ``index`` from the associated
+        Remove the :py:class:`Atom` at the given ``index`` from the associated
         :py:class:`Topology`.
 
-        This shifts all the atoms indexes after ``i`` by 1 (n becomes n-1).
+        This shifts all the atoms indexes larger than ``index`` by 1  (``n``
+        becomes ``n - 1``);
         """
         self.topology.ffi.chfl_topology_remove(self.topology.mut_ptr, c_uint64(index))
 

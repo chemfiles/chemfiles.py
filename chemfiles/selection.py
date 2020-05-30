@@ -18,7 +18,7 @@ class Selection(CxxPointer):
     ``== != < <= > >=``. Refer to the `full documentation
     <selections-doc>`_ to know the allowed selectors and how to use them.
 
-    .. selections-doc: http://chemfiles.rtfd.io/en/latest/selections.html
+    .. selections-doc: https://chemfiles.org/chemfiles/latest/selections.html
     """
 
     def __init__(self, selection):

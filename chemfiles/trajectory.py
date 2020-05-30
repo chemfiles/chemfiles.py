@@ -10,19 +10,19 @@ from .misc import ChemfilesError
 
 class Trajectory(CxxPointer):
     """
-    A :py:class:`Trajectory` is a chemistry file on the hard drive. It is the
-    main entry point of Chemfiles.
+    A :py:class:`Trajectory` represent a physical file from which we can read
+    :py:class:`Frame`.
     """
 
     def __init__(self, path, mode="r", format=""):
         """
-        Open the :py:class:`Trajectory` at the given ``path`` using the
-        given ``mode`` and optional specific file ``format``.
+        Open the file at the given ``path`` using the given ``mode`` and
+        optional file ``format``.
 
         Valid modes are ``'r'`` for read, ``'w'`` for write and ``'a'`` for
         append.
 
-        The specific file format is needed when the file format does not match
+        The ``format`` parameter is needed when the file format does not match
         the extension, or when there is not standard extension for this format.
         If `format` is an empty string, the format will be guessed from the
         file extension.
@@ -61,7 +61,7 @@ class Trajectory(CxxPointer):
 
     def read(self):
         """
-        Read the next step of the :py:class:`Trajectory` and return the
+        Read the next step of this :py:class:`Trajectory` and return the
         corresponding :py:class:`Frame`.
         """
         self.__check_opened()
@@ -71,7 +71,7 @@ class Trajectory(CxxPointer):
 
     def read_step(self, step):
         """
-        Read a specific ``step`` in the :py:class:`Trajectory` and return the
+        Read a specific ``step`` in this :py:class:`Trajectory` and return the
         corresponding :py:class:`Frame`.
         """
         self.__check_opened()
@@ -80,23 +80,24 @@ class Trajectory(CxxPointer):
         return frame
 
     def write(self, frame):
-        """Write a :py:class:`Frame` to the :py:class:`Trajectory`."""
+        """Write a :py:class:`Frame` to this :py:class:`Trajectory`."""
         self.__check_opened()
         self.ffi.chfl_trajectory_write(self.mut_ptr, frame.ptr)
 
     def set_topology(self, topology, format=""):
         """
-        Set the :py:class:`Topology` associated with a :py:class:`Trajectory`.
-        This :py:class:`Topology` will be used when reading and writing the
-        files, replacing any :py:class:`Topology` in the frames or files.
+        Set the :py:class:`Topology` associated with this :py:class:`Trajectory`.
 
-        If ``topology`` is a :py:class:`Topology` instance, it is used
-        directly. If ``topology`` is a string, the first :py:class:`Frame` of
-        the corresponding file is read, and the topology of this frame is used.
+        The new topology will be used when reading and writing the files,
+        replacing any topology in the frames or files.
 
-        When reading from a file, if ``format`` is not the empty string, the
-        code uses this file format instead of guessing it from the file
-        extension.
+        If the ``topology`` parameter is a :py:class:`Topology` instance, it is
+        used directly. If the ``topology`` parameter is a string, the first
+        :py:class:`Frame` of the corresponding file is read, and the topology of
+        this frame is used.
+
+        When reading from a file, if ``format`` is not the empty string, it is
+        used as the file format instead of guessing it from the file extension.
         """
         self.__check_opened()
         if isinstance(topology, Topology):
@@ -108,19 +109,18 @@ class Trajectory(CxxPointer):
 
     def set_cell(self, cell):
         """
-        Set the :py:class:`UnitCell` associated with a :py:class:`Trajectory`.
+        Set the :py:class:`UnitCell` associated with this :py:class:`Trajectory`
+        to a copy of ``cell``.
+
         This :py:class:`UnitCell` will be used when reading and writing the
-        files, replacing any :py:class:`UnitCell` in the frames or files.
+        files, replacing any unit cell in the frames or files.
         """
         self.__check_opened()
         self.ffi.chfl_trajectory_set_cell(self.mut_ptr, cell.ptr)
 
     @property
     def nsteps(self):
-        """
-        Get the number of steps (the number of frames) in a
-        :py:class:`Trajectory`.
-        """
+        """Get the current number of steps in this :py:class:`Trajectory`."""
         self.__check_opened()
         nsteps = c_uint64()
         self.ffi.chfl_trajectory_nsteps(self.mut_ptr, nsteps)
@@ -128,7 +128,7 @@ class Trajectory(CxxPointer):
 
     @property
     def path(self):
-        """Get the path used to open this  :py:class:`Trajectory`."""
+        """Get the path used to open this :py:class:`Trajectory`."""
         self.__check_opened()
         path = c_char_p()
         self.ffi.chfl_trajectory_path(self.ptr, path)
@@ -136,8 +136,8 @@ class Trajectory(CxxPointer):
 
     def close(self):
         """
-        Close the :py:class:`Trajectory` and write any buffered content to the
-        hard drive.
+        Close this :py:class:`Trajectory` and write any buffered content to the
+        file.
         """
         self.__check_opened()
         self.__closed = True
