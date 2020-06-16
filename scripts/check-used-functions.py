@@ -1,13 +1,20 @@
 #!/usr/bin/env python
 """
-Check that all the functions defined in the C API are effectivelly used
+Check that all the functions defined in the C API are
+effectively used in the chemfiles binding.
 """
 import os
 import sys
 
 IGNORED = ["chfl_version", "chfl_trajectory_open"]
-ROOT = os.path.dirname(os.path.dirname(__file__))
 ERROR = False
+ROOT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..")
+
+
+def error(message):
+    print(message)
+    global ERROR
+    ERROR = True
 
 
 def functions_list():
@@ -23,8 +30,8 @@ def functions_list():
 
 def read_all_source():
     source = ""
-    for (dirpath, _, pathes) in os.walk(os.path.join(ROOT, "chemfiles")):
-        for path in pathes:
+    for (dirpath, _, paths) in os.walk(os.path.join(ROOT, "chemfiles")):
+        for path in paths:
             if path != "ffi.py" and path.endswith(".py"):
                 with open(os.path.join(ROOT, dirpath, path)) as fd:
                     source += fd.read()
@@ -34,14 +41,13 @@ def read_all_source():
 def check_functions(functions, source):
     for function in functions:
         if function not in source and function not in IGNORED:
-            print("Missing: " + function)
-            global ERROR
-            ERROR = True
+            error("Missing: " + function)
 
 
 if __name__ == '__main__':
     functions = functions_list()
     source = read_all_source()
     check_functions(functions, source)
+
     if ERROR:
         sys.exit(1)
