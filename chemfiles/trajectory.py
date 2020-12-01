@@ -3,7 +3,7 @@ from __future__ import absolute_import, print_function, unicode_literals
 import ctypes
 from ctypes import c_uint64, c_char_p
 
-from .utils import CxxPointer
+from .utils import CxxPointer, _call_with_growing_buffer
 from .frame import Frame, Topology
 from .misc import ChemfilesError
 
@@ -130,9 +130,10 @@ class Trajectory(CxxPointer):
     def path(self):
         """Get the path used to open this :py:class:`Trajectory`."""
         self.__check_opened()
-        path = c_char_p()
-        self.ffi.chfl_trajectory_path(self.ptr, path)
-        return path.value.decode('utf-8')
+        return _call_with_growing_buffer(
+            lambda buffer, size: self.ffi.chfl_trajectory_path(self.ptr, buffer, size),
+            initial=256,
+        )
 
     def close(self):
         """

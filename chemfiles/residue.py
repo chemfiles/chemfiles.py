@@ -1,6 +1,6 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_bool, c_uint64, c_char_p
+from ctypes import c_bool, c_int64, c_uint64, c_char_p
 import numpy as np
 
 from .utils import CxxPointer, _call_with_growing_buffer, string_type
@@ -75,7 +75,7 @@ class Residue(CxxPointer):
         """
 
         if resid:
-            ptr = self.ffi.chfl_residue_with_id(name.encode("utf8"), c_uint64(resid))
+            ptr = self.ffi.chfl_residue_with_id(name.encode("utf8"), c_int64(resid))
         else:
             ptr = self.ffi.chfl_residue(name.encode("utf8"))
         super(Residue, self).__init__(ptr, is_const=False)
@@ -97,7 +97,7 @@ class Residue(CxxPointer):
     @property
     def id(self):
         """Get the :py:class:`Residue` index in the initial topology."""
-        id = c_uint64()
+        id = c_int64()
         self.ffi.chfl_residue_id(self.ptr, id)
         return id.value
 

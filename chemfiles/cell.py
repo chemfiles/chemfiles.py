@@ -26,9 +26,9 @@ class UnitCell(CxxPointer):
     An :py:class:`UnitCell` represent the box containing the atoms, and its
     periodicity.
 
-    An unit cell is fully represented by three lenghts (a, b, c); and three
+    An unit cell is fully represented by three lengths (a, b, c); and three
     angles (alpha, beta, gamma). The angles are stored in degrees, and the
-    lenghts in Angstroms. The cell angles are defined as follow: alpha is the
+    lengths in Angstroms. The cell angles are defined as follow: alpha is the
     angles between the cell vectors `b` and `c`; beta as the angle between `a`
     and `c`; and gamma as the angle between `a` and `b`.
 
@@ -45,29 +45,26 @@ class UnitCell(CxxPointer):
 
     def __init__(self, a, b, c, alpha=90.0, beta=90.0, gamma=90.0):
         """
-        Create a new :py:class:`UnitCell` with cell lenghts of ``a``, ``b`` and
+        Create a new :py:class:`UnitCell` with cell lengths of ``a``, ``b`` and
         ``c``, and cell angles ``alpha``, ``beta`` and ``gamma``.
 
         If alpha, beta and gamma are equal to 90.0, the new unit cell shape is
         ``CellShape.Orthorhombic``. Else it is ``CellShape.Infinite``.
         """
-        lenghts = chfl_vector3d(a, b, c)
+        lengths = chfl_vector3d(a, b, c)
         angles = chfl_vector3d(alpha, beta, gamma)
-        if alpha == 90.0 and beta == 90.0 and gamma == 90.0:
-            ptr = self.ffi.chfl_cell(lenghts)
-        else:
-            ptr = self.ffi.chfl_cell_triclinic(lenghts, angles)
+        ptr = self.ffi.chfl_cell(lengths, angles)
         super(UnitCell, self).__init__(ptr, is_const=False)
 
     def __copy__(self):
         return UnitCell.from_mutable_ptr(None, self.ffi.chfl_cell_copy(self.ptr))
 
     def __repr__(self):
-        return "UnitCell({}, {}, {}, {}, {}, {})".format(*(self.lengths + self.angles))
+        return "UnitCell({:.9g}, {:.9g}, {:.9g}, {:.7g}, {:.7g}, {:.7g})".format(*(self.lengths + self.angles))
 
     @property
     def lengths(self):
-        """Get the three lenghts of this :py:class:`UnitCell`, in Angstroms."""
+        """Get the three lengths of this :py:class:`UnitCell`, in Angstroms."""
         lengths = chfl_vector3d(0, 0, 0)
         self.ffi.chfl_cell_lengths(self.ptr, lengths)
         return lengths[0], lengths[1], lengths[2]
@@ -75,7 +72,7 @@ class UnitCell(CxxPointer):
     @lengths.setter
     def lengths(self, lengths):
         """
-        Set the three lenghts of this :py:class:`UnitCell` to ``lengths``. The
+        Set the three lengths of this :py:class:`UnitCell` to ``lengths``. The
         values should be in Angstroms.
         """
         a, b, c = lengths

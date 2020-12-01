@@ -211,7 +211,7 @@ class TestFrame(unittest.TestCase):
 
         frame.add_bond(0, 1)
         frame.add_bond(3, 4)
-        frame.add_bond(2, 1, BondOrder.Qintuplet)
+        frame.add_bond(2, 1, BondOrder.Quintuplet)
 
         self.assertEqual(
             frame.topology.bonds.all(), np.array([[0, 1], [1, 2], [3, 4]]).all()
@@ -219,7 +219,7 @@ class TestFrame(unittest.TestCase):
 
         self.assertEqual(
             frame.topology.bonds_orders,
-            [BondOrder.Unknown, BondOrder.Qintuplet, BondOrder.Unknown]
+            [BondOrder.Unknown, BondOrder.Quintuplet, BondOrder.Unknown]
         )
 
         frame.remove_bond(3, 4)
