@@ -22,3 +22,11 @@ deps =
     coverage
     numpy
 """
+
+[tool.black]
+line-length = 88
+exclude = '''
+    /lib |
+    /chemfiles/ffi.py |
+    /doc/conf.py |
+'''

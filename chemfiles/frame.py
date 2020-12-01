@@ -30,9 +30,13 @@ class FrameAtoms(object):
         associated :py:class:`Frame`.
         """
         if index >= len(self):
-            raise IndexError("atom index ({}) out of range for this frame".format(index))
+            raise IndexError(
+                "atom index ({}) out of range for this frame".format(index)
+            )
         else:
-            ptr = self.frame.ffi.chfl_atom_from_frame(self.frame.mut_ptr, c_uint64(index))
+            ptr = self.frame.ffi.chfl_atom_from_frame(
+                self.frame.mut_ptr, c_uint64(index)
+            )
             return Atom.from_mutable_ptr(self, ptr)
 
     def __iter__(self):
@@ -202,7 +206,9 @@ class Frame(CxxPointer):
         :py:class:`Frame`. Any modification to the cell will be reflected in
         the frame.
         """
-        return UnitCell.from_mutable_ptr(self, self.ffi.chfl_cell_from_frame(self.mut_ptr))
+        return UnitCell.from_mutable_ptr(
+            self, self.ffi.chfl_cell_from_frame(self.mut_ptr)
+        )
 
     @cell.setter
     def cell(self, cell):
@@ -217,7 +223,9 @@ class Frame(CxxPointer):
         Get read-only access to the :py:class:`Topology` of this
         :py:class:`Frame`.
         """
-        return Topology.from_const_ptr(self, self.ffi.chfl_topology_from_frame(self.ptr))
+        return Topology.from_const_ptr(
+            self, self.ffi.chfl_topology_from_frame(self.ptr)
+        )
 
     @topology.setter
     def topology(self, topology):
@@ -267,7 +275,9 @@ class Frame(CxxPointer):
         into account.
         """
         angle = c_double()
-        self.ffi.chfl_frame_angle(self.ptr, c_uint64(i), c_uint64(j), c_uint64(k), angle)
+        self.ffi.chfl_frame_angle(
+            self.ptr, c_uint64(i), c_uint64(j), c_uint64(k), angle
+        )
         return angle.value
 
     def dihedral(self, i, j, k, m):

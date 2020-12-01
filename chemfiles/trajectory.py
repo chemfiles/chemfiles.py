@@ -57,7 +57,9 @@ class Trajectory(CxxPointer):
             yield self.read_step(step)
 
     def __repr__(self):
-        return "Trajectory('{}', '{}', '{}')".format(self.path, self.__mode, self.__format)
+        return "Trajectory('{}', '{}', '{}')".format(
+            self.path, self.__mode, self.__format
+        )
 
     def read(self):
         """

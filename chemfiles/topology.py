@@ -52,9 +52,13 @@ class TopologyAtoms(object):
         associated :py:class:`Topology`.
         """
         if index >= len(self):
-            raise IndexError("atom index ({}) out of range for this topology".format(index))
+            raise IndexError(
+                "atom index ({}) out of range for this topology".format(index)
+            )
         else:
-            ptr = self.topology.ffi.chfl_atom_from_topology(self.topology.mut_ptr, c_uint64(index))
+            ptr = self.topology.ffi.chfl_atom_from_topology(
+                self.topology.mut_ptr, c_uint64(index)
+            )
             return Atom.from_mutable_ptr(self, ptr)
 
     def __iter__(self):
@@ -104,9 +108,13 @@ class TopologyResidues(object):
         topology does not necessarily match the residue id.
         """
         if index >= len(self):
-            raise IndexError("residue index ({}) out of range for this topology".format(index))
+            raise IndexError(
+                "residue index ({}) out of range for this topology".format(index)
+            )
         else:
-            ptr = self.topology.ffi.chfl_residue_from_topology(self.topology.ptr, c_uint64(index))
+            ptr = self.topology.ffi.chfl_residue_from_topology(
+                self.topology.ptr, c_uint64(index)
+            )
             return Residue.from_const_ptr(self, ptr)
 
     def __iter__(self):

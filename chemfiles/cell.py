@@ -60,7 +60,9 @@ class UnitCell(CxxPointer):
         return UnitCell.from_mutable_ptr(None, self.ffi.chfl_cell_copy(self.ptr))
 
     def __repr__(self):
-        return "UnitCell({:.9g}, {:.9g}, {:.9g}, {:.7g}, {:.7g}, {:.7g})".format(*(self.lengths + self.angles))
+        return "UnitCell({:.9g}, {:.9g}, {:.9g}, {:.7g}, {:.7g}, {:.7g})".format(
+            *(self.lengths + self.angles)
+        )
 
     @property
     def lengths(self):

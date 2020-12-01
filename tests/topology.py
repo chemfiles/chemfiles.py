@@ -15,11 +15,16 @@ class TestTopology(unittest.TestCase):
         topology.resize(4)
         self.assertEqual(topology.__repr__(), "Topology with 4 atoms")
 
-        self.assertEqual(topology.atoms.__repr__(), "[Atom(''), Atom(''), Atom(''), Atom('')]")
+        self.assertEqual(
+            topology.atoms.__repr__(), "[Atom(''), Atom(''), Atom(''), Atom('')]"
+        )
 
         topology.residues.append(Residue("ALA"))
         topology.residues.append(Residue("ARG"))
-        self.assertEqual(topology.residues.__repr__(), "[Residue('ALA') with 0 atoms, Residue('ARG') with 0 atoms]")
+        self.assertEqual(
+            topology.residues.__repr__(),
+            "[Residue('ALA') with 0 atoms, Residue('ARG') with 0 atoms]",
+        )
 
     def test_copy(self):
         topology = Topology()
@@ -63,10 +68,7 @@ class TestTopology(unittest.TestCase):
         topology.add_bond(2, 3)
 
         self.assertEqual(topology.bonds_count(), 3)
-        self.assertEqual(
-            topology.bonds.all(),
-            np.array([[2, 3], [1, 2], [0, 1]]).all()
-        )
+        self.assertEqual(topology.bonds.all(), np.array([[2, 3], [1, 2], [0, 1]]).all())
 
         topology.remove_bond(2, 3)
         self.assertEqual(topology.bonds_count(), 2)
@@ -82,7 +84,7 @@ class TestTopology(unittest.TestCase):
         self.assertEqual(topology.bonds_order(2, 3), BondOrder.Aromatic)
         self.assertEqual(
             topology.bonds_orders,
-            [BondOrder.Unknown, BondOrder.Unknown, BondOrder.Aromatic]
+            [BondOrder.Unknown, BondOrder.Unknown, BondOrder.Aromatic],
         )
 
     def test_angles(self):
@@ -95,10 +97,7 @@ class TestTopology(unittest.TestCase):
         topology.add_bond(2, 3)
 
         self.assertEqual(topology.angles_count(), 2)
-        self.assertEqual(
-            topology.angles.all(),
-            np.array([[0, 1, 2], [1, 2, 3]]).all()
-        )
+        self.assertEqual(topology.angles.all(), np.array([[0, 1, 2], [1, 2, 3]]).all())
 
     def test_dihedrals(self):
         topology = Topology()
@@ -110,10 +109,7 @@ class TestTopology(unittest.TestCase):
         topology.add_bond(2, 3)
 
         self.assertEqual(topology.dihedrals_count(), 1)
-        self.assertEqual(
-            topology.dihedrals.all(),
-            np.array([[0, 1, 2, 3]]).all()
-        )
+        self.assertEqual(topology.dihedrals.all(), np.array([[0, 1, 2, 3]]).all())
 
     def test_impropers(self):
         topology = Topology()
@@ -125,10 +121,7 @@ class TestTopology(unittest.TestCase):
         topology.add_bond(1, 3)
 
         self.assertEqual(topology.impropers_count(), 1)
-        self.assertEqual(
-            topology.impropers.all(),
-            np.array([[0, 1, 2, 3]]).all()
-        )
+        self.assertEqual(topology.impropers.all(), np.array([[0, 1, 2, 3]]).all())
 
     def test_out_of_bounds(self):
         topology = Topology()
@@ -155,12 +148,12 @@ class TestTopology(unittest.TestCase):
         topology = Topology()
         topology.resize(6)
 
-        residue = Residue('foo', 4)
+        residue = Residue("foo", 4)
         residue.atoms.append(3)
         residue.atoms.append(4)
         topology.residues.append(residue)
 
-        residue = Residue('bar', 67)
+        residue = Residue("bar", 67)
         residue.atoms.append(1)
         residue.atoms.append(2)
         topology.residues.append(residue)
@@ -168,10 +161,10 @@ class TestTopology(unittest.TestCase):
         self.assertEqual(topology.residue_for_atom(5), None)
 
         first = topology.residues[0]
-        self.assertEqual(first.name, 'foo')
+        self.assertEqual(first.name, "foo")
 
         second = topology.residues[1]
-        self.assertEqual(second.name, 'bar')
+        self.assertEqual(second.name, "bar")
 
         self.assertFalse(topology.residues_linked(first, second))
 
@@ -195,5 +188,5 @@ class TestTopology(unittest.TestCase):
         self.assertEqual(i, 2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
