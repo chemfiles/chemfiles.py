@@ -46,7 +46,7 @@ def check_functions(functions, binding_functions):
             error("Missing: " + function)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     functions = functions_list()
     binding_functions = read_all_binding_functions()
     check_functions(functions, binding_functions)

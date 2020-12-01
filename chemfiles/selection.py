@@ -55,7 +55,7 @@ class Selection(CxxPointer):
         """
         return _call_with_growing_buffer(
             lambda buffer, size: self.ffi.chfl_selection_string(self.ptr, buffer, size),
-            initial=128
+            initial=128,
         )
 
     def evaluate(self, frame):

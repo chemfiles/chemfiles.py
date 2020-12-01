@@ -77,7 +77,7 @@ class Atom(CxxPointer):
         """Get this :py:class:`Atom` name."""
         return _call_with_growing_buffer(
             lambda buffer, size: self.ffi.chfl_atom_name(self.ptr, buffer, size),
-            initial=32
+            initial=32,
         )
 
     @name.setter
@@ -90,7 +90,7 @@ class Atom(CxxPointer):
         """Get this :py:class:`Atom` type."""
         return _call_with_growing_buffer(
             lambda buffer, size: self.ffi.chfl_atom_type(self.ptr, buffer, size),
-            initial=32
+            initial=32,
         )
 
     @type.setter
@@ -166,9 +166,7 @@ class Atom(CxxPointer):
                 "invalid type {} for a property name".format(type(name))
             )
         property = Property(value)
-        self.ffi.chfl_atom_set_property(
-            self.mut_ptr, name.encode("utf8"), property.ptr
-        )
+        self.ffi.chfl_atom_set_property(self.mut_ptr, name.encode("utf8"), property.ptr)
 
     def properties_count(self):
         """Get the number of properties in this atom."""

@@ -17,7 +17,9 @@ class TestFrame(unittest.TestCase):
         frame.resize(4)
         self.assertEqual(frame.__repr__(), "Frame with 4 atoms")
 
-        self.assertEqual(frame.atoms.__repr__(), "[Atom(''), Atom(''), Atom(''), Atom('')]")
+        self.assertEqual(
+            frame.atoms.__repr__(), "[Atom(''), Atom(''), Atom(''), Atom('')]"
+        )
 
     def test_copy(self):
         frame = Frame()
@@ -219,7 +221,7 @@ class TestFrame(unittest.TestCase):
 
         self.assertEqual(
             frame.topology.bonds_orders,
-            [BondOrder.Unknown, BondOrder.Quintuplet, BondOrder.Unknown]
+            [BondOrder.Unknown, BondOrder.Quintuplet, BondOrder.Unknown],
         )
 
         frame.remove_bond(3, 4)
@@ -227,9 +229,7 @@ class TestFrame(unittest.TestCase):
         frame.remove_bond(3, 4)
         frame.remove_bond(0, 4)
 
-        self.assertEqual(
-            frame.topology.bonds.all(), np.array([[0, 1], [1, 2]]).all()
-        )
+        self.assertEqual(frame.topology.bonds.all(), np.array([[0, 1], [1, 2]]).all())
 
     def test_residues(self):
         frame = Frame()

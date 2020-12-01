@@ -5,7 +5,7 @@
 from chemfiles import Trajectory, Selection
 
 trajectory = Trajectory("input.arc")
-output = Trajectory("output.pdb", 'w')
+output = Trajectory("output.pdb", "w")
 
 selection = Selection("name Zn or name N")
 

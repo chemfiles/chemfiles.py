@@ -33,7 +33,9 @@ class ResidueAtoms(object):
             return index in self.indexes
         else:
             result = c_bool()
-            self.residue.ffi.chfl_residue_contains(self.residue.ptr, c_uint64(index), result)
+            self.residue.ffi.chfl_residue_contains(
+                self.residue.ptr, c_uint64(index), result
+            )
             return result.value
 
     def __getitem__(self, i):
@@ -43,7 +45,9 @@ class ResidueAtoms(object):
         if self.indexes is None:
             count = len(self)
             self.indexes = np.zeros(count, np.uint64)
-            self.residue.ffi.chfl_residue_atoms(self.residue.ptr, self.indexes, c_uint64(count))
+            self.residue.ffi.chfl_residue_atoms(
+                self.residue.ptr, self.indexes, c_uint64(count)
+            )
 
         return self.indexes[i]
 
@@ -91,7 +95,7 @@ class Residue(CxxPointer):
         """Get the name of this :py:class:`Residue`."""
         return _call_with_growing_buffer(
             lambda buffer, size: self.ffi.chfl_residue_name(self.ptr, buffer, size),
-            initial=32
+            initial=32,
         )
 
     @property

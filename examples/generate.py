@@ -29,5 +29,5 @@ frame.add_bond(4, 5)
 
 frame.cell = UnitCell(10, 10, 10)
 
-with Trajectory("water-co2.pdb", 'w') as trajectory:
+with Trajectory("water-co2.pdb", "w") as trajectory:
     trajectory.write(frame)

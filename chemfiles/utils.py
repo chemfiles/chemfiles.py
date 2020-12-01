@@ -63,7 +63,9 @@ class CxxPointer(object):
     def mut_ptr(self):
         """Get the **mutable** C++ pointer for this object"""
         if self.__is_const:
-            raise ChemfilesError("Trying to use a const pointer for mutable access, this is a bug")
+            raise ChemfilesError(
+                "Trying to use a const pointer for mutable access, this is a bug"
+            )
         else:
             return self.__ptr
 
