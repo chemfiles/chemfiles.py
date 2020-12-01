@@ -10,6 +10,8 @@ rm -rf _skbuild
 rm -rf dist
 rm -rf MANIFEST
 rm -rf chemfiles.egg-info
-rm -rf chemfiles/lib
-rm -rf chemfiles/include
+
+rm -rf chemfiles/*.dylib
+rm -rf chemfiles/*.so
+rm -rf chemfiles/*.dll
 rm -rf chemfiles/external.py

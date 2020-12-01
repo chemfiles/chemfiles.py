@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools", "wheel", "scikit-build"] #, "cmake", "ninja"]
+build-backend = "setuptools.build_meta"
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+skipsdist = True
+
+[testenv]
+; this is required on windows to ensure the compiler finds the standard lib
+; files (kernel32.lib, etc.) and headers
+passenv = LIB INCLUDE LIBPATH
+setenv =
+    CHFL_PY_INTERNAL_CHEMFILES = 1
+commands =
+    pip install -e .
+    discover -p "*.py" tests
+deps =
+    discover
+    numpy
+"""

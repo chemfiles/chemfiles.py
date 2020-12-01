@@ -40,15 +40,15 @@ class FindChemfilesLibrary(object):
 def _lib_path():
     if EXTERNAL_CHEMFILES:
         return EXTERNAL_CHEMFILES
-    root = os.path.dirname(__file__)
+    root = os.path.abspath(os.path.dirname(__file__))
     if sys.platform.startswith("darwin"):
-        return os.path.join(root, "lib", "libchemfiles.dylib")
+        return os.path.join(root, "libchemfiles.dylib")
     elif sys.platform.startswith("linux"):
-        return os.path.join(root, "lib", "libchemfiles.so")
+        return os.path.join(root, "libchemfiles.so")
     elif sys.platform.startswith("win"):
         candidates = [
-            os.path.join(root, "bin", "libchemfiles.dll"),  # MinGW
-            os.path.join(root, "bin", "chemfiles.dll"),  # MSVC
+            os.path.join(root, "libchemfiles.dll"),  # MinGW
+            os.path.join(root, "chemfiles.dll"),  # MSVC
         ]
         for path in candidates:
             if os.path.isfile(path):
