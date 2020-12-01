@@ -19,7 +19,7 @@ class BondOrder(IntEnum):
     - ``BondOrder.Double``: bond order for double bond
     - ``BondOrder.Triple``: bond order for triple bond
     - ``BondOrder.Quadruple``: bond order for quadruple bond (present in some metals)
-    - ``BondOrder.Qintuplet``: bond order for qintuplet bond (present in some metals)
+    - ``BondOrder.Quintuplet``: bond order for quintuplet bond (present in some metals)
     - ``BondOrder.Amide``: bond order for amide bond
     - ``BondOrder.Aromatic``: bond order for aromatic bond
     """
@@ -29,7 +29,7 @@ class BondOrder(IntEnum):
     Double = chfl_bond_order.CHFL_BOND_DOUBLE
     Triple = chfl_bond_order.CHFL_BOND_TRIPLE
     Quadruple = chfl_bond_order.CHFL_BOND_QUADRUPLE
-    Qintuplet = chfl_bond_order.CHFL_BOND_QINTUPLET
+    Quintuplet = chfl_bond_order.CHFL_BOND_QUINTUPLET
     Amide = chfl_bond_order.CHFL_BOND_AMIDE
     Aromatic = chfl_bond_order.CHFL_BOND_AROMATIC
 

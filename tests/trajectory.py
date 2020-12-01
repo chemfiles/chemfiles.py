@@ -27,13 +27,17 @@ class TestTrajectory(unittest.TestCase):
             self.assertEqual(trajectory.__repr__(), expected)
 
         with Trajectory("test-tmp.xyz", "w") as trajectory:
-            self.assertEqual(trajectory.__repr__(), "Trajectory('test-tmp.xyz', 'w', '')")
+            self.assertEqual(
+                trajectory.__repr__(), "Trajectory('test-tmp.xyz', 'w', '')"
+            )
         os.unlink("test-tmp.xyz")
 
     def test_errors(self):
         with remove_warnings:
             self.assertRaises(ChemfilesError, Trajectory, get_data_path("not-here.xyz"))
-            self.assertRaises(ChemfilesError, Trajectory, get_data_path("empty.unknown"))
+            self.assertRaises(
+                ChemfilesError, Trajectory, get_data_path("empty.unknown")
+            )
 
             with Trajectory("test-tmp.xyz", "w") as trajectory:
                 self.assertRaises(AttributeError, trajectory.write, None)
@@ -50,12 +54,10 @@ class TestTrajectory(unittest.TestCase):
         self.assertEqual(len(frame.atoms), 297)
 
         self.assertEqual(
-            frame.positions[0].all(),
-            np.array([0.417219, 8.303366, 11.737172]).all()
+            frame.positions[0].all(), np.array([0.417219, 8.303366, 11.737172]).all()
         )
         self.assertEqual(
-            frame.positions[124].all(),
-            np.array([5.099554, -0.045104, 14.153846]).all()
+            frame.positions[124].all(), np.array([5.099554, -0.045104, 14.153846]).all()
         )
 
         self.assertEqual(len(frame.atoms), 297)
@@ -67,20 +69,18 @@ class TestTrajectory(unittest.TestCase):
         self.assertEqual(frame.cell.lengths, (30.0, 30.0, 30.0))
 
         self.assertEqual(
-            frame.positions[0].all(),
-            np.array([0.761277, 8.106125, 10.622949]).all()
+            frame.positions[0].all(), np.array([0.761277, 8.106125, 10.622949]).all()
         )
         self.assertEqual(
-            frame.positions[124].all(),
-            np.array([5.13242, 0.079862, 14.194161]).all()
+            frame.positions[124].all(), np.array([5.13242, 0.079862, 14.194161]).all()
         )
 
         self.assertEqual(len(frame.atoms), 297)
         self.assertEqual(frame.topology.bonds_count(), 0)
 
         frame.guess_bonds()
-        self.assertEqual(frame.topology.bonds_count(), 181)
-        self.assertEqual(frame.topology.angles_count(), 87)
+        self.assertEqual(frame.topology.bonds_count(), 180)
+        self.assertEqual(frame.topology.angles_count(), 84)
 
         topology = Topology()
         for i in range(297):
@@ -113,7 +113,7 @@ class TestTrajectory(unittest.TestCase):
             fd.write(frame)
 
         expected_content = """4
-Written by the chemfiles library
+Properties=species:S:1:pos:R:3
 X 1 2 3
 X 1 2 3
 X 1 2 3
