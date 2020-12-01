@@ -2,7 +2,6 @@
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import warnings
-import sys
 
 import chemfiles
 from chemfiles import Trajectory, ChemfilesError
@@ -85,6 +84,21 @@ class TestWarnings(unittest.TestCase):
         )
 
         chemfiles.misc._set_default_warning_callback()
+
+
+class TestFormatList(unittest.TestCase):
+    def test_format_list(self):
+        formats = chemfiles.formats_list()
+
+        xyz = formats[-1]
+        self.assertEqual(xyz.name, "XYZ")
+        self.assertEqual(xyz.description, "XYZ text format")
+        self.assertEqual(xyz.extension, ".xyz")
+
+        self.assertEqual(xyz.read, True)
+        self.assertEqual(xyz.memory, True)
+        self.assertEqual(xyz.atoms, True)
+        self.assertEqual(xyz.bonds, False)
 
 
 if __name__ == "__main__":

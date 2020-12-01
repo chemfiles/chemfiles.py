@@ -102,7 +102,20 @@ class chfl_match(Structure):
 
 class chfl_format_metadata(Structure):
     _fields_ = [
-        # TODO
+        ('name', c_char_p),
+        ('extension', c_char_p),
+        ('description', c_char_p),
+        ('reference', c_char_p),
+
+        ('read', c_bool),
+        ('write', c_bool),
+        ('memory', c_bool),
+        ('positions', c_bool),
+        ('velocities', c_bool),
+        ('unit_cell', c_bool),
+        ('atoms', c_bool),
+        ('bonds', c_bool),
+        ('residues', c_bool),
     ]
 
 # end of hand-defined types
