@@ -10,8 +10,8 @@ if(NOT ${CHFL_PY_INTERNAL_CHEMFILES})
     find_package(chemfiles CONFIG QUIET 0.9)
 endif()
 
-file(REMOVE ${CMAKE_BINARY_DIR}/external.py)
-file(REMOVE ${CMAKE_BINARY_DIR}/external.pyc)
+file(REMOVE ${PROJECT_SOURCE_DIR}/chemfiles/external.py)
+file(REMOVE ${PROJECT_SOURCE_DIR}/chemfiles/external.py)
 
 if(${chemfiles_FOUND})
     set(CHEMFILES_VERSION "${chemfiles_VERSION}")
@@ -25,10 +25,9 @@ if(${chemfiles_FOUND})
             "Define CHFL_PY_INTERNAL_CHEMFILES=ON to use use the internal chemfiles."
         )
     endif()
-    file(WRITE ${CMAKE_BINARY_DIR}/external.py
+    file(WRITE ${PROJECT_SOURCE_DIR}/chemfiles/external.py
         "EXTERNAL_CHEMFILES = \"${CHEMFILES_LOCATION}\"\n"
     )
-    install(FILES ${CMAKE_BINARY_DIR}/external.py DESTINATION ".")
 else()
     # Use the git submodule
     if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/CMakeLists.txt")
@@ -40,7 +39,12 @@ else()
 
     message(STATUS "Using internal chemfiles from ${CMAKE_CURRENT_SOURCE_DIR}/lib")
     set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries instead of static ones" FORCE)
-    add_subdirectory(lib)
-    file(READ lib/VERSION CHEMFILES_VERSION)
-    string(STRIP ${CHEMFILES_VERSION} CHEMFILES_VERSION)
+    add_subdirectory(lib EXCLUDE_FROM_ALL)
+
+    add_custom_target(build_chemfiles ALL)
+    add_dependencies(build_chemfiles chemfiles)
+    install(TARGETS chemfiles
+        LIBRARY DESTINATION "chemfiles"
+        RUNTIME DESTINATION "chemfiles"
+    )
 endif()
