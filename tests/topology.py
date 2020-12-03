@@ -87,6 +87,9 @@ class TestTopology(unittest.TestCase):
             [BondOrder.Unknown, BondOrder.Unknown, BondOrder.Aromatic],
         )
 
+        topology.clear_bonds()
+        self.assertEqual(topology.bonds_count(), 0)
+
     def test_angles(self):
         topology = Topology()
         topology.resize(4)

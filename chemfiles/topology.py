@@ -297,3 +297,10 @@ class Topology(CxxPointer):
         This function does nothing if there is no bond between ``i`` and ``j``.
         """
         self.ffi.chfl_topology_remove_bond(self.mut_ptr, c_uint64(i), c_uint64(j))
+
+    def clear_bonds(self):
+        """
+        Remove all existing bonds, angles, dihedral angles and improper dihedral
+        angles in this topology.
+        """
+        self.ffi.chfl_topology_clear_bonds(self.mut_ptr)
