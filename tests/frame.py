@@ -95,7 +95,7 @@ class TestFrame(unittest.TestCase):
 
     def test_cell(self):
         frame = Frame()
-        frame.cell = UnitCell(1, 2, 4)
+        frame.cell = UnitCell([1, 2, 4])
         self.assertEqual(frame.cell.lengths, (1, 2, 4))
         self.assertEqual(frame.cell.angles, (90, 90, 90))
         self.assertEqual(frame.cell.shape, CellShape.Orthorhombic)
@@ -171,7 +171,7 @@ class TestFrame(unittest.TestCase):
 
     def test_distance(self):
         frame = Frame()
-        frame.cell = UnitCell(3.0, 4.0, 5.0)
+        frame.cell = UnitCell([3.0, 4.0, 5.0])
         frame.add_atom(Atom(""), (0, 0, 0))
         frame.add_atom(Atom(""), (1, 2, 6))
 

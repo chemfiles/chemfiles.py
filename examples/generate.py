@@ -27,7 +27,7 @@ frame.add_atom(Atom("O"), [7.0, 0.0, 0.0])
 frame.add_bond(3, 4)
 frame.add_bond(4, 5)
 
-frame.cell = UnitCell(10, 10, 10)
+frame.cell = UnitCell([10, 10, 10])
 
 with Trajectory("water-co2.pdb", "w") as trajectory:
     trajectory.write(frame)
