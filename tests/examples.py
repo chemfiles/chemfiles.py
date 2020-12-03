@@ -24,20 +24,22 @@ class TestExamples(unittest.TestCase):
 
     def test_generate(self):
         path = os.path.join(ROOT, "..", "examples", "generate.py")
-        exec(open(path).read(), globals())
+        with open(path) as fd:
+            exec(fd.read(), globals())
 
     def test_indexes(self):
         # Create an input file
         frame = Frame()
         for i in range(120):
-            frame.add_atom(Atom('X'), [i % 10, i + 1 % 10, i + 2 % 10])
+            frame.add_atom(Atom("X"), [i % 10, i + 1 % 10, i + 2 % 10])
 
         with Trajectory("filename.xyz", "w") as file:
             file.write(frame)
 
         path = os.path.join(ROOT, "..", "examples", "indexes.py")
         # disable output
-        exec(open(path).read(), globals(), {'print': lambda _: None})
+        with open(path) as fd:
+            exec(fd.read(), globals(), {"print": lambda _: None})
 
     def test_select(self):
         # Create an input file
@@ -46,11 +48,12 @@ class TestExamples(unittest.TestCase):
         for i in range(120):
             frame.add_atom(Atom(NAMES[i % 4]), [i % 10, i + 1 % 10, i + 2 % 10])
 
-        with Trajectory("input.arc", "w")as file:
+        with Trajectory("input.arc", "w") as file:
             file.write(frame)
 
         path = os.path.join(ROOT, "..", "examples", "select.py")
-        exec(open(path).read(), globals())
+        with open(path) as fd:
+            exec(fd.read(), globals())
 
 
 if __name__ == "__main__":
