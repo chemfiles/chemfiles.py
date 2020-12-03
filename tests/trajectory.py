@@ -64,7 +64,7 @@ class TestTrajectory(unittest.TestCase):
         self.assertEqual(frame.atoms[0].name, "O")
         self.assertEqual(frame.atoms[1].name, "H")
 
-        trajectory.set_cell(UnitCell(30, 30, 30))
+        trajectory.set_cell(UnitCell([30, 30, 30]))
         frame = trajectory.read_step(41)
         self.assertEqual(frame.cell.lengths, (30.0, 30.0, 30.0))
 

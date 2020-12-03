@@ -2,8 +2,9 @@
 from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_double, ARRAY
 from enum import IntEnum
+import numpy as np
 
-from .utils import CxxPointer
+from .utils import CxxPointer, ChemfilesError
 from .ffi import chfl_cellshape, chfl_vector3d
 
 
@@ -43,24 +44,51 @@ class UnitCell(CxxPointer):
         |  0     0    c_z |
     """
 
-    def __init__(self, a, b, c, alpha=90.0, beta=90.0, gamma=90.0):
+    def __init__(self, lengths, angles=(90.0, 90.0, 90.0)):
         """
-        Create a new :py:class:`UnitCell` with cell lengths of ``a``, ``b`` and
-        ``c``, and cell angles ``alpha``, ``beta`` and ``gamma``.
+        Create a new :py:class:`UnitCell` with the given cell ``lengths`` and
+        cell ``angles``. If ``lengths`` is a 3x3 matrix, it is taken to be the
+        unit cell matrix, and ``angles`` is ignored.
 
-        If alpha, beta and gamma are equal to 90.0, the new unit cell shape is
+        If the three angles are equal to 90.0, the new unit cell shape is
         ``CellShape.Orthorhombic``. Else it is ``CellShape.Infinite``.
         """
-        lengths = chfl_vector3d(a, b, c)
-        angles = chfl_vector3d(alpha, beta, gamma)
-        ptr = self.ffi.chfl_cell(lengths, angles)
+        lengths = np.array(lengths)
+        if len(lengths.shape) == 1:
+            lengths = chfl_vector3d(*lengths)
+            angles = chfl_vector3d(*angles)
+            ptr = self.ffi.chfl_cell(lengths, angles)
+        else:
+            if lengths.shape != (3, 3):
+                raise ChemfilesError(
+                    "expected the cell matrix to have 3x3 shape, got {}".format(
+                        lengths.shape
+                    )
+                )
+            matrix = ARRAY(chfl_vector3d, (3))()
+            matrix[0][0] = lengths[0, 0]
+            matrix[0][1] = lengths[0, 1]
+            matrix[0][2] = lengths[0, 2]
+
+            matrix[1][0] = lengths[1, 0]
+            matrix[1][1] = lengths[1, 1]
+            matrix[1][2] = lengths[1, 2]
+
+            matrix[2][0] = lengths[2, 0]
+            matrix[2][1] = lengths[2, 1]
+            matrix[2][2] = lengths[2, 2]
+            ptr = self.ffi.chfl_cell_from_matrix(matrix)
+
         super(UnitCell, self).__init__(ptr, is_const=False)
 
     def __copy__(self):
         return UnitCell.from_mutable_ptr(None, self.ffi.chfl_cell_copy(self.ptr))
 
     def __repr__(self):
-        return "UnitCell({:.9g}, {:.9g}, {:.9g}, {:.7g}, {:.7g}, {:.7g})".format(
+        return """UnitCell(
+    lengths=({:.9g}, {:.9g}, {:.9g}),
+    angles=({:.7g}, {:.7g}, {:.7g})
+)""".format(
             *(self.lengths + self.angles)
         )
 
@@ -114,11 +142,13 @@ class UnitCell(CxxPointer):
         """
         m = ARRAY(chfl_vector3d, 3)()
         self.ffi.chfl_cell_matrix(self.ptr, m)
-        return [
-            (m[0][0], m[0][1], m[0][2]),
-            (m[1][0], m[1][1], m[1][2]),
-            (m[2][0], m[2][1], m[2][2]),
-        ]
+        return np.array(
+            (
+                (m[0][0], m[0][1], m[0][2]),
+                (m[1][0], m[1][1], m[1][2]),
+                (m[2][0], m[2][1], m[2][2]),
+            )
+        )
 
     @property
     def shape(self):
