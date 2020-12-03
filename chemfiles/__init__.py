@@ -7,7 +7,7 @@ from .residue import Residue
 from .topology import Topology, BondOrder
 from .cell import UnitCell, CellShape
 from .frame import Frame
-from .trajectory import Trajectory
+from .trajectory import Trajectory, MemoryTrajectory
 from .selection import Selection
 from .property import Property
 

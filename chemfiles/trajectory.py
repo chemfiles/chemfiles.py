@@ -1,40 +1,25 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import ctypes
 from ctypes import c_uint64, c_char_p
+import sys
 
 from .utils import CxxPointer, _call_with_growing_buffer
 from .frame import Frame, Topology
 from .misc import ChemfilesError
 
+# Python 2 compatibility
+if sys.hexversion >= 0x03000000:
+    unicode_string = str
+    bytes_string = bytes
+else:
+    unicode_string = unicode  # noqa
+    bytes_string = str
 
-class Trajectory(CxxPointer):
-    """
-    A :py:class:`Trajectory` represent a physical file from which we can read
-    :py:class:`Frame`.
-    """
 
-    def __init__(self, path, mode="r", format=""):
-        """
-        Open the file at the given ``path`` using the given ``mode`` and
-        optional file ``format``.
-
-        Valid modes are ``'r'`` for read, ``'w'`` for write and ``'a'`` for
-        append.
-
-        The ``format`` parameter is needed when the file format does not match
-        the extension, or when there is not standard extension for this format.
-        If `format` is an empty string, the format will be guessed from the
-        file extension.
-        """
+class BaseTrajectory(CxxPointer):
+    def __init__(self, ptr):
         self.__closed = False
-        # Store mode and format for __repr__
-        self.__mode = mode
-        self.__format = format
-        ptr = self.ffi.chfl_trajectory_with_format(
-            path.encode("utf8"), mode.encode("utf8"), format.encode("utf8")
-        )
-        super(Trajectory, self).__init__(ptr, is_const=False)
+        super(BaseTrajectory, self).__init__(ptr, is_const=False)
 
     def __check_opened(self):
         if self.__closed:
@@ -55,11 +40,6 @@ class Trajectory(CxxPointer):
         self.__check_opened()
         for step in range(self.nsteps):
             yield self.read_step(step)
-
-    def __repr__(self):
-        return "Trajectory('{}', '{}', '{}')".format(
-            self.path, self.__mode, self.__format
-        )
 
     def read(self):
         """
@@ -145,3 +125,92 @@ class Trajectory(CxxPointer):
         self.__check_opened()
         self.__closed = True
         self.ffi.chfl_trajectory_close(self.ptr)
+
+
+class Trajectory(BaseTrajectory):
+    """
+    A :py:class:`Trajectory` represent a physical file from which we can read
+    :py:class:`Frame`.
+    """
+
+    def __init__(self, path, mode="r", format=""):
+        """
+        Open the file at the given ``path`` using the given ``mode`` and
+        optional file ``format``.
+
+        Valid modes are ``'r'`` for read, ``'w'`` for write and ``'a'`` for
+        append.
+
+        The ``format`` parameter is needed when the file format does not match
+        the extension, or when there is not standard extension for this format.
+        If `format` is an empty string, the format will be guessed from the
+        file extension.
+        """
+        ptr = self.ffi.chfl_trajectory_with_format(
+            path.encode("utf8"), mode.encode("utf8"), format.encode("utf8")
+        )
+        # Store mode and format for __repr__
+        self.__mode = mode
+        self.__format = format
+        super(Trajectory, self).__init__(ptr)
+
+    def __repr__(self):
+        return "Trajectory('{}', '{}', '{}')".format(
+            self.path, self.__mode, self.__format
+        )
+
+
+class MemoryTrajectory(BaseTrajectory):
+    """
+    A :py:class:`MemoryTrajectory` allow to read/write in-memory data as though
+    it was a formatted file.
+    """
+
+    def __init__(self, data="", mode="r", format=""):
+        """
+        The ``format`` parameter is always required.
+
+        When reading (``mode`` is ``'r'``), the ``data`` parameter will be used
+        as the formatted file.
+
+        When writing (``mode`` is ``'w'``), the ``data`` parameter is ignored.
+        To get the memory buffer containing everything already written, use the
+        :py:func:`buffer` function.
+        """
+
+        if not format:
+            raise ChemfilesError(
+                "'format' is required when creating a MemoryTrajectory"
+            )
+
+        if mode == "r":
+            if isinstance(data, unicode_string):
+                data = data.encode("utf8")
+            elif not isinstance(data, bytes_string):
+                raise ChemfilesError("the 'data' parameter must be a string")
+
+            ptr = self.ffi.chfl_trajectory_memory_reader(
+                data, len(data), format.encode("utf8")
+            )
+        elif mode == "w":
+            ptr = self.ffi.chfl_trajectory_memory_writer(format.encode("utf8"))
+        else:
+            raise ChemfilesError(
+                "invalid mode '{}' passed to MemoryTrajectory".format(mode)
+            )
+
+        super(MemoryTrajectory, self).__init__(ptr)
+
+    def __repr__(self):
+        return "MemoryTrajectory({}', '{}')".format(self.__mode, self.__format)
+
+    def buffer(self):
+        """
+        Get the data written to this in-memory trajectory. This is not valid to
+        call when reading in-memory data.
+        """
+        buffer = c_char_p()
+        size = c_uint64()
+        self.ffi.chfl_trajectory_memory_buffer(self.ptr, buffer, size)
+
+        return buffer.value
