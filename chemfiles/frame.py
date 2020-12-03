@@ -128,6 +128,13 @@ class Frame(CxxPointer):
         """
         self.ffi.chfl_frame_remove_bond(self.mut_ptr, c_uint64(i), c_uint64(j))
 
+    def clear_bonds(self):
+        """
+        Remove all existing bonds, angles, dihedral angles and improper dihedral
+        angles in this frame.
+        """
+        self.ffi.chfl_frame_clear_bonds(self.mut_ptr)
+
     def add_residue(self, residue):
         """
         Add the :py:class:`Residue` ``residue`` to this :py:class:`Frame`'s

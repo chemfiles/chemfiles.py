@@ -231,6 +231,9 @@ class TestFrame(unittest.TestCase):
 
         self.assertEqual(frame.topology.bonds.all(), np.array([[0, 1], [1, 2]]).all())
 
+        frame.clear_bonds()
+        self.assertEqual(frame.topology.bonds_count(), 0)
+
     def test_residues(self):
         frame = Frame()
         frame.add_residue(Residue("Foo"))
