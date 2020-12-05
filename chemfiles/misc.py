@@ -1,7 +1,10 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import warnings
+import sys
 
+import ctypes
+from ctypes import util
 from ctypes import c_uint64, POINTER
 
 from .clib import _get_c_library
@@ -140,7 +143,11 @@ def formats_list():
     for i in range(count.value):
         formats[i]._set_from_c(array[i])
 
-    lib.free(array)
+    if sys.platform.startswith("win"):
+        libc = ctypes.cdll[ctypes.util.find_msvcrt()]
+    else:
+        libc = lib
+    libc.free(array)
     return formats
 
 
@@ -199,6 +206,6 @@ def _clear_errors():
 def _set_default_warning_callback():
     set_warnings_callback(
         # We need to set stacklevel=4 to get through the lambda =>
-        # adapatator => C++ code => Python binding => user code
+        # adaptor => C++ code => Python binding => user code
         lambda message: warnings.warn(message, ChemfilesWarning, stacklevel=4)
     )
