@@ -1,12 +1,14 @@
-name: Deploy docs
+name: Documentation
 
 on:
   push:
     branches: [master]
     tags: ["*"]
+  pull_request:
+    # Check all PR
 
 jobs:
-  build:
+  build-and-publish:
     runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
@@ -16,9 +18,33 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: 3.8
+      - name: install dependencies
+        run: |
+          pip install --upgrade pip
+          pip install -r doc/requirements.txt
       - name: build documentation
-        run: ./scripts/build-docs.sh
+        run: |
+          cd doc
+          make html
+          rm -rf _build/html/.doctrees/ _build/html/.buildinfo
+          rm -rf _build/html/_static/bootswatch-2.3.2/ _build/html/_static/bootstrap-2.3.2/
+          shopt -s extglob
+          cd _build/html/_static/bootswatch-* && rm -rf !(flatly) && cd -
+      - name: put documentation in the website
+        run: |
+          git clone https://github.com/$GITHUB_REPOSITORY --branch gh-pages gh-pages
+          rm -rf gh-pages/.git
+
+          REF_KIND=$(echo $GITHUB_REF | cut -d / -f2)
+          if [[ "$REF_KIND" == "tags" ]]; then
+              TAG=${GITHUB_REF#refs/tags/}
+              mv doc/_build/html/ gh-pages/$TAG
+          else
+              rm -rf gh-pages/latest
+              mv doc/_build/html/ gh-pages/latest
+          fi
       - name: deploy to gh-pages
+        if: github.event_name == 'push'
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
