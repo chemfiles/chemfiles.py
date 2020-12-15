@@ -142,12 +142,8 @@ def formats_list():
     formats = [FormatMetadata() for i in range(count.value)]
     for i in range(count.value):
         formats[i]._set_from_c(array[i])
+    lib.chfl_free(array)
 
-    if sys.platform.startswith("win"):
-        libc = ctypes.cdll[ctypes.util.find_msvcrt()]
-    else:
-        libc = lib
-    libc.free(array)
     return formats
 
 
