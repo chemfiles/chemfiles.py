@@ -50,7 +50,6 @@ setup(
     version=__version__,
     install_requires=install_requires,
     cmdclass={"bdist_wheel": universal_wheel},
-    # cmake_install_dir="chemfiles",
     cmake_args=cmake_args,
     packages=["chemfiles"],
     package_data={
