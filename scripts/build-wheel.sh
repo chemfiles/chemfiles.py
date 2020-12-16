@@ -8,8 +8,19 @@
 set -xe
 
 clean_build() {
-    rm -rf _skbuild/ chemfiles.egg-info
-    rm -rf chemfiles/lib/ chemfiles/include/ chemfiles/external.py chemfiles/*.pyc
+    # this can not use clean.sh because we do not want to remove the dist folder
+    find . -name "*.pyc" -delete
+    find . -name "__pycache__" | xargs rm -rf
+
+    rm -rf .tox
+    rm -rf _skbuild
+    rm -rf MANIFEST
+    rm -rf chemfiles.egg-info
+
+    rm -rf chemfiles/*.dylib
+    rm -rf chemfiles/*.so
+    rm -rf chemfiles/*.dll
+    rm -rf chemfiles/external.py
 }
 
 IMAGE=$1
@@ -21,32 +32,31 @@ fi
 if [[ "$IMAGE" == "macos" ]]; then
     clean_build
     export MACOSX_DEPLOYMENT_TARGET=10.9
-    python setup.py bdist_wheel --plat-name macosx-10.9-x86_64
+    python -m pip wheel dist/*.tar.gz -w dist
     exit 0
-fi
-
-# Switch to root and proceed
-if [ $UID -ne 0 ]; then
-  exec sudo su root "$0" "$@"
 fi
 
 clean_build
 
-WHEELS=/tmp/wheels
-export PATH=/opt/python/cp27-cp27m/bin/:$PATH
-pip install --user -r dev-requirements.txt
-
-if [[ "$IMAGE" == "manylinux-x64" || "$IMAGE" == "manylinux-x86" ]]; then
-    pip wheel . -w ${WHEELS}
+if [[ "$IMAGE" == "manylinux1-x64" || "$IMAGE" == "manylinux1-x86" ]]; then
+    WHEELS=/tmp/wheels
+    /opt/python/cp36-cp36m/bin/python -m pip wheel dist/*.tar.gz -w ${WHEELS}
     # Make sure wheels get the manylinux tag
     auditwheel repair -w ${WHEELS} ${WHEELS}/chemfiles-*.whl
     mv -f ${WHEELS}/chemfiles-*manylinux*.whl dist
 fi
 
-if [[ "$IMAGE" == "chemfiles-w64" ]]; then
-    python setup.py bdist_wheel --plat-name win_amd64
-fi
+if [[ "$IMAGE" == "windows-static-x64" || "$IMAGE" == "windows-static-x86" ]]; then
+    sudo apt update
+    sudo apt install -y python3-pip
+    python3 -m pip install --upgrade pip
+    python3 -m pip install scikit-build
 
-if [[ "$IMAGE" == "chemfiles-w32" ]]; then
-    python setup.py bdist_wheel --plat-name win32
+    if [[ "$IMAGE" == "windows-static-x64" ]]; then
+        python3 setup.py bdist_wheel --plat-name win_amd64
+    fi
+
+    if [[ "$IMAGE" == "windows-static-x86" ]]; then
+        python3 setup.py bdist_wheel --plat-name win32
+    fi
 fi

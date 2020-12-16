@@ -23,17 +23,10 @@ python setup.py sdist
 # Build for OS X
 ./scripts/build-wheel.sh macos
 
-# Build for Linux
-for image in manylinux-x64 manylinux-x86
+# Build for Linux and windows using dockcross
+for image in manylinux1-x64 manylinux1-x86 windows-static-x64 windows-static-x86
 do
     dockcross -i dockcross/$image ./scripts/build-wheel.sh $image
 done
 
-docker build scripts/chemfiles-w64 --tag chemfiles-w64:latest
-docker build scripts/chemfiles-w32 --tag chemfiles-w32:latest
-
-# Build for Windows
-for image in chemfiles-w64 chemfiles-w32
-do
-    dockcross -i $image ./scripts/build-wheel.sh $image
-done
+rm dist/numpy-*
