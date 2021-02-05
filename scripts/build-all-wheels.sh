@@ -30,3 +30,5 @@ do
 done
 
 rm dist/numpy-*
+
+twine check dist/chemfiles-*.whl

@@ -47,9 +47,13 @@ if [[ "$IMAGE" == "manylinux1-x64" || "$IMAGE" == "manylinux1-x86" ]]; then
 fi
 
 if [[ "$IMAGE" == "windows-static-x64" || "$IMAGE" == "windows-static-x86" ]]; then
+    function sudo {
+        gosu root "$@"
+    }
+
     sudo apt update
     sudo apt install -y python3-pip
-    python3 -m pip install --upgrade pip
+    python3 -m pip install --upgrade pip wheel setuptools
     python3 -m pip install scikit-build
 
     if [[ "$IMAGE" == "windows-static-x64" ]]; then
