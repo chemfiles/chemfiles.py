@@ -7,7 +7,7 @@ project(chemfiles-python NONE)
 option(CHFL_PY_INTERNAL_CHEMFILES "Use the internal version of chemfiles" OFF)
 
 if(NOT ${CHFL_PY_INTERNAL_CHEMFILES})
-    find_package(chemfiles CONFIG QUIET 0.9)
+    find_package(chemfiles CONFIG QUIET 0.10)
 endif()
 
 file(REMOVE ${PROJECT_SOURCE_DIR}/chemfiles/external.py)
@@ -28,6 +28,8 @@ if(${chemfiles_FOUND})
     file(WRITE ${PROJECT_SOURCE_DIR}/chemfiles/external.py
         "EXTERNAL_CHEMFILES = \"${CHEMFILES_LOCATION}\"\n"
     )
+
+    install(CODE "message(STATUS \"nothing to install\")")
 else()
     # Use the git submodule
     if(NOT EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/lib/CMakeLists.txt")
