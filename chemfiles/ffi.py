@@ -9,13 +9,15 @@
 # =========================================================================== #
 
 # flake8: noqa
-'''
+"""
 Foreign function interface declaration for the Python interface to chemfiles
-'''
+"""
 from numpy.ctypeslib import ndpointer
 import numpy as np
-from ctypes import c_int, c_int64, c_uint64, c_double, c_char, c_char_p, c_void_p, c_bool
-from ctypes import CFUNCTYPE, ARRAY, POINTER, Structure
+from ctypes import c_int, c_int64, c_uint64, c_double
+from ctypes import c_char, c_char_p, c_void_p, c_bool
+from ctypes import CFUNCTYPE, POINTER, Structure
+from ctypes import ARRAY # type: ignore[attr-defined]
 
 from .utils import _check_return_code
 

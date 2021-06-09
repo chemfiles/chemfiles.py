@@ -1,6 +1,7 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_double, ARRAY
+from ctypes import c_double
+from ctypes import ARRAY  # type: ignore[attr-defined]
 from enum import IntEnum
 import numpy as np
 

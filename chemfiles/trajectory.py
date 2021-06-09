@@ -1,5 +1,6 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
+
 from ctypes import c_uint64, c_char_p
 import sys
 
@@ -7,11 +8,11 @@ from .utils import CxxPointer, _call_with_growing_buffer
 from .frame import Frame, Topology
 from .misc import ChemfilesError
 
-# Python 2 compatibility
-if sys.hexversion >= 0x03000000:
+if sys.version_info >= (3, 0):
     unicode_string = str
     bytes_string = bytes
 else:
+    # Python 2 compatibility
     unicode_string = unicode  # noqa
     bytes_string = str
 
