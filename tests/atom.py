@@ -4,7 +4,7 @@ import unittest
 import copy
 
 from chemfiles import Atom, ChemfilesError
-from _utils import remove_warnings
+from ._utils import remove_warnings
 
 
 class TestAtom(unittest.TestCase):
@@ -85,14 +85,14 @@ class TestAtom(unittest.TestCase):
                 _ = atom["bar"]
 
             with self.assertRaises(ChemfilesError):
-                atom[3] = "test"
+                atom[3] = "test"  # type: ignore
 
             with self.assertRaises(ChemfilesError):
-                _ = atom[3]
+                _ = atom[3]  # type: ignore
 
         # Check that enabling indexing/__getitem__ did not enable iteration
         with self.assertRaises(TypeError):
-            for i in atom:
+            for i in atom:  # type: ignore
                 pass
 
         atom["bar"] = "baz"

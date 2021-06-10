@@ -4,8 +4,11 @@ from __future__ import absolute_import, print_function, unicode_literals
 from ctypes import c_uint64
 import numpy as np
 
+from typing import List, Union, Tuple
+
 from .utils import CxxPointer, _call_with_growing_buffer
 from .ffi import chfl_match
+from .frame import Frame
 
 
 class Selection(CxxPointer):
@@ -22,6 +25,7 @@ class Selection(CxxPointer):
     """
 
     def __init__(self, selection):
+        # type: (str) -> None
         """
         Create a new :py:class:`Selection` from the given ``selection`` string.
         """
@@ -29,13 +33,16 @@ class Selection(CxxPointer):
         super(Selection, self).__init__(ptr, is_const=False)
 
     def __copy__(self):
+        # type: () -> Selection
         return Selection.from_mutable_ptr(None, self.ffi.chfl_selection_copy(self.ptr))
 
     def __repr__(self):
+        # type: () -> str
         return "Selection('{}')".format(self.string)
 
     @property
     def size(self):
+        # type: () -> int
         """
         Get the size of this :py:class:`Selection`.
 
@@ -50,6 +57,7 @@ class Selection(CxxPointer):
 
     @property
     def string(self):
+        # type: () -> str
         """
         Get the selection string used to create this :py:class:`Selection`.
         """
@@ -59,6 +67,7 @@ class Selection(CxxPointer):
         )
 
     def evaluate(self, frame):
+        # type: (Frame) -> List[Union[int, Tuple[int, ...]]]
         """
         Evaluate a :py:class:`Selection` for a given :py:class:`Frame`, and
         return a list of matching atoms, either as a list of index or a list

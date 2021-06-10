@@ -1,12 +1,17 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import sys
 import numpy as np
 from ctypes import c_double, c_bool
+
+from typing import Union, Tuple
 
 from .ffi import chfl_property_kind, chfl_vector3d
 from .misc import ChemfilesError
 from .utils import CxxPointer, _call_with_growing_buffer, string_type
+from .typing import ArrayLike
+
+PropertyValueGet = Union[str, float, bool, Tuple[float, float, float]]
+PropertyValueSet = Union[str, float, bool, ArrayLike[float]]
 
 
 class Property(CxxPointer):
@@ -19,6 +24,7 @@ class Property(CxxPointer):
     """
 
     def __init__(self, value):
+        # type: (PropertyValueSet) -> None
         """Create a new property containing the given value"""
         if isinstance(value, bool):
             ptr = self.ffi.chfl_property_bool(c_bool(value))
@@ -39,33 +45,41 @@ class Property(CxxPointer):
         super(Property, self).__init__(ptr, is_const=False)
 
     def get(self):
+        # type: () -> PropertyValueGet
         kind = chfl_property_kind()
         self.ffi.chfl_property_get_kind(self.ptr, kind)
+
         if kind.value == chfl_property_kind.CHFL_PROPERTY_BOOL:
-            value = c_bool()
-            self.ffi.chfl_property_get_bool(self.ptr, value)
-            return value.value
+            bool_ptr = c_bool()
+            self.ffi.chfl_property_get_bool(self.ptr, bool_ptr)
+            return bool_ptr.value
+
         if kind.value == chfl_property_kind.CHFL_PROPERTY_DOUBLE:
-            value = c_double()
-            self.ffi.chfl_property_get_double(self.ptr, value)
-            return value.value
+            double_ptr = c_double()
+            self.ffi.chfl_property_get_double(self.ptr, double_ptr)
+            return double_ptr.value
+
         if kind.value == chfl_property_kind.CHFL_PROPERTY_STRING:
+            return _call_with_growing_buffer(
+                lambda buffer, size: self.ffi.chfl_property_get_string(
+                    self.ptr, buffer, size
+                ),
+                initial=32,
+            )
 
-            def callback(buffer, size):
-                self.ffi.chfl_property_get_string(self.ptr, buffer, size)
-
-            return _call_with_growing_buffer(callback, initial=32)
         if kind.value == chfl_property_kind.CHFL_PROPERTY_VECTOR3D:
-            value = chfl_vector3d()
-            self.ffi.chfl_property_get_vector3d(self.ptr, value)
-            return value[0], value[1], value[2]
+            vector_ptr = chfl_vector3d()
+            self.ffi.chfl_property_get_vector3d(self.ptr, vector_ptr)
+            return vector_ptr[0], vector_ptr[1], vector_ptr[2]
+
         else:
             raise ChemfilesError("unknown property kind, this is a bug")
 
 
 def _is_vector3d(value):
+    # type: (PropertyValueSet) -> bool
     try:
-        a = np.array(value, dtype="double")
+        a = np.array(value, dtype=np.float64)
         return len(a) >= 3
     except Exception:
         return False

@@ -1,19 +1,23 @@
 # -* coding: utf-8 -*
 import os
 import sys
-from ctypes import cdll, c_double, POINTER
+from ctypes import cdll, CDLL, c_double, POINTER
+from typing import Optional
 
 try:
     from .external import EXTERNAL_CHEMFILES
 except ImportError:
-    EXTERNAL_CHEMFILES = False
+    EXTERNAL_CHEMFILES = ""
 
 
 class FindChemfilesLibrary(object):
     def __init__(self):
-        self._cache = None
+        # type: () -> None
+
+        self._cache = None  # type: Optional[CDLL]
 
     def __call__(self):
+        # type: () -> CDLL
         if self._cache is None:
             path = _lib_path()
             self._cache = cdll.LoadLibrary(path)
@@ -38,6 +42,7 @@ class FindChemfilesLibrary(object):
 
 
 def _lib_path():
+    # type: () -> str
     if EXTERNAL_CHEMFILES:
         return EXTERNAL_CHEMFILES
     root = os.path.abspath(os.path.dirname(__file__))
@@ -60,6 +65,7 @@ def _lib_path():
 
 
 def _check_dll(path):
+    # type: (str) -> None
     import struct
     import platform
 
@@ -68,8 +74,8 @@ def _check_dll(path):
 
     machine = None
     with open(path, "rb") as fd:
-        header = fd.read(2).decode(encoding="utf-8", errors="strict")
-        if header != "MZ":
+        header = fd.read(2)
+        if header != b"MZ":
             raise ImportError(path + " is not a DLL")
         else:
             fd.seek(60)

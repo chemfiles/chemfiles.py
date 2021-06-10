@@ -13,14 +13,14 @@ ROOT = os.path.dirname(__file__)
 class TestExamples(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._cwd = os.getcwd()
-        cls._tmpdir = tempfile.mkdtemp()
-        os.chdir(cls._tmpdir)
+        cls._cwd = os.getcwd()  # type: ignore
+        cls._tmpdir = tempfile.mkdtemp()  # type: ignore
+        os.chdir(cls._tmpdir)  # type: ignore
 
     @classmethod
     def tearDownClass(cls):
-        os.chdir(cls._cwd)
-        shutil.rmtree(cls._tmpdir)
+        os.chdir(cls._cwd)  # type: ignore
+        shutil.rmtree(cls._tmpdir)  # type: ignore
 
     def test_generate(self):
         path = os.path.join(ROOT, "..", "examples", "generate.py")

@@ -5,7 +5,11 @@ from ctypes import ARRAY  # type: ignore[attr-defined]
 from enum import IntEnum
 import numpy as np
 
-from .utils import CxxPointer, ChemfilesError
+from typing import Tuple
+
+from .utils import CxxPointer
+from .typing import ArrayLike
+from .misc import ChemfilesError
 from .ffi import chfl_cellshape, chfl_vector3d
 
 
@@ -46,6 +50,7 @@ class UnitCell(CxxPointer):
     """
 
     def __init__(self, lengths, angles=(90.0, 90.0, 90.0)):
+        # type: (ArrayLike[float], ArrayLike[float]) -> None
         """
         Create a new :py:class:`UnitCell` with the given cell ``lengths`` and
         cell ``angles``. If ``lengths`` is a 3x3 matrix, it is taken to be the
@@ -83,18 +88,24 @@ class UnitCell(CxxPointer):
         super(UnitCell, self).__init__(ptr, is_const=False)
 
     def __copy__(self):
+        # type: () -> UnitCell
         return UnitCell.from_mutable_ptr(None, self.ffi.chfl_cell_copy(self.ptr))
 
     def __repr__(self):
+        # type: () -> str
         return """UnitCell(
     lengths=({:.9g}, {:.9g}, {:.9g}),
     angles=({:.7g}, {:.7g}, {:.7g})
 )""".format(
-            *(self.lengths + self.angles)
+            *(self.lengths + self.angles)  # type: ignore
         )
 
     @property
     def lengths(self):
+        # type: () -> ArrayLike[float]
+        # TODO: we would like the return type to be (float, float float) instead
+        # but we can not do it until https://github.com/python/mypy/issues/3004
+        # is resolved
         """Get the three lengths of this :py:class:`UnitCell`, in Angstroms."""
         lengths = chfl_vector3d(0, 0, 0)
         self.ffi.chfl_cell_lengths(self.ptr, lengths)
@@ -102,6 +113,7 @@ class UnitCell(CxxPointer):
 
     @lengths.setter
     def lengths(self, lengths):
+        # type: (ArrayLike[float]) -> None
         """
         Set the three lengths of this :py:class:`UnitCell` to ``lengths``. The
         values should be in Angstroms.
@@ -111,6 +123,10 @@ class UnitCell(CxxPointer):
 
     @property
     def angles(self):
+        # type: () -> ArrayLike[float]
+        # TODO: we would like the return type to be (float, float float) instead
+        # but we can not do it until https://github.com/python/mypy/issues/3004
+        # is resolved
         """Get the three angles of this :py:class:`UnitCell`, in degrees."""
         angles = chfl_vector3d(0, 0, 0)
         self.ffi.chfl_cell_angles(self.ptr, angles)
@@ -118,6 +134,7 @@ class UnitCell(CxxPointer):
 
     @angles.setter
     def angles(self, angles):
+        # type: (ArrayLike[float]) -> None
         """
         Set the three angles of this :py:class:`UnitCell` to ``alpha``,
         ``beta`` and ``gamma``. These values should be in degrees. Setting
@@ -128,6 +145,7 @@ class UnitCell(CxxPointer):
 
     @property
     def matrix(self):
+        # type: () -> np.ndarray
         """
         Get this :py:class:`UnitCell` matricial representation.
 
@@ -153,6 +171,7 @@ class UnitCell(CxxPointer):
 
     @property
     def shape(self):
+        # type: () -> CellShape
         """Get the shape of this :py:class:`UnitCell`."""
         shape = chfl_cellshape()
         self.ffi.chfl_cell_shape(self.ptr, shape)
@@ -160,17 +179,20 @@ class UnitCell(CxxPointer):
 
     @shape.setter
     def shape(self, shape):
+        # type: (CellShape) -> None
         """Set the shape of this :py:class:`UnitCell` to ``shape``."""
         self.ffi.chfl_cell_set_shape(self.mut_ptr, chfl_cellshape(shape))
 
     @property
     def volume(self):
+        # type: () -> float
         """Get the volume of this :py:class:`UnitCell`."""
         volume = c_double()
         self.ffi.chfl_cell_volume(self.ptr, volume)
         return volume.value
 
     def wrap(self, vector):
+        # type: (ArrayLike[float]) -> Tuple[float, float, float]
         """
         Wrap a ``vector`` in this :py:class:`UnitCell`, and return the wrapped
         vector.

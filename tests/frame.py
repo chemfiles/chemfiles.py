@@ -7,7 +7,7 @@ import numpy as np
 
 from chemfiles import Frame, UnitCell, Topology, Atom, Residue, ChemfilesError
 from chemfiles import BondOrder, CellShape
-from _utils import remove_warnings
+from ._utils import remove_warnings
 
 
 class TestFrame(unittest.TestCase):
@@ -154,14 +154,14 @@ class TestFrame(unittest.TestCase):
                 _ = frame["bar"]
 
             with self.assertRaises(ChemfilesError):
-                frame[3] = "test"
+                frame[3] = "test"  # type: ignore
 
             with self.assertRaises(ChemfilesError):
-                _ = frame[3]
+                _ = frame[3]  # type: ignore
 
         # Check that enabling indexing/__getitem__ did not enable iteration
         with self.assertRaises(TypeError):
-            for i in frame:
+            for i in frame:  # type: ignore
                 pass
 
         frame["bar"] = "baz"

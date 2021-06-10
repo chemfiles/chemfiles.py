@@ -2,10 +2,11 @@
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import copy
+import numpy as np
 
 from chemfiles import UnitCell, CellShape
 from chemfiles import ChemfilesError
-from _utils import remove_warnings
+from ._utils import remove_warnings
 
 
 class TestUnitCell(unittest.TestCase):
@@ -34,6 +35,9 @@ class TestUnitCell(unittest.TestCase):
         cell = UnitCell((3, 4, 5))
         self.assertEqual(cell.lengths, (3.0, 4.0, 5.0))
         cell.lengths = [10, 11, 12]
+        self.assertEqual(cell.lengths, (10.0, 11.0, 12.0))
+
+        cell.lengths = np.array([10, 11, 12])
         self.assertEqual(cell.lengths, (10.0, 11.0, 12.0))
 
     def test_angles(self):

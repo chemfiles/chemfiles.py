@@ -1,12 +1,16 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 
-from ctypes import c_uint64, c_char_p
+from ctypes import c_uint64, c_char_p, pointer
 import sys
 
+from typing import Any, Generator, Union
+
 from .utils import CxxPointer, _call_with_growing_buffer
-from .frame import Frame, Topology
 from .misc import ChemfilesError
+from .cell import UnitCell
+from .frame import Frame
+from .topology import Topology
 
 if sys.version_info >= (3, 0):
     unicode_string = str
@@ -19,30 +23,37 @@ else:
 
 class BaseTrajectory(CxxPointer):
     def __init__(self, ptr):
+        # type: (pointer[Any]) -> None
         self.__closed = False
         super(BaseTrajectory, self).__init__(ptr, is_const=False)
 
     def __check_opened(self):
+        # type: () -> None
         if self.__closed:
             raise ChemfilesError("Can not use a closed Trajectory")
 
     def __del__(self):
+        # type: () -> None
         if not self.__closed:
             self.close()
 
     def __enter__(self):
+        # type: () -> BaseTrajectory
         self.__check_opened()
         return self
 
     def __exit__(self, *args):
+        # type: (*Any) -> None
         self.close()
 
     def __iter__(self):
+        # type: () -> Generator[Frame, None, None]
         self.__check_opened()
         for step in range(self.nsteps):
             yield self.read_step(step)
 
     def read(self):
+        # type: () -> Frame
         """
         Read the next step of this :py:class:`Trajectory` and return the
         corresponding :py:class:`Frame`.
@@ -53,6 +64,7 @@ class BaseTrajectory(CxxPointer):
         return frame
 
     def read_step(self, step):
+        # type: (int) -> Frame
         """
         Read a specific ``step`` in this :py:class:`Trajectory` and return the
         corresponding :py:class:`Frame`.
@@ -63,11 +75,13 @@ class BaseTrajectory(CxxPointer):
         return frame
 
     def write(self, frame):
+        # type: (Frame) -> None
         """Write a :py:class:`Frame` to this :py:class:`Trajectory`."""
         self.__check_opened()
         self.ffi.chfl_trajectory_write(self.mut_ptr, frame.ptr)
 
     def set_topology(self, topology, format=""):
+        # type: (Union[Topology, str], str) -> None
         """
         Set the :py:class:`Topology` associated with this :py:class:`Trajectory`.
 
@@ -91,6 +105,7 @@ class BaseTrajectory(CxxPointer):
             )
 
     def set_cell(self, cell):
+        # type: (UnitCell) -> None
         """
         Set the :py:class:`UnitCell` associated with this :py:class:`Trajectory`
         to a copy of ``cell``.
@@ -103,6 +118,7 @@ class BaseTrajectory(CxxPointer):
 
     @property
     def nsteps(self):
+        # type: () -> int
         """Get the current number of steps in this :py:class:`Trajectory`."""
         self.__check_opened()
         nsteps = c_uint64()
@@ -111,6 +127,7 @@ class BaseTrajectory(CxxPointer):
 
     @property
     def path(self):
+        # type: () -> str
         """Get the path used to open this :py:class:`Trajectory`."""
         self.__check_opened()
         return _call_with_growing_buffer(
@@ -119,6 +136,7 @@ class BaseTrajectory(CxxPointer):
         )
 
     def close(self):
+        # type: () -> None
         """
         Close this :py:class:`Trajectory` and write any buffered content to the
         file.
@@ -135,6 +153,7 @@ class Trajectory(BaseTrajectory):
     """
 
     def __init__(self, path, mode="r", format=""):
+        # type: (str, str, str) -> None
         """
         Open the file at the given ``path`` using the given ``mode`` and
         optional file ``format``.
@@ -156,6 +175,7 @@ class Trajectory(BaseTrajectory):
         super(Trajectory, self).__init__(ptr)
 
     def __repr__(self):
+        # type: () -> str
         return "Trajectory('{}', '{}', '{}')".format(
             self.path, self.__mode, self.__format
         )
@@ -168,6 +188,7 @@ class MemoryTrajectory(BaseTrajectory):
     """
 
     def __init__(self, data="", mode="r", format=""):
+        # type: (Union[str, bytes], str, str) -> None
         """
         The ``format`` parameter is always required.
 
@@ -203,9 +224,14 @@ class MemoryTrajectory(BaseTrajectory):
         super(MemoryTrajectory, self).__init__(ptr)
 
     def __repr__(self):
-        return "MemoryTrajectory({}', '{}')".format(self.__mode, self.__format)
+        # type: () -> str
+        return "MemoryTrajectory({}', '{}')".format(
+            self.__mode,  # type: ignore
+            self.__format,  # type: ignore
+        )
 
     def buffer(self):
+        # type: () -> bytes
         """
         Get the data written to this in-memory trajectory. This is not valid to
         call when reading in-memory data.
@@ -214,4 +240,7 @@ class MemoryTrajectory(BaseTrajectory):
         size = c_uint64()
         self.ffi.chfl_trajectory_memory_buffer(self.ptr, buffer, size)
 
-        return buffer.value
+        if buffer.value is not None:
+            return buffer.value
+        else:
+            return b""

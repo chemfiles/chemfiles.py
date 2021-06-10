@@ -1,7 +1,6 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
-import copy
 import numpy as np
 
 from chemfiles import Property, ChemfilesError
@@ -35,7 +34,7 @@ class TestProperty(unittest.TestCase):
 
     def test_bad(self):
         with self.assertRaises(ChemfilesError):
-            _ = Property(ArithmeticError)
+            _ = Property(ArithmeticError)  # type: ignore
 
 
 if __name__ == "__main__":

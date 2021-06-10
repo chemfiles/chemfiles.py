@@ -1,13 +1,13 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import warnings
-import sys
 
-import ctypes
-from ctypes import util
+from typing import List, Callable
+
 from ctypes import c_uint64, POINTER
 
 from .clib import _get_c_library
+from .ffi import chfl_format_metadata
 
 
 class ChemfilesWarning(UserWarning):
@@ -46,6 +46,7 @@ class FormatMetadata:
     """
 
     def __init__(self):
+        # type: () -> None
         self.name = ""
         self.extension = None
         self.description = ""
@@ -63,6 +64,7 @@ class FormatMetadata:
         self.residues = False
 
     def _set_from_c(self, c_format_metadata):
+        # type: (chfl_format_metadata) -> None
         self.name = c_format_metadata.name.decode("utf8")
 
         if c_format_metadata.extension is None:
@@ -85,6 +87,7 @@ class FormatMetadata:
         self.residues = c_format_metadata.residues
 
     def __repr__(self):
+        # type: () -> str
         return """
 FormatMetadata for {name}
 -------------------{name_underline}
@@ -125,14 +128,13 @@ residues    = {residues}
 
 
 def formats_list():
+    # type: () -> List[FormatMetadata]
     """
     Get the list of formats known by chemfiles, as well as all associated
     metadata.
 
     :rtype: list(FormatMetadata)
     """
-    from .ffi import chfl_format_metadata
-
     lib = _get_c_library()
 
     array = POINTER(chfl_format_metadata)()
@@ -153,6 +155,7 @@ _CURRENT_CALLBACK = None
 
 
 def set_warnings_callback(function):
+    # type: (Callable[[str], None]) -> None
     """
     Call `function` on every warning event. The callback should take a string
     message and return nothing.
@@ -162,11 +165,12 @@ def set_warnings_callback(function):
     from .ffi import chfl_warning_callback
 
     def callback(message):
+        # type: (bytes) -> None
         try:
             function(message.decode("utf8"))
         except Exception as e:
-            message = "exception raised in warning callback: {}".format(e)
-            warnings.warn(message, ChemfilesWarning)
+            m = "exception raised in warning callback: {}".format(e)
+            warnings.warn(m, ChemfilesWarning)
 
     global _CURRENT_CALLBACK
     _CURRENT_CALLBACK = chfl_warning_callback(callback)
@@ -175,6 +179,7 @@ def set_warnings_callback(function):
 
 
 def add_configuration(path):
+    # type: (str) -> None
     """
     Read configuration data from the file at ``path``.
 
@@ -190,16 +195,20 @@ def add_configuration(path):
 
 
 def _last_error():
+    # type: () -> str
     """Get the last error from the chemfiles runtime."""
-    return _get_c_library().chfl_last_error().decode("utf8")
+    error = _get_c_library().chfl_last_error().decode("utf8")  # type: str
+    return error
 
 
 def _clear_errors():
+    # type: () -> None
     """Clear any error message saved in the chemfiles runtime."""
-    return _get_c_library().chfl_clear_errors()
+    _get_c_library().chfl_clear_errors()
 
 
 def _set_default_warning_callback():
+    # type: () -> None
     set_warnings_callback(
         # We need to set stacklevel=4 to get through the lambda =>
         # adaptor => C++ code => Python binding => user code

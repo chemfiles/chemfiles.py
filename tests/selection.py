@@ -3,10 +3,11 @@ from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import copy
 
-from chemfiles import Selection, Topology, Frame, Atom
+from chemfiles import Selection, Frame, Atom
 
 
 def testing_frame():
+    # type: () -> Frame
     frame = Frame()
 
     frame.add_atom(Atom("H"), [0, 0, 0])

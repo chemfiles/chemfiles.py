@@ -12,3 +12,21 @@ from .selection import Selection
 from .property import Property
 
 __version__ = "0.10.0"
+
+__all__ = [
+    "ChemfilesError",
+    "set_warnings_callback",
+    "add_configuration",
+    "formats_list",
+    "Atom",
+    "Residue",
+    "Topology",
+    "BondOrder",
+    "UnitCell",
+    "CellShape",
+    "Frame",
+    "Trajectory",
+    "MemoryTrajectory",
+    "Selection",
+    "Property",
+]

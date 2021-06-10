@@ -2,10 +2,9 @@
 from __future__ import absolute_import, print_function, unicode_literals
 import unittest
 import copy
-import numpy as np
 
 from chemfiles import Residue, ChemfilesError
-from _utils import remove_warnings
+from ._utils import remove_warnings
 
 
 class TestResidue(unittest.TestCase):
@@ -80,14 +79,14 @@ class TestResidue(unittest.TestCase):
                 _ = residue["bar"]
 
             with self.assertRaises(ChemfilesError):
-                residue[3] = "test"
+                residue[3] = "test"  # type: ignore
 
             with self.assertRaises(ChemfilesError):
-                _ = residue[3]
+                _ = residue[3]  # type: ignore
 
         # Check that enabling indexing/__getitem__ did not enable iteration
         with self.assertRaises(TypeError):
-            for i in residue:
+            for i in residue:  # type: ignore
                 pass
 
         residue["bar"] = "baz"

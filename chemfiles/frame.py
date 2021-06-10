@@ -3,28 +3,35 @@ from __future__ import absolute_import, print_function, unicode_literals
 import numpy as np
 from ctypes import c_uint64, c_bool, c_double, c_char_p, POINTER
 
+from typing import Generator, Optional, NoReturn, List
+
 from .utils import CxxPointer, string_type
 from .misc import ChemfilesError
 from .ffi import chfl_vector3d, chfl_bond_order
 from .atom import Atom
-from .topology import Topology
+from .topology import Topology, BondOrder
+from .residue import Residue
 from .cell import UnitCell
-from .property import Property
+from .property import Property, PropertyValueGet, PropertyValueSet
+from .typing import ArrayLike
 
 
 class FrameAtoms(object):
     """Proxy object to get the atoms in a frame"""
 
     def __init__(self, frame):
+        # type: (Frame) -> None
         self.frame = frame
 
     def __len__(self):
+        # type: () -> int
         """Get the current number of atoms in this :py:class:`Frame`."""
         count = c_uint64()
         self.frame.ffi.chfl_frame_atoms_count(self.frame.ptr, count)
         return count.value
 
     def __getitem__(self, index):
+        # type: (int) -> Atom
         """
         Get a reference to the :py:class:`Atom` at the given ``index`` in the
         associated :py:class:`Frame`.
@@ -40,10 +47,12 @@ class FrameAtoms(object):
             return Atom.from_mutable_ptr(self, ptr)
 
     def __iter__(self):
+        # type: () -> Generator[Atom, None, None]
         for i in range(len(self)):
             yield self[i]
 
     def __repr__(self):
+        # type: () -> str
         return "[" + ", ".join([atom.__repr__() for atom in self]) + "]"
 
 
@@ -56,6 +65,7 @@ class Frame(CxxPointer):
     """
 
     def __init__(self):
+        # type: () -> None
         """
         Create an empty :py:class:`Frame` that will be resized by the runtime
         as needed.
@@ -63,16 +73,20 @@ class Frame(CxxPointer):
         super(Frame, self).__init__(self.ffi.chfl_frame(), is_const=False)
 
     def __copy__(self):
+        # type: () -> Frame
         return Frame.from_mutable_ptr(None, self.ffi.chfl_frame_copy(self.ptr))
 
     def __repr__(self):
+        # type: () -> str
         return "Frame with {} atoms".format(len(self.atoms))
 
     @property
     def atoms(self):
+        # type: () -> FrameAtoms
         return FrameAtoms(self)
 
     def resize(self, count):
+        # type: (int) -> None
         """
         Resize the positions, velocities and topology in this
         :py:class:`Frame`, to have space for `count` atoms.
@@ -85,6 +99,7 @@ class Frame(CxxPointer):
         self.ffi.chfl_frame_resize(self.mut_ptr, c_uint64(count))
 
     def add_atom(self, atom, position, velocity=None):
+        # type: (Atom, ArrayLike[float], Optional[ArrayLike[float]]) -> None
         """
         Add a copy of the :py:class:`Atom` ``atom`` and the corresponding
         ``position`` and ``velocity`` to this :py:class:`Frame`.
@@ -98,6 +113,7 @@ class Frame(CxxPointer):
         self.ffi.chfl_frame_add_atom(self.mut_ptr, atom.ptr, position, velocity)
 
     def remove(self, index):
+        # type: (int) -> None
         """
         Remove the atom at the given ``index`` in this :py:class:`Frame`.
 
@@ -108,6 +124,7 @@ class Frame(CxxPointer):
         self.ffi.chfl_frame_remove(self.mut_ptr, c_uint64(index))
 
     def add_bond(self, i, j, order=None):
+        # type: (int, int, Optional[BondOrder]) -> None
         """
         Add a bond between the atoms at indexes ``i`` and ``j`` in this
         :py:class:`Frame`'s topology, optionally setting the bond ``order``.
@@ -120,6 +137,7 @@ class Frame(CxxPointer):
             )
 
     def remove_bond(self, i, j):
+        # type: (int, int) -> None
         """
         Remove any existing bond between the atoms at indexes ``i`` and ``j``
         in this :py:class:`Frame`'s topology.
@@ -129,6 +147,7 @@ class Frame(CxxPointer):
         self.ffi.chfl_frame_remove_bond(self.mut_ptr, c_uint64(i), c_uint64(j))
 
     def clear_bonds(self):
+        # type: () -> None
         """
         Remove all existing bonds, angles, dihedral angles and improper dihedral
         angles in this frame.
@@ -136,6 +155,7 @@ class Frame(CxxPointer):
         self.ffi.chfl_frame_clear_bonds(self.mut_ptr)
 
     def add_residue(self, residue):
+        # type: (Residue) -> None
         """
         Add the :py:class:`Residue` ``residue`` to this :py:class:`Frame`'s
         topology.
@@ -147,6 +167,7 @@ class Frame(CxxPointer):
 
     @property
     def positions(self):
+        # type: () -> np.ndarray
         """
         Get a view into the positions of this :py:class:`Frame`.
 
@@ -164,12 +185,13 @@ class Frame(CxxPointer):
         count = count.value
         if count != 0:
             positions = np.ctypeslib.as_array(data, shape=(count,))
-            return positions.view(np.float64).reshape((count, 3))
+            return positions.view(np.float64).reshape((count, 3))  # type: ignore
         else:
             return np.array([[], [], []], dtype=np.float64)
 
     @property
     def velocities(self):
+        # type: () -> np.ndarray
         """
         Get a view into the velocities of this :py:class:`Frame`.
 
@@ -187,11 +209,12 @@ class Frame(CxxPointer):
         count = count.value
         if count != 0:
             velocities = np.ctypeslib.as_array(data, shape=(count,))
-            return velocities.view(np.float64).reshape((count, 3))
+            return velocities.view(np.float64).reshape((count, 3))  # type: ignore
         else:
             return np.array([[], [], []], dtype=np.float64)
 
     def add_velocities(self):
+        # type: () -> None
         """
         Add velocity data to this :py:class:`Frame`.
 
@@ -201,6 +224,7 @@ class Frame(CxxPointer):
         self.ffi.chfl_frame_add_velocities(self.mut_ptr)
 
     def has_velocities(self):
+        # type: () -> bool
         """Check if this :py:class:`Frame` contains velocity."""
         velocities = c_bool()
         self.ffi.chfl_frame_has_velocities(self.ptr, velocities)
@@ -208,6 +232,7 @@ class Frame(CxxPointer):
 
     @property
     def cell(self):
+        # type: () -> UnitCell
         """
         Get a mutable reference to the :py:class:`UnitCell` of this
         :py:class:`Frame`. Any modification to the cell will be reflected in
@@ -219,6 +244,7 @@ class Frame(CxxPointer):
 
     @cell.setter
     def cell(self, cell):
+        # type: (UnitCell) -> None
         """
         Set the :py:class:`UnitCell` of this :py:class:`Frame` to ``cell``.
         """
@@ -226,6 +252,7 @@ class Frame(CxxPointer):
 
     @property
     def topology(self):
+        # type: () -> Topology
         """
         Get read-only access to the :py:class:`Topology` of this
         :py:class:`Frame`.
@@ -236,6 +263,7 @@ class Frame(CxxPointer):
 
     @topology.setter
     def topology(self, topology):
+        # type: (Topology) -> None
         """
         Set the :py:class:`Topology` of this :py:class:`Frame` to ``topology``.
         """
@@ -243,6 +271,7 @@ class Frame(CxxPointer):
 
     @property
     def step(self):
+        # type: () -> int
         """
         Get the step of this :py:class:`Frame`, i.e. the frame number in the
         trajectory.
@@ -253,10 +282,12 @@ class Frame(CxxPointer):
 
     @step.setter
     def step(self, value):
+        # type: (int) -> None
         """Set the step for this :py:class:`Frame` to the given ``value``."""
         self.ffi.chfl_frame_set_step(self.mut_ptr, c_uint64(value))
 
     def guess_bonds(self):
+        # type: () -> None
         """
         Guess the bonds, angles and dihedrals in this :py:class:`Frame`.
 
@@ -266,6 +297,7 @@ class Frame(CxxPointer):
         self.ffi.chfl_frame_guess_bonds(self.mut_ptr)
 
     def distance(self, i, j):
+        # type: (int, int) -> float
         """
         Get the distance (in Ångströms) between the atoms at indexes ``i`` and
         ``j`` in this :py:class:`Frame`, taking periodic boundary conditions
@@ -276,6 +308,7 @@ class Frame(CxxPointer):
         return distance.value
 
     def angle(self, i, j, k):
+        # type: (int, int, int) -> float
         """
         Get the angle (in radians) formed by the atoms at indexes ``i``, ``j``
         and ``k`` in this :py:class:`Frame`, taking periodic boundary conditions
@@ -288,6 +321,7 @@ class Frame(CxxPointer):
         return angle.value
 
     def dihedral(self, i, j, k, m):
+        # type: (int, int, int, int) -> float
         """
         Get the dihedral angle (in radians) formed by the atoms at indexes
         ``i``, ``j``, ``k`` and ``m`` in this :py:class:`Frame`, taking periodic
@@ -300,6 +334,7 @@ class Frame(CxxPointer):
         return dihedral.value
 
     def out_of_plane(self, i, j, k, m):
+        # type: (int, int, int, int) -> float
         """
         Get the out of plane distance (in Ångströms) formed by the atoms at
         indexes ``i``, ``j``, ``k`` and ``m`` in this :py:class:`Frame`, taking
@@ -315,10 +350,12 @@ class Frame(CxxPointer):
         return distance.value
 
     def __iter__(self):
+        # type: () -> NoReturn
         # Disable automatic iteration from __getitem__
         raise TypeError("use Frame.atoms to iterate over a frame")
 
     def __getitem__(self, name):
+        # type: (str) -> PropertyValueGet
         """
         Get a property of this frame with the given ``name``, or raise an error
         if the property does not exists.
@@ -331,6 +368,7 @@ class Frame(CxxPointer):
         return Property.from_mutable_ptr(self, ptr).get()
 
     def __setitem__(self, name, value):
+        # type: (str, PropertyValueSet) -> None
         """
         Set a property of this frame, with the given ``name`` and ``value``.
         The new value overwrite any pre-existing property with the same name.
@@ -345,15 +383,22 @@ class Frame(CxxPointer):
         )
 
     def properties_count(self):
+        # type: () -> int
         """Get the number of properties in this frame."""
         count = c_uint64()
         self.ffi.chfl_frame_properties_count(self.ptr, count)
         return count.value
 
     def list_properties(self):
+        # type: () -> List[str]
         """Get the name of all properties in this frame."""
         count = self.properties_count()
         StringArray = c_char_p * count
-        names = StringArray()
-        self.ffi.chfl_frame_list_properties(self.ptr, names, count)
-        return list(map(lambda n: n.decode("utf8"), names))
+        c_names = StringArray()
+        self.ffi.chfl_frame_list_properties(self.ptr, c_names, count)
+
+        names = []
+        for name in c_names:
+            assert name is not None
+            names.append(name.decode("utf8"))
+        return names

@@ -5,7 +5,7 @@ import copy
 import numpy as np
 
 from chemfiles import Topology, Atom, Residue, BondOrder, ChemfilesError
-from _utils import remove_warnings
+from ._utils import remove_warnings
 
 
 class TestTopology(unittest.TestCase):

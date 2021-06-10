@@ -4,6 +4,8 @@ from ctypes import c_uint64, c_bool
 from enum import IntEnum
 import numpy as np
 
+from typing import Generator, Optional, List
+
 from .utils import CxxPointer
 from .ffi import chfl_bond_order
 from .atom import Atom
@@ -38,15 +40,18 @@ class TopologyAtoms(object):
     """Proxy object to get the atoms in a topology"""
 
     def __init__(self, topology):
+        # type: (Topology) -> None
         self.topology = topology
 
     def __len__(self):
+        # type: () -> int
         """Get the current number of atoms in this :py:class:`Topology`."""
         count = c_uint64()
         self.topology.ffi.chfl_topology_atoms_count(self.topology.ptr, count)
         return count.value
 
     def __getitem__(self, index):
+        # type: (int) -> Atom
         """
         Get a reference to the :py:class:`Atom` at the given ``index`` in the
         associated :py:class:`Topology`.
@@ -62,16 +67,20 @@ class TopologyAtoms(object):
             return Atom.from_mutable_ptr(self, ptr)
 
     def __iter__(self):
+        # type: () -> Generator[Atom, None, None]
         for i in range(len(self)):
             yield self[i]
 
     def __delitem__(self, index):
+        # type: (int) -> None
         self.remove(index)
 
     def __repr__(self):
+        # type: () -> str
         return "[" + ", ".join([atom.__repr__() for atom in self]) + "]"
 
     def remove(self, index):
+        # type: (int) -> None
         """
         Remove the :py:class:`Atom` at the given ``index`` from the associated
         :py:class:`Topology`.
@@ -82,6 +91,7 @@ class TopologyAtoms(object):
         self.topology.ffi.chfl_topology_remove(self.topology.mut_ptr, c_uint64(index))
 
     def append(self, atom):
+        # type: (Atom) -> None
         """
         Add a copy of the :py:class:`Atom` ``atom`` at the end of this
         :py:class:`Topology`.
@@ -93,15 +103,18 @@ class TopologyResidues(object):
     """Proxy object to get the residues in a topology"""
 
     def __init__(self, topology):
+        # type: (Topology) -> None
         self.topology = topology
 
     def __len__(self):
+        # type: () -> int
         """Get the current number of residues in this :py:class:`Topology`."""
         count = c_uint64()
         self.topology.ffi.chfl_topology_residues_count(self.topology.ptr, count)
         return count.value
 
     def __getitem__(self, index):
+        # type: (int) -> Residue
         """
         Get read-only access to the :py:class:`Residue` at the given ``index``
         from the associated :py:class:`Topology`. The residue index in the
@@ -118,13 +131,16 @@ class TopologyResidues(object):
             return Residue.from_const_ptr(self, ptr)
 
     def __iter__(self):
+        # type: () -> Generator[Residue, None, None]
         for i in range(len(self)):
             yield self[i]
 
     def __repr__(self):
+        # type: () -> str
         return "[" + ", ".join([residue.__repr__() for residue in self]) + "]"
 
     def append(self, residue):
+        # type: (Residue) -> None
         """
         Add the :py:class:`Residue` ``residue`` to this :py:class:`Topology`.
 
@@ -142,28 +158,33 @@ class Topology(CxxPointer):
     """
 
     def __init__(self):
+        # type: () -> None
         """Create a new empty :py:class:`Topology`."""
         super(Topology, self).__init__(self.ffi.chfl_topology(), is_const=False)
 
     def __copy__(self):
+        # type: () -> Topology
         return Topology.from_mutable_ptr(None, self.ffi.chfl_topology_copy(self.ptr))
 
     def __repr__(self):
+        # type: () -> str
         return "Topology with {} atoms".format(len(self.atoms))
 
     @property
     def atoms(self):
+        # type: () -> TopologyAtoms
         # late import to break circular dependency
         from .frame import FrameAtoms
 
         # if the topology comes from a frame, allow accessing atoms as
         # frame.topology.atoms anyway
-        if self._CxxPointer__is_const:
-            return FrameAtoms(self._CxxPointer__origin)
+        if self._CxxPointer__is_const:  # type: ignore
+            return FrameAtoms(self._CxxPointer__origin)  # type: ignore
         else:
             return TopologyAtoms(self)
 
     def resize(self, count):
+        # type: (int) -> None
         """
         Resize this :py:class:`Topology` to contain ``count`` atoms. If the
         new number of atoms is bigger than the current number, new atoms will
@@ -175,9 +196,11 @@ class Topology(CxxPointer):
 
     @property
     def residues(self):
+        # type: () -> TopologyResidues
         return TopologyResidues(self)
 
     def residue_for_atom(self, index):
+        # type: (int) -> Optional[Residue]
         """
         Get read-only access to the :py:class:`Residue` containing the atom at
         the given ``index`` from this :py:class:`Topology`; or ``None`` if the
@@ -194,6 +217,7 @@ class Topology(CxxPointer):
             return None
 
     def residues_linked(self, first, second):
+        # type: (Residue, Residue) -> bool
         """
         Check if the two :py:class:`Residue` ``first`` and ``second`` from this
         :py:class:`Topology` are linked together, *i.e.* if there is a bond
@@ -204,24 +228,28 @@ class Topology(CxxPointer):
         return linked.value
 
     def bonds_count(self):
+        # type: () -> int
         """Get the number of bonds in this :py:class:`Topology`."""
         bonds = c_uint64()
         self.ffi.chfl_topology_bonds_count(self.ptr, bonds)
         return bonds.value
 
     def angles_count(self):
+        # type: () -> int
         """Get the number of angles in this :py:class:`Topology`."""
         angles = c_uint64()
         self.ffi.chfl_topology_angles_count(self.ptr, angles)
         return angles.value
 
     def dihedrals_count(self):
+        # type: () -> int
         """Get the number of dihedral angles in this :py:class:`Topology`."""
         dihedrals = c_uint64()
         self.ffi.chfl_topology_dihedrals_count(self.ptr, dihedrals)
         return dihedrals.value
 
     def impropers_count(self):
+        # type: () -> int
         """Get the number of improper angles in this :py:class:`Topology`."""
         impropers = c_uint64()
         self.ffi.chfl_topology_impropers_count(self.ptr, impropers)
@@ -229,6 +257,7 @@ class Topology(CxxPointer):
 
     @property
     def bonds(self):
+        # type: () -> np.ndarray
         """Get the list of bonds in this :py:class:`Topology`."""
         count = self.bonds_count()
         bonds = np.zeros((count, 2), np.uint64)
@@ -236,6 +265,7 @@ class Topology(CxxPointer):
         return bonds
 
     def bonds_order(self, i, j):
+        # type: (int, int) -> BondOrder
         """
         Get the bonds order corresponding to the bond between atoms i and j
         """
@@ -245,6 +275,7 @@ class Topology(CxxPointer):
 
     @property
     def bonds_orders(self):
+        # type: () -> List[BondOrder]
         """
         Get the list of bonds order for each bond in this :py:class:`Topology`.
         """
@@ -255,6 +286,7 @@ class Topology(CxxPointer):
 
     @property
     def angles(self):
+        # type: () -> np.ndarray
         """Get the list of angles in this :py:class:`Topology`."""
         count = self.angles_count()
         angles = np.zeros((count, 3), np.uint64)
@@ -263,6 +295,7 @@ class Topology(CxxPointer):
 
     @property
     def dihedrals(self):
+        # type: () -> np.ndarray
         """Get the list of dihedral angles in this :py:class:`Topology`."""
         count = self.dihedrals_count()
         dihedrals = np.zeros((count, 4), np.uint64)
@@ -271,6 +304,7 @@ class Topology(CxxPointer):
 
     @property
     def impropers(self):
+        # type: () -> np.ndarray
         """Get the list of improper angles in this :py:class:`Topology`."""
         count = self.impropers_count()
         impropers = np.zeros((count, 4), np.uint64)
@@ -278,6 +312,7 @@ class Topology(CxxPointer):
         return impropers
 
     def add_bond(self, i, j, order=None):
+        # type: (int, int, Optional[BondOrder]) -> None
         """
         Add a bond between the atoms at indexes ``i`` and ``j`` in this
         :py:class:`Topology`, optionally setting the bond ``order``.
@@ -290,6 +325,7 @@ class Topology(CxxPointer):
             )
 
     def remove_bond(self, i, j):
+        # type: (int, int) -> None
         """
         Remove any existing bond between the atoms at indexes ``i`` and ``j``
         in this :py:class:`Topology`.
@@ -299,6 +335,7 @@ class Topology(CxxPointer):
         self.ffi.chfl_topology_remove_bond(self.mut_ptr, c_uint64(i), c_uint64(j))
 
     def clear_bonds(self):
+        # type: () -> None
         """
         Remove all existing bonds, angles, dihedral angles and improper dihedral
         angles in this topology.

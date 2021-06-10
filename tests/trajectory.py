@@ -7,7 +7,7 @@ import os
 from chemfiles import Trajectory, MemoryTrajectory, Topology, Frame, UnitCell, Atom
 from chemfiles import ChemfilesError
 
-from _utils import remove_warnings
+from ._utils import remove_warnings
 
 EXPECTED_XYZ_TRAJECTORY = """4
 Properties=species:S:1:pos:R:3
@@ -19,6 +19,7 @@ X 1 2 3
 
 
 def get_data_path(data):
+    # type: (str) -> str
     root = os.path.dirname(__file__)
     return os.path.join(root, "data", data)
 
