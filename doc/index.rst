@@ -10,22 +10,32 @@ This interface uses Numpy, and is compatible with Python 2.7 and 3.4+, and Numpy
 Installation
 ^^^^^^^^^^^^
 
-Pre-built binaries
-------------------
+Pre-compiled packages
+---------------------
 
-The easiest way to install this interface is to use the the `conda`_ package
-manager. It is part of the Anaconda Python distribution, and can be installed
-separatly using the Miniconda distribution. The command to install the chemfiles
-Python module with conda is:
-
-.. _conda: http://conda.pydata.org/docs/
+Chemfiles is available as pre-compiled packages for the three main operating
+systems, both on `PyPI`_ and `conda`_. You can install these pre-compiled
+packages using
 
 .. code-block:: bash
 
+    # if you use pip
+    pip install chemfiles
+
+    # if you use conda
     conda install -c conda-forge chemfiles
 
-Build from sources
-------------------
+In case there is no pre-compiled wheel for your platform available (currently 32
+and 64-bit x86/Intel CPU on Linux and Windows are supported, as well as macOS
+with Intel CPU); then the ``pip`` installation will try to build the latest
+release from source on your machine. In this case, you will need to have a C++
+compiler installed, as well as CMake.
+
+.. _conda: https://conda.pydata.org/docs/
+.. _PyPI: https://pypi.org/
+
+Build from sources -- development version
+-----------------------------------------
 
 You can also install this python module from sources if you have all the
 `dependencies`_ of the C++ library installed on your computer.
