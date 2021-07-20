@@ -2,10 +2,13 @@
 from wheel.bdist_wheel import bdist_wheel
 from skbuild import setup
 
+import site
 import sys
 import os
 import re
 
+# workaround https://github.com/pypa/pip/issues/7953
+site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 
 # Read the version from chemfiles/__init__.py without importing chemfiles
 __version__ = re.search(
