@@ -155,6 +155,11 @@ def set_interface(c_lib):
     c_lib.chfl_formats_list.restype = chfl_status
     c_lib.chfl_formats_list.errcheck = _check_return_code
 
+    # Function "chfl_guess_format", at misc.h:93
+    c_lib.chfl_guess_format.argtypes = [c_char_p, c_char_p, c_uint64]
+    c_lib.chfl_guess_format.restype = chfl_status
+    c_lib.chfl_guess_format.errcheck = _check_return_code
+
     # Function "chfl_property_bool", at property.h:37
     c_lib.chfl_property_bool.argtypes = [c_bool]
     c_lib.chfl_property_bool.restype = POINTER(CHFL_PROPERTY)

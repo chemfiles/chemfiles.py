@@ -1,11 +1,8 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
 import warnings
-import sys
 
-import ctypes
-from ctypes import util
-from ctypes import c_uint64, POINTER
+from ctypes import c_uint64, POINTER, create_string_buffer
 
 from .clib import _get_c_library
 
@@ -154,10 +151,10 @@ _CURRENT_CALLBACK = None
 
 def set_warnings_callback(function):
     """
-    Call `function` on every warning event. The callback should take a string
+    Call ``function`` on every warning event. The callback should take a string
     message and return nothing.
 
-    By default, warnings are send to python `warnings` module.
+    By default, warnings are send to python ``warnings`` module.
     """
     from .ffi import chfl_warning_callback
 
@@ -178,9 +175,9 @@ def add_configuration(path):
     """
     Read configuration data from the file at ``path``.
 
-    By default, chemfiles reads configuration from any file name `.chemfilesrc`
-    in the current directory or any parent directory. This function can be used
-    to add data from another configuration file.
+    By default, chemfiles reads configuration from any file named
+    ``.chemfilesrc`` in the current directory or any parent directory. This
+    function can be used to add data from another configuration file.
 
     This function will fail if there is no file at ``path``, or if the file is
     incorrectly formatted. Data from the new configuration file will overwrite
@@ -205,3 +202,26 @@ def _set_default_warning_callback():
         # adaptor => C++ code => Python binding => user code
         lambda message: warnings.warn(message, ChemfilesWarning, stacklevel=4)
     )
+
+
+def guess_format(path):
+    """
+    Get the format that chemfiles would use to read a file at the given
+    ``path``.
+
+    The format is mostly guessed from the path extension, chemfiles only tries
+    to read the file to distinguish between CIF and mmCIF files. Opening the
+    file using the returned format string might still fail. For example, it will
+    fail if the file is not actually formatted according to the guessed format;
+    or the format/compression combination is not supported (e.g. ``XTC / GZ``
+    will not work since the XTC reader does not support compressed files).
+
+    The returned format is represented in a way compatible with the various
+    ``Trajectory`` constructors, i.e. ``"<format name> [/ <compression>]"``,
+    where compression is optional.
+    """
+    lib = _get_c_library()
+
+    buffer = create_string_buffer(b"\0", 128)
+    lib.chfl_guess_format(path.encode("utf8"), buffer, 128)
+    return buffer.value.decode("utf8")
