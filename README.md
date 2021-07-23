@@ -1,7 +1,6 @@
 # Python binding for the chemfiles library
 
-[![Build Status](https://travis-ci.org/chemfiles/chemfiles.py.svg?branch=master)](https://travis-ci.org/chemfiles/chemfiles.py)
-[![Build status](https://ci.appveyor.com/api/projects/status/hvkwj8rf59q5jyeg?svg=true)](https://ci.appveyor.com/project/Luthaf/chemfiles-py)
+[![Build Status](https://github.com/chemfiles/chemfiles.py/actions/workflows/tests.yml/badge.svg)](https://github.com/chemfiles/chemfiles.py/actions/workflows/tests.yml)
 [![Code coverage](http://codecov.io/github/chemfiles/chemfiles.py/coverage.svg?branch=master)](http://codecov.io/github/chemfiles/chemfiles.py?branch=master)
 [![Documentation](https://img.shields.io/badge/docs-latest-brightgreen.svg)](http://chemfiles.github.io/chemfiles.py/)
 
@@ -55,7 +54,7 @@ tox
 ## Usage example
 
 Here is a simple usage example for the `chemfiles` module. Please see the
-`examples` folder for other examples.
+`examples` folder for more examples.
 
 ```python
 from chemfiles import Trajectory, Frame
@@ -63,7 +62,7 @@ from chemfiles import Trajectory, Frame
 trajectory = Trajectory("filename.xyz")
 frame = trajectory.read()
 
-print("There are {} atoms in the frame".format(frame.natoms()))
+print(f"There are {len(frame.atoms)} atoms in the frame")
 positions = frame.positions()
 
 # Do awesome things with the positions here !
