@@ -16,7 +16,6 @@ fi
 
 rm -rf dist/
 ./scripts/clean.sh
-mkdir -p dist
 
 # make source distribution
 python setup.py sdist

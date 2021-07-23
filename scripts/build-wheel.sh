@@ -7,6 +7,8 @@
 
 set -xe
 
+export CHFL_PY_INTERNAL_CHEMFILES=1
+
 clean_build() {
     # this can not use clean.sh because we do not want to remove the dist folder
     find . -name "*.pyc" -delete
