@@ -4,6 +4,7 @@ set -ex
 
 find . -name "*.pyc" -delete
 find . -name "__pycache__" | xargs rm -rf
+find . -name ".mypy_cache" | xargs rm -rf
 
 rm -rf .tox
 rm -rf _skbuild
