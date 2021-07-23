@@ -18,6 +18,12 @@ class RemoveChemfilesWarnings(object):
 remove_warnings = RemoveChemfilesWarnings()
 
 
+class TestVersion(unittest.TestCase):
+    def test_version(self):
+        version = chemfiles.clib._get_c_library().chfl_version()
+        self.assertEqual(chemfiles.__version__, version.decode("utf8"))
+
+
 class TestErrors(unittest.TestCase):
     def test_last_error(self):
         chemfiles.misc._clear_errors()
@@ -99,6 +105,12 @@ class TestFormatList(unittest.TestCase):
         self.assertEqual(xyz.memory, True)
         self.assertEqual(xyz.atoms, True)
         self.assertEqual(xyz.bonds, False)
+
+
+class TestGuessFormat(unittest.TestCase):
+    def test_guess_format(self):
+        self.assertEqual(chemfiles.guess_format("test.xtc.gz"), "XTC / GZ")
+        self.assertEqual(chemfiles.guess_format("test.nc"), "Amber NetCDF")
 
 
 if __name__ == "__main__":
