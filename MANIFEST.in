@@ -5,4 +5,3 @@ prune lib/doc
 include CMakeLists.txt
 include README.md
 include LICENSE
-global-exclude *.pyc
