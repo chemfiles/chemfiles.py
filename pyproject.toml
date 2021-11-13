@@ -18,7 +18,7 @@ passenv = LIB INCLUDE LIBPATH
 setenv =
     CHFL_PY_INTERNAL_CHEMFILES = 1
 commands =
-    pip install -e .
+    pip install -e . --verbose
     coverage run -m unittest discover -s tests -p "*.py"
     coverage xml --include="chemfiles/*" -o .tox/coverage.xml
 deps =
