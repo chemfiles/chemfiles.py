@@ -12,4 +12,4 @@ from .trajectory import Trajectory, MemoryTrajectory
 from .selection import Selection
 from .property import Property
 
-__version__ = "0.10.1"
+__version__ = "0.10.2"
