@@ -32,9 +32,15 @@ if(${chemfiles_FOUND})
     # external library.
     get_target_property(CHEMFILES_FULL_LOCATION chemfiles LOCATION)
     get_target_property(CHEMFILES_SONAME chemfiles IMPORTED_SONAME)
-    get_filename_component(CHEMFILES_SOLINK ${CHEMFILES_SONAME} NAME)
-    get_filename_component(CHEMFILES_DIR ${CHEMFILES_FULL_LOCATION} DIRECTORY)
-    set(CHEMFILES_LOCATION ${CHEMFILES_DIR}/${CHEMFILES_SOLINK})
+    if(${CHEMFILES_SONAME})
+        get_filename_component(CHEMFILES_SOLINK ${CHEMFILES_SONAME} NAME)
+        get_filename_component(CHEMFILES_DIR ${CHEMFILES_FULL_LOCATION} DIRECTORY)
+        set(CHEMFILES_LOCATION ${CHEMFILES_DIR}/${CHEMFILES_SOLINK})
+    else()
+        # if chemfiles does not define a SONAME (chemfiles <0.10.2 or on windows)
+        # then use the full path
+        set(CHEMFILES_LOCATION ${CHEMFILES_FULL_LOCATION})
+    endif()
 
     if (EXISTS ${CHEMFILES_LOCATION})
         message(STATUS "Using external chemfiles ${CHEMFILES_VERSION} at ${CHEMFILES_LOCATION}")
