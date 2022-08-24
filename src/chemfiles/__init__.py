@@ -1,6 +1,3 @@
-# -*- coding=utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 from .atom import Atom
 from .cell import CellShape, UnitCell
 from .frame import Frame

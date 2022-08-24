@@ -14,4 +14,4 @@ for i in range(len(frame.atoms)):
 
 print("Atoms with x < 5: ")
 for i in less_than_five:
-    print("  - {}".format(i))
+    print(f"  - {i}")

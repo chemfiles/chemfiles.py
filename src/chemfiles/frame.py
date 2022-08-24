@@ -1,6 +1,3 @@
-# -*- coding=utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 from ctypes import POINTER, c_bool, c_char_p, c_double, c_uint64
 
 import numpy as np
@@ -11,7 +8,7 @@ from .cell import UnitCell
 from .misc import ChemfilesError
 from .property import Property
 from .topology import Topology
-from .utils import CxxPointer, string_type
+from .utils import CxxPointer
 
 
 class FrameAtoms(object):
@@ -32,9 +29,7 @@ class FrameAtoms(object):
         associated :py:class:`Frame`.
         """
         if index >= len(self):
-            raise IndexError(
-                "atom index ({}) out of range for this frame".format(index)
-            )
+            raise IndexError(f"atom index ({index}) out of range for this frame")
         else:
             ptr = self.frame.ffi.chfl_atom_from_frame(
                 self.frame.mut_ptr, c_uint64(index)
@@ -68,7 +63,7 @@ class Frame(CxxPointer):
         return Frame.from_mutable_ptr(None, self.ffi.chfl_frame_copy(self.ptr))
 
     def __repr__(self):
-        return "Frame with {} atoms".format(len(self.atoms))
+        return f"Frame with {len(self.atoms)} atoms"
 
     @property
     def atoms(self):
@@ -325,10 +320,9 @@ class Frame(CxxPointer):
         Get a property of this frame with the given ``name``, or raise an error
         if the property does not exists.
         """
-        if not isinstance(name, string_type):
-            raise ChemfilesError(
-                "Invalid type {} for a frame property name".format(type(name))
-            )
+        if not isinstance(name, str):
+            raise ChemfilesError(f"Invalid type {type(name)} for a frame property name")
+
         ptr = self.ffi.chfl_frame_get_property(self.ptr, name.encode("utf8"))
         return Property.from_mutable_ptr(self, ptr).get()
 
@@ -337,10 +331,9 @@ class Frame(CxxPointer):
         Set a property of this frame, with the given ``name`` and ``value``.
         The new value overwrite any pre-existing property with the same name.
         """
-        if not isinstance(name, string_type):
-            raise ChemfilesError(
-                "Invalid type {} for a frame property name".format(type(name))
-            )
+        if not isinstance(name, str):
+            raise ChemfilesError(f"Invalid type {type(name)} for a frame property name")
+
         property = Property(value)
         self.ffi.chfl_frame_set_property(
             self.mut_ptr, name.encode("utf8"), property.ptr

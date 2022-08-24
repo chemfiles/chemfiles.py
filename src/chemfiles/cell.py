@@ -1,6 +1,3 @@
-# -*- coding=utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 from ctypes import ARRAY, c_double
 from enum import IntEnum
 
@@ -63,9 +60,7 @@ class UnitCell(CxxPointer):
         else:
             if lengths.shape != (3, 3):
                 raise ChemfilesError(
-                    "expected the cell matrix to have 3x3 shape, got {}".format(
-                        lengths.shape
-                    )
+                    f"expected the cell matrix to have 3x3 shape, got {lengths.shape}"
                 )
             matrix = ARRAY(chfl_vector3d, (3))()
             matrix[0][0] = lengths[0, 0]

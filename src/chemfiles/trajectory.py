@@ -1,20 +1,8 @@
-# -*- coding=utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
-import sys
 from ctypes import c_char_p, c_uint64
 
 from .frame import Frame, Topology
 from .misc import ChemfilesError
 from .utils import CxxPointer, _call_with_growing_buffer
-
-# Python 2 compatibility
-if sys.hexversion >= 0x03000000:
-    unicode_string = str
-    bytes_string = bytes
-else:
-    unicode_string = unicode  # noqa
-    bytes_string = str
 
 
 class BaseTrajectory(CxxPointer):
@@ -156,9 +144,7 @@ class Trajectory(BaseTrajectory):
         super(Trajectory, self).__init__(ptr)
 
     def __repr__(self):
-        return "Trajectory('{}', '{}', '{}')".format(
-            self.path, self.__mode, self.__format
-        )
+        return f"Trajectory('{self.path}', '{self.__mode}', '{self.__format}')"
 
 
 class MemoryTrajectory(BaseTrajectory):
@@ -185,9 +171,9 @@ class MemoryTrajectory(BaseTrajectory):
             )
 
         if mode == "r":
-            if isinstance(data, unicode_string):
+            if isinstance(data, str):
                 data = data.encode("utf8")
-            elif not isinstance(data, bytes_string):
+            elif not isinstance(data, bytes):
                 raise ChemfilesError("the 'data' parameter must be a string")
 
             ptr = self.ffi.chfl_trajectory_memory_reader(
@@ -196,14 +182,12 @@ class MemoryTrajectory(BaseTrajectory):
         elif mode == "w":
             ptr = self.ffi.chfl_trajectory_memory_writer(format.encode("utf8"))
         else:
-            raise ChemfilesError(
-                "invalid mode '{}' passed to MemoryTrajectory".format(mode)
-            )
+            raise ChemfilesError(f"invalid mode '{mode}' passed to MemoryTrajectory")
 
         super(MemoryTrajectory, self).__init__(ptr)
 
     def __repr__(self):
-        return "MemoryTrajectory({}', '{}')".format(self.__mode, self.__format)
+        return f"MemoryTrajectory({self.__mode}', '{self.__format}')"
 
     def buffer(self):
         """

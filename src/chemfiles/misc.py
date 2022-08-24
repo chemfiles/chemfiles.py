@@ -1,6 +1,3 @@
-# -*- coding=utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 import warnings
 from ctypes import POINTER, c_uint64, create_string_buffer
 
@@ -82,43 +79,28 @@ class FormatMetadata:
         self.residues = c_format_metadata.residues
 
     def __repr__(self):
-        return """
-FormatMetadata for {name}
--------------------{name_underline}
-{description}
+        return f"""
+FormatMetadata for {self.name}
+-------------------{"-" * len(self.name)}
+{self.description}
 
-name      = {name}
-extension = {extension}
-reference = {reference}
+name      = {self.name}
+extension = {self.extension}
+reference = {self.reference}
 
 Capacities:
 -----------
 
-read        = {read}
-write       = {write}
-memory      = {memory}
-positions   = {positions}
-velocities  = {velocities}
-unit_cell   = {unit_cell}
-atoms       = {atoms}
-bonds       = {bonds}
-residues    = {residues}
-""".format(
-            name=self.name,
-            name_underline="-" * len(self.name),
-            description=self.description,
-            extension=self.extension,
-            reference=self.reference,
-            read=self.read,
-            write=self.write,
-            memory=self.memory,
-            positions=self.positions,
-            velocities=self.velocities,
-            unit_cell=self.unit_cell,
-            atoms=self.atoms,
-            bonds=self.bonds,
-            residues=self.residues,
-        )
+read        = {self.read}
+write       = {self.write}
+memory      = {self.memory}
+positions   = {self.positions}
+velocities  = {self.velocities}
+unit_cell   = {self.unit_cell}
+atoms       = {self.atoms}
+bonds       = {self.bonds}
+residues    = {self.residues}
+"""
 
 
 def formats_list():
@@ -162,7 +144,7 @@ def set_warnings_callback(function):
         try:
             function(message.decode("utf8"))
         except Exception as e:
-            message = "exception raised in warning callback: {}".format(e)
+            message = f"exception raised in warning callback: {e}"
             warnings.warn(message, ChemfilesWarning)
 
     global _CURRENT_CALLBACK
