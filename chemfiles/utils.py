@@ -1,11 +1,11 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
+
 import sys
-from ctypes import create_string_buffer, c_uint64
+from ctypes import c_uint64, create_string_buffer
 
 from ._c_lib import _get_c_library
 from .misc import ChemfilesError, _last_error
-
 
 if sys.version_info >= (3, 0):
     string_type = str

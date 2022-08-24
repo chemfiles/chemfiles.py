@@ -1,11 +1,13 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_bool, c_int64, c_uint64, c_char_p
+
+from ctypes import c_bool, c_char_p, c_int64, c_uint64
+
 import numpy as np
 
-from .utils import CxxPointer, _call_with_growing_buffer, string_type
 from .misc import ChemfilesError
 from .property import Property
+from .utils import CxxPointer, _call_with_growing_buffer, string_type
 
 
 class ResidueAtoms(object):

@@ -1,11 +1,13 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import unittest
-import copy
-import numpy as np
 
-from chemfiles import Residue, ChemfilesError
+import copy
+import unittest
+
+import numpy as np
 from _utils import remove_warnings
+
+from chemfiles import ChemfilesError, Residue
 
 
 class TestResidue(unittest.TestCase):

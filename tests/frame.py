@@ -1,13 +1,23 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import unittest
+
 import copy
 import math
-import numpy as np
+import unittest
 
-from chemfiles import Frame, UnitCell, Topology, Atom, Residue, ChemfilesError
-from chemfiles import BondOrder, CellShape
+import numpy as np
 from _utils import remove_warnings
+
+from chemfiles import (
+    Atom,
+    BondOrder,
+    CellShape,
+    ChemfilesError,
+    Frame,
+    Residue,
+    Topology,
+    UnitCell,
+)
 
 
 class TestFrame(unittest.TestCase):

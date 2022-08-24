@@ -1,13 +1,21 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import unittest
-import numpy as np
+
 import os
+import unittest
 
-from chemfiles import Trajectory, MemoryTrajectory, Topology, Frame, UnitCell, Atom
-from chemfiles import ChemfilesError
-
+import numpy as np
 from _utils import remove_warnings
+
+from chemfiles import (
+    Atom,
+    ChemfilesError,
+    Frame,
+    MemoryTrajectory,
+    Topology,
+    Trajectory,
+    UnitCell,
+)
 
 EXPECTED_XYZ_TRAJECTORY = """4
 Properties=species:S:1:pos:R:3

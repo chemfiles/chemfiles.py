@@ -1,11 +1,12 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_uint64, c_char_p
-import sys
 
-from .utils import CxxPointer, _call_with_growing_buffer
+import sys
+from ctypes import c_char_p, c_uint64
+
 from .frame import Frame, Topology
 from .misc import ChemfilesError
+from .utils import CxxPointer, _call_with_growing_buffer
 
 # Python 2 compatibility
 if sys.hexversion >= 0x03000000:

@@ -1,15 +1,17 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import numpy as np
-from ctypes import c_uint64, c_bool, c_double, c_char_p, POINTER
 
-from .utils import CxxPointer, string_type
-from .misc import ChemfilesError
-from ._c_api import chfl_vector3d, chfl_bond_order
+from ctypes import POINTER, c_bool, c_char_p, c_double, c_uint64
+
+import numpy as np
+
+from ._c_api import chfl_bond_order, chfl_vector3d
 from .atom import Atom
-from .topology import Topology
 from .cell import UnitCell
+from .misc import ChemfilesError
 from .property import Property
+from .topology import Topology
+from .utils import CxxPointer, string_type
 
 
 class FrameAtoms(object):

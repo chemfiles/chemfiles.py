@@ -1,10 +1,11 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_double, c_uint64, c_char_p
 
-from .utils import CxxPointer, _call_with_growing_buffer, string_type
+from ctypes import c_char_p, c_double, c_uint64
+
 from .misc import ChemfilesError
 from .property import Property
+from .utils import CxxPointer, _call_with_growing_buffer, string_type
 
 
 class Atom(CxxPointer):

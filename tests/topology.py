@@ -1,11 +1,13 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import unittest
-import copy
-import numpy as np
 
-from chemfiles import Topology, Atom, Residue, BondOrder, ChemfilesError
+import copy
+import unittest
+
+import numpy as np
 from _utils import remove_warnings
+
+from chemfiles import Atom, BondOrder, ChemfilesError, Residue, Topology
 
 
 class TestTopology(unittest.TestCase):
