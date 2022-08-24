@@ -4,8 +4,8 @@ Check that all the functions defined in the C API are
 effectively used in the chemfiles binding.
 """
 import os
-import sys
 import re
+import sys
 
 IGNORED = ["chfl_version", "chfl_trajectory_open"]
 ERROR = False
@@ -20,7 +20,7 @@ def error(message):
 
 def functions_list():
     functions = []
-    with open(os.path.join(ROOT, "chemfiles", "ffi.py")) as fd:
+    with open(os.path.join(ROOT, "src", "chemfiles", "_c_api.py")) as fd:
         for line in fd:
             line = line.strip()
             if line.startswith("# Function"):
@@ -31,9 +31,9 @@ def functions_list():
 
 def read_all_binding_functions():
     binding_functions = set()
-    for (dirpath, _, paths) in os.walk(os.path.join(ROOT, "chemfiles")):
+    for (dirpath, _, paths) in os.walk(os.path.join(ROOT, "src", "chemfiles")):
         for path in paths:
-            if path != "ffi.py" and path.endswith(".py"):
+            if path != "_c_api.py" and path.endswith(".py"):
                 with open(os.path.join(ROOT, dirpath, path)) as fd:
                     file_functions = re.findall(r"(chfl_[a-z A-Z 0-9 _]*)\(", fd.read())
                     binding_functions.update(file_functions)
