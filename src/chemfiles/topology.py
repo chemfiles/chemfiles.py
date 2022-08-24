@@ -1,6 +1,3 @@
-# -*- coding=utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 from ctypes import c_bool, c_uint64
 from enum import IntEnum
 
@@ -54,9 +51,7 @@ class TopologyAtoms(object):
         associated :py:class:`Topology`.
         """
         if index >= len(self):
-            raise IndexError(
-                "atom index ({}) out of range for this topology".format(index)
-            )
+            raise IndexError(f"atom index ({index}) out of range for this topology")
         else:
             ptr = self.topology.ffi.chfl_atom_from_topology(
                 self.topology.mut_ptr, c_uint64(index)
@@ -110,9 +105,7 @@ class TopologyResidues(object):
         topology does not necessarily match the residue id.
         """
         if index >= len(self):
-            raise IndexError(
-                "residue index ({}) out of range for this topology".format(index)
-            )
+            raise IndexError(f"residue index ({index}) out of range for this topology")
         else:
             ptr = self.topology.ffi.chfl_residue_from_topology(
                 self.topology.ptr, c_uint64(index)
@@ -151,7 +144,7 @@ class Topology(CxxPointer):
         return Topology.from_mutable_ptr(None, self.ffi.chfl_topology_copy(self.ptr))
 
     def __repr__(self):
-        return "Topology with {} atoms".format(len(self.atoms))
+        return f"Topology with {len(self.atoms)} atoms"
 
     @property
     def atoms(self):
@@ -186,9 +179,8 @@ class Topology(CxxPointer):
         atom is not part of a residue.
         """
         if index >= len(self.atoms):
-            raise IndexError(
-                "residue index ({}) out of range for this topology".format(index)
-            )
+            raise IndexError(f"residue index ({index}) out of range for this topology")
+
         ptr = self.ffi.chfl_residue_for_atom(self.ptr, c_uint64(index))
         if ptr:
             return Residue.from_const_ptr(self, ptr)

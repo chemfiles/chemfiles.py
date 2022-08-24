@@ -1,14 +1,10 @@
-# -*- coding=utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
-import sys
 from ctypes import c_bool, c_double
 
 import numpy as np
 
 from ._c_api import chfl_property_kind, chfl_vector3d
 from .misc import ChemfilesError
-from .utils import CxxPointer, _call_with_growing_buffer, string_type
+from .utils import CxxPointer, _call_with_growing_buffer
 
 
 class Property(CxxPointer):
@@ -26,16 +22,14 @@ class Property(CxxPointer):
             ptr = self.ffi.chfl_property_bool(c_bool(value))
         elif isinstance(value, (float, int)):
             ptr = self.ffi.chfl_property_double(c_double(value))
-        elif isinstance(value, string_type):
+        elif isinstance(value, str):
             ptr = self.ffi.chfl_property_string(value.encode("utf8"))
         elif _is_vector3d(value):
             value = chfl_vector3d(value[0], value[1], value[2])
             ptr = self.ffi.chfl_property_vector3d(value)
         else:
             raise ChemfilesError(
-                "can not create a Property with a value of type '{}'".format(
-                    type(value)
-                )
+                f"can not create a Property with a value of type '{type(value)}'"
             )
 
         super(Property, self).__init__(ptr, is_const=False)

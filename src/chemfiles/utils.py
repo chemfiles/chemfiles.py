@@ -1,16 +1,7 @@
-# -*- coding=utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
-import sys
 from ctypes import c_uint64, create_string_buffer
 
 from ._c_lib import _get_c_library
 from .misc import ChemfilesError, _last_error
-
-if sys.version_info >= (3, 0):
-    string_type = str
-else:
-    string_type = basestring
 
 
 class CxxPointer(object):
@@ -41,7 +32,7 @@ class CxxPointer(object):
     def __setattr__(self, key, value):
         if self.__frozen and not hasattr(self, key):
             raise TypeError(
-                "Can not add new attributes to this {}".format(self.__class__.__name__)
+                f"Can not add new attributes to this {self.__class__.__name__}"
             )
         object.__setattr__(self, key, value)
 

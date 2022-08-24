@@ -1,6 +1,3 @@
-# -*- coding=utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 from ctypes import c_uint64
 
 import numpy as np
@@ -33,7 +30,7 @@ class Selection(CxxPointer):
         return Selection.from_mutable_ptr(None, self.ffi.chfl_selection_copy(self.ptr))
 
     def __repr__(self):
-        return "Selection('{}')".format(self.string)
+        return f"Selection('{self.string}')"
 
     @property
     def size(self):

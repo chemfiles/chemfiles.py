@@ -1,11 +1,8 @@
-# -*- coding=utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 from ctypes import c_char_p, c_double, c_uint64
 
 from .misc import ChemfilesError
 from .property import Property
-from .utils import CxxPointer, _call_with_growing_buffer, string_type
+from .utils import CxxPointer, _call_with_growing_buffer
 
 
 class Atom(CxxPointer):
@@ -38,12 +35,10 @@ class Atom(CxxPointer):
         return Atom.from_mutable_ptr(None, self.ffi.chfl_atom_copy(self.ptr))
 
     def __repr__(self):
-        name = self.name
-        type = self.type
-        if type == name:
-            return "Atom('{}')".format(name)
+        if self.type == self.name:
+            return f"Atom('{self.name}')"
         else:
-            return "Atom('{}', '{}')".format(name, type)
+            return f"Atom('{self.name}', '{self.type}')"
 
     @property
     def mass(self):
@@ -150,10 +145,11 @@ class Atom(CxxPointer):
         Get a property of this atom with the given ``name``, or raise an error
         if the property does not exists.
         """
-        if not isinstance(name, string_type):
+        if not isinstance(name, str):
             raise ChemfilesError(
-                "Invalid type {} for an atomic property name".format(type(name))
+                f"Invalid type {type(name)} for an atomic property name"
             )
+
         ptr = self.ffi.chfl_atom_get_property(self.ptr, name.encode("utf8"))
         return Property.from_mutable_ptr(self, ptr).get()
 
@@ -162,10 +158,9 @@ class Atom(CxxPointer):
         Set a property of this atom, with the given ``name`` and ``value``.
         The new value overwrite any pre-existing property with the same name.
         """
-        if not isinstance(name, string_type):
-            raise ChemfilesError(
-                "invalid type {} for a property name".format(type(name))
-            )
+        if not isinstance(name, str):
+            raise ChemfilesError(f"invalid type {type(name)} for a property name")
+
         property = Property(value)
         self.ffi.chfl_atom_set_property(self.mut_ptr, name.encode("utf8"), property.ptr)
 

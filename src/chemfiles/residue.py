@@ -1,13 +1,10 @@
-# -*- coding=utf-8 -*-
-from __future__ import absolute_import, print_function, unicode_literals
-
 from ctypes import c_bool, c_char_p, c_int64, c_uint64
 
 import numpy as np
 
 from .misc import ChemfilesError
 from .property import Property
-from .utils import CxxPointer, _call_with_growing_buffer, string_type
+from .utils import CxxPointer, _call_with_growing_buffer
 
 
 class ResidueAtoms(object):
@@ -90,7 +87,7 @@ class Residue(CxxPointer):
         return Residue.from_mutable_ptr(None, self.ffi.chfl_residue_copy(self.ptr))
 
     def __repr__(self):
-        return "Residue('{}') with {} atoms".format(self.name, len(self.atoms))
+        return f"Residue('{self.name}') with {len(self.atoms)} atoms"
 
     @property
     def name(self):
@@ -120,10 +117,11 @@ class Residue(CxxPointer):
         Get a property of this residude with the given ``name``, or raise an
         error if the property does not exists.
         """
-        if not isinstance(name, string_type):
+        if not isinstance(name, str):
             raise ChemfilesError(
-                "Invalid type {} for a residue property name".format(type(name))
+                f"Invalid type {type(name)} for a residue property name"
             )
+
         ptr = self.ffi.chfl_residue_get_property(self.ptr, name.encode("utf8"))
         return Property.from_mutable_ptr(self, ptr).get()
 
@@ -132,10 +130,11 @@ class Residue(CxxPointer):
         Set a property of this residue, with the given ``name`` and ``value``.
         The new value overwrite any pre-existing property with the same name.
         """
-        if not isinstance(name, string_type):
+        if not isinstance(name, str):
             raise ChemfilesError(
-                "Invalid type {} for a residue property name".format(type(name))
+                f"Invalid type {type(name)} for a residue property name"
             )
+
         property = Property(value)
         self.ffi.chfl_residue_set_property(
             self.mut_ptr, name.encode("utf8"), property.ptr
