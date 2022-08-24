@@ -1,11 +1,12 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import unittest
-import tempfile
-import shutil
-import os
 
-from chemfiles import Trajectory, Frame, Atom
+import os
+import shutil
+import tempfile
+import unittest
+
+from chemfiles import Atom, Frame, Trajectory
 
 ROOT = os.path.dirname(__file__)
 

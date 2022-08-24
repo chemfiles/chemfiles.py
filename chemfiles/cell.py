@@ -1,11 +1,13 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_double, ARRAY
+
+from ctypes import ARRAY, c_double
 from enum import IntEnum
+
 import numpy as np
 
-from .utils import CxxPointer, ChemfilesError
 from ._c_api import chfl_cellshape, chfl_vector3d
+from .utils import ChemfilesError, CxxPointer
 
 
 class CellShape(IntEnum):

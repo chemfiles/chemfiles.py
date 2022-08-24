@@ -1,10 +1,11 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
+
 import unittest
 import warnings
 
 import chemfiles
-from chemfiles import Trajectory, ChemfilesError
+from chemfiles import ChemfilesError, Trajectory
 
 
 class RemoveChemfilesWarnings(object):

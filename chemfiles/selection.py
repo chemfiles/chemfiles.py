@@ -2,10 +2,11 @@
 from __future__ import absolute_import, print_function, unicode_literals
 
 from ctypes import c_uint64
+
 import numpy as np
 
-from .utils import CxxPointer, _call_with_growing_buffer
 from ._c_api import chfl_match
+from .utils import CxxPointer, _call_with_growing_buffer
 
 
 class Selection(CxxPointer):

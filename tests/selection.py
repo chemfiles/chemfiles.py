@@ -1,9 +1,10 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import unittest
-import copy
 
-from chemfiles import Selection, Topology, Frame, Atom
+import copy
+import unittest
+
+from chemfiles import Atom, Frame, Selection, Topology
 
 
 def testing_frame():

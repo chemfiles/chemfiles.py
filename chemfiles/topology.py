@@ -1,13 +1,15 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-from ctypes import c_uint64, c_bool
+
+from ctypes import c_bool, c_uint64
 from enum import IntEnum
+
 import numpy as np
 
-from .utils import CxxPointer
 from ._c_api import chfl_bond_order
 from .atom import Atom
 from .residue import Residue
+from .utils import CxxPointer
 
 
 class BondOrder(IntEnum):

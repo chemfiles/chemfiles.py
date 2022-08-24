@@ -1,8 +1,10 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
+
 import sys
+from ctypes import c_bool, c_double
+
 import numpy as np
-from ctypes import c_double, c_bool
 
 from ._c_api import chfl_property_kind, chfl_vector3d
 from .misc import ChemfilesError

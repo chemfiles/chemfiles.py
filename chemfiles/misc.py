@@ -1,8 +1,8 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import warnings
 
-from ctypes import c_uint64, POINTER, create_string_buffer
+import warnings
+from ctypes import POINTER, c_uint64, create_string_buffer
 
 from ._c_lib import _get_c_library
 

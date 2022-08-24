@@ -1,10 +1,12 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import unittest
+
 import copy
+import unittest
+
+from _utils import remove_warnings
 
 from chemfiles import Atom, ChemfilesError
-from _utils import remove_warnings
 
 
 class TestAtom(unittest.TestCase):

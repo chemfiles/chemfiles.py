@@ -1,11 +1,12 @@
 # -*- coding=utf-8 -*-
 from __future__ import absolute_import, print_function, unicode_literals
-import unittest
-import copy
 
-from chemfiles import UnitCell, CellShape
-from chemfiles import ChemfilesError
+import copy
+import unittest
+
 from _utils import remove_warnings
+
+from chemfiles import CellShape, ChemfilesError, UnitCell
 
 
 class TestUnitCell(unittest.TestCase):
