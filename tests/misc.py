@@ -20,7 +20,7 @@ remove_warnings = RemoveChemfilesWarnings()
 
 class TestVersion(unittest.TestCase):
     def test_version(self):
-        version = chemfiles.clib._get_c_library().chfl_version()
+        version = chemfiles._c_lib._get_c_library().chfl_version()
         self.assertEqual(chemfiles.__version__, version.decode("utf8"))
 
 

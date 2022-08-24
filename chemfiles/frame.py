@@ -5,7 +5,7 @@ from ctypes import c_uint64, c_bool, c_double, c_char_p, POINTER
 
 from .utils import CxxPointer, string_type
 from .misc import ChemfilesError
-from .ffi import chfl_vector3d, chfl_bond_order
+from ._c_api import chfl_vector3d, chfl_bond_order
 from .atom import Atom
 from .topology import Topology
 from .cell import UnitCell

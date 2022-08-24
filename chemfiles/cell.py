@@ -5,7 +5,7 @@ from enum import IntEnum
 import numpy as np
 
 from .utils import CxxPointer, ChemfilesError
-from .ffi import chfl_cellshape, chfl_vector3d
+from ._c_api import chfl_cellshape, chfl_vector3d
 
 
 class CellShape(IntEnum):

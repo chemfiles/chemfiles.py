@@ -5,7 +5,7 @@ from ctypes import c_uint64
 import numpy as np
 
 from .utils import CxxPointer, _call_with_growing_buffer
-from .ffi import chfl_match
+from ._c_api import chfl_match
 
 
 class Selection(CxxPointer):

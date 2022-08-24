@@ -4,7 +4,7 @@ import warnings
 
 from ctypes import c_uint64, POINTER, create_string_buffer
 
-from .clib import _get_c_library
+from ._c_lib import _get_c_library
 
 
 class ChemfilesWarning(UserWarning):
@@ -128,7 +128,7 @@ def formats_list():
 
     :rtype: list(FormatMetadata)
     """
-    from .ffi import chfl_format_metadata
+    from ._c_api import chfl_format_metadata
 
     lib = _get_c_library()
 
@@ -156,7 +156,7 @@ def set_warnings_callback(function):
 
     By default, warnings are send to python ``warnings`` module.
     """
-    from .ffi import chfl_warning_callback
+    from ._c_api import chfl_warning_callback
 
     def callback(message):
         try:
