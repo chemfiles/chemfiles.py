@@ -5,7 +5,7 @@ from enum import IntEnum
 import numpy as np
 
 from .utils import CxxPointer
-from .ffi import chfl_bond_order
+from ._c_api import chfl_bond_order
 from .atom import Atom
 from .residue import Residue
 

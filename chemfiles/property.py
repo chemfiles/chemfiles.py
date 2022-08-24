@@ -4,7 +4,7 @@ import sys
 import numpy as np
 from ctypes import c_double, c_bool
 
-from .ffi import chfl_property_kind, chfl_vector3d
+from ._c_api import chfl_property_kind, chfl_vector3d
 from .misc import ChemfilesError
 from .utils import CxxPointer, _call_with_growing_buffer, string_type
 

@@ -1,7 +1,7 @@
 # -* coding: utf-8 -*
 import os
 import sys
-from ctypes import cdll, c_double, POINTER
+from ctypes import POINTER, c_double, cdll
 
 try:
     from .external import EXTERNAL_CHEMFILES
@@ -18,8 +18,7 @@ class FindChemfilesLibrary(object):
             path = _lib_path()
             self._cache = cdll.LoadLibrary(path)
 
-            from .ffi import set_interface
-            from .ffi import CHFL_FRAME, CHFL_ATOM, chfl_vector3d
+            from ._c_api import CHFL_ATOM, CHFL_FRAME, chfl_vector3d, set_interface
 
             set_interface(self._cache)
             # We update the arguments here, as ctypes can not pass a NULL value
@@ -60,8 +59,8 @@ def _lib_path():
 
 
 def _check_dll(path):
-    import struct
     import platform
+    import struct
 
     IMAGE_FILE_MACHINE_I386 = 332
     IMAGE_FILE_MACHINE_AMD64 = 34404
