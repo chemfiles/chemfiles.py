@@ -13,11 +13,14 @@ clean_build() {
     # this can not use clean.sh because we do not want to remove the dist folder
     find . -name "*.pyc" -delete
     find . -name "__pycache__" | xargs rm -rf
+    find . -name ".mypy_cache" | xargs rm -rf
 
     rm -rf .tox
-    rm -rf _skbuild
+    rm -rf build
     rm -rf MANIFEST
-    rm -rf chemfiles.egg-info
+    rm -rf .coverage
+    rm -rf src/chemfiles.egg-info
+    rm -rf doc/_build
 
     rm -rf chemfiles/*.dylib
     rm -rf chemfiles/*.so
@@ -40,9 +43,9 @@ fi
 
 clean_build
 
-if [[ "$IMAGE" == "manylinux1-x64" || "$IMAGE" == "manylinux1-x86" ]]; then
+if [[ "$IMAGE" == "manylinux2014-x64" ]]; then
     WHEELS=/tmp/wheels
-    /opt/python/cp36-cp36m/bin/python -m pip wheel dist/*.tar.gz -w ${WHEELS}
+    /opt/python/cp38-cp38/bin/python -m pip wheel dist/*.tar.gz -w ${WHEELS} --verbose
     # Make sure wheels get the manylinux tag
     auditwheel repair -w ${WHEELS} ${WHEELS}/chemfiles-*.whl
     mv -f ${WHEELS}/chemfiles-*manylinux*.whl dist
@@ -56,7 +59,7 @@ if [[ "$IMAGE" == "windows-static-x64" || "$IMAGE" == "windows-static-x86" ]]; t
     sudo apt update
     sudo apt install -y python3-pip
     python3 -m pip install --upgrade pip wheel setuptools
-    python3 -m pip install scikit-build
+    python3 -m pip install cmake ninja
 
     if [[ "$IMAGE" == "windows-static-x64" ]]; then
         python3 setup.py bdist_wheel --plat-name win_amd64

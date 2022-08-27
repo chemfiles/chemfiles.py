@@ -24,9 +24,9 @@ python setup.py sdist
 ./scripts/build-wheel.sh macos
 
 # Build for Linux and windows using dockcross
-for image in manylinux1-x64 manylinux1-x86 windows-static-x64 windows-static-x86
+for image in manylinux2014-x64 windows-static-x64 windows-static-x86
 do
-    dockcross -i dockcross/$image ./scripts/build-wheel.sh $image
+    lima nerdctl run --rm -v $ROOT:/work dockcross/$image ./scripts/build-wheel.sh $image
 done
 
 rm dist/numpy-*
