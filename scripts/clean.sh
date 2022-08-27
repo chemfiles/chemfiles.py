@@ -7,10 +7,12 @@ find . -name "__pycache__" | xargs rm -rf
 find . -name ".mypy_cache" | xargs rm -rf
 
 rm -rf .tox
-rm -rf _skbuild
+rm -rf build
 rm -rf dist
 rm -rf MANIFEST
-rm -rf chemfiles.egg-info
+rm -rf .coverage
+rm -rf src/chemfiles.egg-info
+rm -rf doc/_build
 
 rm -rf chemfiles/*.dylib
 rm -rf chemfiles/*.so
