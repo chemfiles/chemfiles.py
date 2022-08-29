@@ -8,6 +8,7 @@ import sys
 from setuptools import Extension, setup
 from wheel.bdist_wheel import bdist_wheel
 
+from distutils.command.build_py import build_py  # type: ignore   isort: skip
 from distutils.command.build_ext import build_ext  # type: ignore   isort: skip
 from distutils.command.install import install as distutils_install  # type: ignore   isort: skip
 
@@ -44,10 +45,8 @@ class universal_wheel(bdist_wheel):
         return ("py2.py3", "none") + tag[2:]
 
 
-class cmake_ext(build_ext):
-    """
-    Build the native library using cmake
-    """
+class cmake_configure(build_py):
+    """configure cmake to build chemfiles and generate external.py"""
 
     def run(self):
         source_dir = ROOT
@@ -80,6 +79,17 @@ class cmake_ext(build_ext):
             cwd=build_dir,
             check=True,
         )
+
+        return super().run()
+
+
+class cmake_build(build_ext):
+    """build and install chemfiles with cmake"""
+
+    def run(self):
+        source_dir = ROOT
+        build_dir = os.path.join(ROOT, "build", "cmake-build")
+
         subprocess.run(
             [CMAKE_EXECUTABLE, "--build", build_dir, "--target", "install"],
             check=True,
@@ -112,7 +122,8 @@ setup(
         Extension(name="chemfiles", sources=[]),
     ],
     cmdclass={
-        "build_ext": cmake_ext,
+        "build_py": cmake_configure,
+        "build_ext": cmake_build,
         "bdist_wheel": universal_wheel,
         # HACK: do not use the new setuptools install implementation, it tries
         # to install the package with `easy_install`, which fails to resolve the
