@@ -5,13 +5,27 @@ import site
 import subprocess
 import sys
 
-import cmake
-import ninja
 from setuptools import Extension, setup
 from wheel.bdist_wheel import bdist_wheel
 
 from distutils.command.build_ext import build_ext  # type: ignore   isort: skip
 from distutils.command.install import install as distutils_install  # type: ignore   isort: skip
+
+try:
+    import cmake
+
+    CMAKE_EXECUTABLE = os.path.join(cmake.CMAKE_BIN_DIR, "cmake")
+
+except ImportError:
+    CMAKE_EXECUTABLE = "cmake"
+
+try:
+    import ninja
+
+    NINJA_EXECUTABLE = os.path.join(ninja.BIN_DIR, "ninja")
+except ImportError:
+    NINJA_EXECUTABLE = "ninja"
+
 
 # workaround https://github.com/pypa/pip/issues/7953
 site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
@@ -45,11 +59,9 @@ class cmake_ext(build_ext):
         except OSError:
             pass
 
-        cmake_executable = os.path.join(cmake.CMAKE_BIN_DIR, "cmake")
-        ninja_executable = os.path.join(ninja.BIN_DIR, "ninja")
         cmake_options = [
             "-GNinja",
-            f"-DCMAKE_MAKE_PROGRAM={ninja_executable}",
+            f"-DCMAKE_MAKE_PROGRAM={NINJA_EXECUTABLE}",
             f"-DCMAKE_INSTALL_PREFIX={install_dir}",
             "-DCMAKE_BUILD_TYPE=Release",
             "-DBUILD_SHARED_LIBS=ON",
@@ -64,12 +76,12 @@ class cmake_ext(build_ext):
         ninja_args = []
 
         subprocess.run(
-            [cmake_executable, source_dir, *cmake_options],
+            [CMAKE_EXECUTABLE, source_dir, *cmake_options],
             cwd=build_dir,
             check=True,
         )
         subprocess.run(
-            [cmake_executable, "--build", build_dir, "--target", "install"],
+            [CMAKE_EXECUTABLE, "--build", build_dir, "--target", "install"],
             check=True,
         )
 
