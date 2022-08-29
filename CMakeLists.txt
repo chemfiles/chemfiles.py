@@ -32,7 +32,7 @@ if(${chemfiles_FOUND})
     # external library.
     get_target_property(CHEMFILES_FULL_LOCATION chemfiles LOCATION)
     get_target_property(CHEMFILES_SONAME chemfiles IMPORTED_SONAME)
-    if(${CHEMFILES_SONAME})
+    if(NOT "${CHEMFILES_SONAME}" STREQUAL "CHEMFILES_SONAME-NOTFOUND")
         get_filename_component(CHEMFILES_SOLINK ${CHEMFILES_SONAME} NAME)
         get_filename_component(CHEMFILES_DIR ${CHEMFILES_FULL_LOCATION} DIRECTORY)
         set(CHEMFILES_LOCATION ${CHEMFILES_DIR}/${CHEMFILES_SOLINK})
@@ -48,7 +48,7 @@ if(${chemfiles_FOUND})
         message(FATAL_ERROR "Missing symbolic link to ${CHEMFILES_FULL_LOCATION}, expected it at ${CHEMFILES_LOCATION}")
     endif()
 
-    file(WRITE ${PROJECT_SOURCE_DIR}/chemfiles/external.py
+    file(WRITE ${PROJECT_SOURCE_DIR}/src/chemfiles/external.py
         "EXTERNAL_CHEMFILES = \"${CHEMFILES_LOCATION}\"\n"
     )
 
