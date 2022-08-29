@@ -14,7 +14,7 @@ rm -rf .coverage
 rm -rf src/chemfiles.egg-info
 rm -rf doc/_build
 
-rm -rf chemfiles/*.dylib
-rm -rf chemfiles/*.so
-rm -rf chemfiles/*.dll
-rm -rf chemfiles/external.py
+rm -rf src/chemfiles/*.dylib
+rm -rf src/chemfiles/*.so
+rm -rf src/chemfiles/*.dll
+rm -rf src/chemfiles/external.py
