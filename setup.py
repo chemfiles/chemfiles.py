@@ -69,10 +69,15 @@ class cmake_configure(build_py):
         if sys.platform.startswith("darwin"):
             cmake_options.append("-DCMAKE_OSX_DEPLOYMENT_TARGET:STRING=10.9")
 
+        # ARCHFLAGS is used by cibuildwheel to pass the requested arch to the
+        # compilers
+        ARCHFLAGS = os.environ.get("ARCHFLAGS")
+        if ARCHFLAGS is not None:
+            cmake_options.append(f"-DCMAKE_C_FLAGS={ARCHFLAGS}")
+            cmake_options.append(f"-DCMAKE_CXX_FLAGS={ARCHFLAGS}")
+
         if os.getenv("CHFL_PY_INTERNAL_CHEMFILES"):
             cmake_options.append("-DCHFL_PY_INTERNAL_CHEMFILES=ON")
-
-        ninja_args = []
 
         subprocess.run(
             [CMAKE_EXECUTABLE, source_dir, *cmake_options],
@@ -87,18 +92,12 @@ class cmake_build(build_ext):
     """build and install chemfiles with cmake"""
 
     def run(self):
-        source_dir = ROOT
         build_dir = os.path.join(ROOT, "build", "cmake-build")
 
         subprocess.run(
             [CMAKE_EXECUTABLE, "--build", build_dir, "--target", "install"],
             check=True,
         )
-
-
-install_requires = ["numpy"]
-if sys.hexversion < 0x03040000:
-    install_requires.append("enum34")
 
 
 def _get_lib_ext():
@@ -115,7 +114,6 @@ def _get_lib_ext():
 
 setup(
     version=__version__,
-    install_requires=install_requires,
     ext_modules=[
         # only declare the extension, it is built & copied as required by cmake
         # in the build_ext command
