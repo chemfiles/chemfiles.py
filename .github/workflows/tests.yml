@@ -19,11 +19,11 @@ jobs:
           - os: macos-10.15
             python-version: "3.8"
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
           submodules: true
       - name: set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: ${{ matrix.python-version }}
       - name: install dependencies
@@ -42,6 +42,8 @@ jobs:
       - name: run extra checks
         run: |
           ./scripts/check-used-functions.py
-      - uses: codecov/codecov-action@v1
+      - uses: codecov/codecov-action@v3
         with:
           file: .tox/coverage.xml
+          fail_ci_if_error: true
+          verbose: true
