@@ -15,7 +15,10 @@ skipsdist = True
 [testenv]
 ; this is required on windows to ensure the compiler finds the standard lib
 ; files (kernel32.lib, etc.) and headers
-passenv = LIB INCLUDE LIBPATH
+passenv =
+    LIB
+    INCLUDE
+    LIBPATH
 setenv =
     CHFL_PY_INTERNAL_CHEMFILES = 1
 
