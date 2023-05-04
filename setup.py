@@ -1,4 +1,3 @@
-# -*- coding=utf-8 -*-
 import os
 import re
 import site
@@ -6,27 +5,10 @@ import subprocess
 import sys
 
 from setuptools import Extension, setup
+from setuptools.command.bdist_egg import bdist_egg
+from setuptools.command.build_ext import build_ext
+from setuptools.command.build_py import build_py
 from wheel.bdist_wheel import bdist_wheel
-
-from distutils.command.build_py import build_py  # type: ignore   isort: skip
-from distutils.command.build_ext import build_ext  # type: ignore   isort: skip
-from distutils.command.install import install as distutils_install  # type: ignore   isort: skip
-
-try:
-    import cmake
-
-    CMAKE_EXECUTABLE = os.path.join(cmake.CMAKE_BIN_DIR, "cmake")
-
-except ImportError:
-    CMAKE_EXECUTABLE = "cmake"
-
-try:
-    import ninja
-
-    NINJA_EXECUTABLE = os.path.join(ninja.BIN_DIR, "ninja")
-except ImportError:
-    NINJA_EXECUTABLE = "ninja"
-
 
 # workaround https://github.com/pypa/pip/issues/7953
 site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
@@ -59,8 +41,6 @@ class cmake_configure(build_py):
             pass
 
         cmake_options = [
-            "-GNinja",
-            f"-DCMAKE_MAKE_PROGRAM={NINJA_EXECUTABLE}",
             f"-DCMAKE_INSTALL_PREFIX={install_dir}",
             "-DCMAKE_BUILD_TYPE=Release",
             "-DBUILD_SHARED_LIBS=ON",
@@ -80,7 +60,7 @@ class cmake_configure(build_py):
             cmake_options.append("-DCHFL_PY_INTERNAL_CHEMFILES=ON")
 
         subprocess.run(
-            [CMAKE_EXECUTABLE, source_dir, *cmake_options],
+            ["cmake", source_dir, *cmake_options],
             cwd=build_dir,
             check=True,
         )
@@ -95,21 +75,25 @@ class cmake_build(build_ext):
         build_dir = os.path.join(ROOT, "build", "cmake-build")
 
         subprocess.run(
-            [CMAKE_EXECUTABLE, "--build", build_dir, "--target", "install"],
+            ["cmake", "--build", build_dir, "--target", "install"],
             check=True,
         )
 
 
-def _get_lib_ext():
-    if sys.platform.startswith("win32"):
-        ext = ".dll"
-    elif sys.platform.startswith("darwin"):
-        ext = ".dylib"
-    elif sys.platform.startswith("linux"):
-        ext = ".so"
-    else:
-        raise Exception("Unknown operating system: %s" % sys.platform)
-    return ext
+class bdist_egg_disabled(bdist_egg):
+    """Disabled version of bdist_egg
+
+    Prevents setup.py install performing setuptools' default easy_install,
+    which it should never ever do.
+    """
+
+    def run(self):
+        sys.exit(
+            "Aborting implicit building of eggs. "
+            + "Use `pip install .` or `python setup.py bdist_wheel && pip "
+            + "uninstall chemfiles -y && pip install dist/chemfiles-*.whl` "
+            + "to install from source."
+        )
 
 
 setup(
@@ -123,10 +107,7 @@ setup(
         "build_py": cmake_configure,
         "build_ext": cmake_build,
         "bdist_wheel": universal_wheel,
-        # HACK: do not use the new setuptools install implementation, it tries
-        # to install the package with `easy_install`, which fails to resolve the
-        # freshly installed package and tries to load it from pypi.
-        "install": distutils_install,
+        "bdist_egg": bdist_egg if "bdist_egg" in sys.argv else bdist_egg_disabled,
     },
     exclude_package_data={
         "chemfiles": [
