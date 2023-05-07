@@ -14,4 +14,4 @@ from .selection import Selection
 from .topology import BondOrder, Topology
 from .trajectory import MemoryTrajectory, Trajectory
 
-__version__ = "0.10.3"
+__version__ = "0.10.4"
