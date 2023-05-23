@@ -2,6 +2,7 @@ recursive-include chemfiles *
 recursive-include lib *
 prune lib/tests
 prune lib/doc
+include pyproject.toml
 include CMakeLists.txt
 include README.md
 include LICENSE
