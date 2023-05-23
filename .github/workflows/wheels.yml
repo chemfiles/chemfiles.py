@@ -34,6 +34,7 @@ jobs:
           CIBW_BUILD: cp39-*
           CIBW_SKIP: cp39-musllinux* *win32
           CIBW_ARCHS_MACOS: x86_64 arm64
+          CIBW_BEFORE_BUILD: rm -rf build
 
       - uses: actions/upload-artifact@v3
         with:
