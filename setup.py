@@ -41,6 +41,7 @@ class cmake_configure(build_py):
             pass
 
         cmake_options = [
+            "-GNinja",
             f"-DCMAKE_INSTALL_PREFIX={install_dir}",
             "-DCMAKE_BUILD_TYPE=Release",
             "-DBUILD_SHARED_LIBS=ON",
@@ -75,7 +76,12 @@ class cmake_build(build_ext):
         build_dir = os.path.join(ROOT, "build", "cmake-build")
 
         subprocess.run(
-            ["cmake", "--build", build_dir, "--target", "install"],
+            ["cmake", "--build", build_dir],
+            check=True,
+        )
+
+        subprocess.run(
+            ["cmake", "--install", build_dir, "--strip"],
             check=True,
         )
 
