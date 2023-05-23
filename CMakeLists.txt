@@ -68,6 +68,12 @@ else()
 
     add_custom_target(build_chemfiles ALL)
     add_dependencies(build_chemfiles chemfiles)
+
+    # unset VERSION and SOVERSION to make sure only one copy of libchemfiles
+    # is included in the wheels
+    set_property(TARGET chemfiles PROPERTY VERSION)
+    set_property(TARGET chemfiles PROPERTY SOVERSION)
+
     install(TARGETS chemfiles
         LIBRARY DESTINATION "chemfiles"
         RUNTIME DESTINATION "chemfiles"
