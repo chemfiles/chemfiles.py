@@ -62,6 +62,12 @@ else()
         )
     endif()
 
+    if (MSVC)
+        set(CMAKE_CXX_FLAGS_RELEASE "/LTCG")
+        set(CMAKE_C_FLAGS_RELEASE "/LTCG")
+        set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "/LTCG")
+    endif()
+
     message(STATUS "Using internal chemfiles from ${CMAKE_CURRENT_SOURCE_DIR}/lib")
     set(BUILD_SHARED_LIBS ON CACHE BOOL "Build shared libraries instead of static ones" FORCE)
     add_subdirectory(lib EXCLUDE_FROM_ALL)
