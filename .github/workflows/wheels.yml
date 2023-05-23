@@ -32,7 +32,7 @@ jobs:
         run: python -m cibuildwheel --output-dir wheelhouse
         env:
           CIBW_BUILD: cp39-*
-          CIBW_SKIP: cp39-musllinux*
+          CIBW_SKIP: cp39-musllinux* *win32
           CIBW_ARCHS_MACOS: x86_64 arm64
 
       - uses: actions/upload-artifact@v3
