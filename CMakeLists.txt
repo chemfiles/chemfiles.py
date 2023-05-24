@@ -63,9 +63,9 @@ else()
     endif()
 
     if (MSVC)
-        set(CMAKE_CXX_FLAGS_RELEASE "/LTCG")
-        set(CMAKE_C_FLAGS_RELEASE "/LTCG")
-        set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "/LTCG")
+        set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /LTCG")
+        set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} /LTCG")
+        set(CMAKE_SHARED_LINKER_FLAGS_RELEASE "${CMAKE_SHARED_LINKER_FLAGS_RELEASE} /LTCG")
     endif()
 
     message(STATUS "Using internal chemfiles from ${CMAKE_CURRENT_SOURCE_DIR}/lib")
