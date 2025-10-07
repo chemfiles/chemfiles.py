@@ -33,14 +33,14 @@ class UnitCell(CxxPointer):
     and `c`; and gamma as the angle between `a` and `b`.
 
     A cell also has a matricial representation, by projecting the three base
-    vector into an orthonormal base. We choose to represent such matrix as an
-    upper triangular matrix:
+    vector into an orthonormal base. We choose to represent such matrix as a
+    lower triangular matrix, with one row per axis of the cell:
 
     .. code-block:: sh
 
-        | a_x   b_x   c_x |
-        |  0    b_y   c_y |
-        |  0     0    c_z |
+        | a_x    0     0  |
+        | b_x   b_y    0  |
+        | c_x   c_y   c_z |
     """
 
     def __init__(self, lengths, angles=(90.0, 90.0, 90.0)):
@@ -85,9 +85,7 @@ class UnitCell(CxxPointer):
         return """UnitCell(
     lengths=({:.9g}, {:.9g}, {:.9g}),
     angles=({:.7g}, {:.7g}, {:.7g})
-)""".format(
-            *(self.lengths + self.angles)
-        )
+)""".format(*(self.lengths + self.angles))
 
     @property
     def lengths(self):
@@ -133,9 +131,9 @@ class UnitCell(CxxPointer):
 
         .. code-block:: sh
 
-            | a_x   b_x   c_x |
-            |  0    b_y   c_y |
-            |  0     0    c_z |
+            | a_x    0     0  |
+            | b_x   b_y    0  |
+            | c_x   c_y   c_z |
         """
         m = ARRAY(chfl_vector3d, 3)()
         self.ffi.chfl_cell_matrix(self.ptr, m)

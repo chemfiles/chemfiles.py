@@ -1,6 +1,5 @@
 import os
 import re
-import site
 import subprocess
 import sys
 
@@ -9,9 +8,6 @@ from setuptools.command.bdist_egg import bdist_egg
 from setuptools.command.build_ext import build_ext
 from setuptools.command.build_py import build_py
 from wheel.bdist_wheel import bdist_wheel
-
-# workaround https://github.com/pypa/pip/issues/7953
-site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 
 # Read the version from chemfiles/__init__.py without importing chemfiles
 ROOT = os.path.realpath(os.path.dirname(__file__))

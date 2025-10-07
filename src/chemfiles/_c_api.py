@@ -1,4 +1,3 @@
-# -* coding: utf-8 -*
 # Chemfiles, a modern library for chemistry file reading and writing
 # Copyright (C) Guillaume Fraux and contributors -- BSD license
 #
@@ -8,7 +7,6 @@
 # This file contains Python ctype interface to the C API
 # =========================================================================== #
 
-# flake8: noqa
 '''
 Foreign function interface declaration for the Python interface to chemfiles
 '''
@@ -26,7 +24,6 @@ class chfl_status(c_int):
     CHFL_FILE_ERROR = 2
     CHFL_FORMAT_ERROR = 3
     CHFL_SELECTION_ERROR = 4
-    CHFL_CONFIGURATION_ERROR = 5
     CHFL_OUT_OF_BOUNDS = 6
     CHFL_PROPERTY_ERROR = 7
     CHFL_GENERIC_ERROR = 254
@@ -127,7 +124,7 @@ def set_interface(c_lib):
     c_lib.chfl_trajectory_close.argtypes = [POINTER(CHFL_TRAJECTORY)]
     # End of manually defined functions
 
-    # Function "chfl_version", at types.h:150
+    # Function "chfl_version", at types.h:157
     c_lib.chfl_version.argtypes = []
     c_lib.chfl_version.restype = c_char_p
 
@@ -145,17 +142,12 @@ def set_interface(c_lib):
     c_lib.chfl_set_warning_callback.restype = chfl_status
     c_lib.chfl_set_warning_callback.errcheck = _check_return_code
 
-    # Function "chfl_add_configuration", at misc.h:58
-    c_lib.chfl_add_configuration.argtypes = [c_char_p]
-    c_lib.chfl_add_configuration.restype = chfl_status
-    c_lib.chfl_add_configuration.errcheck = _check_return_code
-
-    # Function "chfl_formats_list", at misc.h:71
+    # Function "chfl_formats_list", at misc.h:55
     c_lib.chfl_formats_list.argtypes = [POINTER(POINTER(chfl_format_metadata)), POINTER(c_uint64)]
     c_lib.chfl_formats_list.restype = chfl_status
     c_lib.chfl_formats_list.errcheck = _check_return_code
 
-    # Function "chfl_guess_format", at misc.h:93
+    # Function "chfl_guess_format", at misc.h:82
     c_lib.chfl_guess_format.argtypes = [c_char_p, c_char_p, c_uint64]
     c_lib.chfl_guess_format.restype = chfl_status
     c_lib.chfl_guess_format.errcheck = _check_return_code
@@ -601,15 +593,15 @@ def set_interface(c_lib):
     c_lib.chfl_frame_set_topology.restype = chfl_status
     c_lib.chfl_frame_set_topology.errcheck = _check_return_code
 
-    # Function "chfl_frame_step", at frame.h:173
-    c_lib.chfl_frame_step.argtypes = [POINTER(CHFL_FRAME), POINTER(c_uint64)]
-    c_lib.chfl_frame_step.restype = chfl_status
-    c_lib.chfl_frame_step.errcheck = _check_return_code
+    # Function "chfl_frame_index", at frame.h:173
+    c_lib.chfl_frame_index.argtypes = [POINTER(CHFL_FRAME), POINTER(c_uint64)]
+    c_lib.chfl_frame_index.restype = chfl_status
+    c_lib.chfl_frame_index.errcheck = _check_return_code
 
-    # Function "chfl_frame_set_step", at frame.h:182
-    c_lib.chfl_frame_set_step.argtypes = [POINTER(CHFL_FRAME), c_uint64]
-    c_lib.chfl_frame_set_step.restype = chfl_status
-    c_lib.chfl_frame_set_step.errcheck = _check_return_code
+    # Function "chfl_frame_set_index", at frame.h:182
+    c_lib.chfl_frame_set_index.argtypes = [POINTER(CHFL_FRAME), c_uint64]
+    c_lib.chfl_frame_set_index.restype = chfl_status
+    c_lib.chfl_frame_set_index.errcheck = _check_return_code
 
     # Function "chfl_frame_guess_bonds", at frame.h:194
     c_lib.chfl_frame_guess_bonds.argtypes = [POINTER(CHFL_FRAME)]
@@ -706,10 +698,10 @@ def set_interface(c_lib):
     c_lib.chfl_trajectory_read.restype = chfl_status
     c_lib.chfl_trajectory_read.errcheck = _check_return_code
 
-    # Function "chfl_trajectory_read_step", at trajectory.h:110
-    c_lib.chfl_trajectory_read_step.argtypes = [POINTER(CHFL_TRAJECTORY), c_uint64, POINTER(CHFL_FRAME)]
-    c_lib.chfl_trajectory_read_step.restype = chfl_status
-    c_lib.chfl_trajectory_read_step.errcheck = _check_return_code
+    # Function "chfl_trajectory_read_at", at trajectory.h:110
+    c_lib.chfl_trajectory_read_at.argtypes = [POINTER(CHFL_TRAJECTORY), c_uint64, POINTER(CHFL_FRAME)]
+    c_lib.chfl_trajectory_read_at.restype = chfl_status
+    c_lib.chfl_trajectory_read_at.errcheck = _check_return_code
 
     # Function "chfl_trajectory_write", at trajectory.h:119
     c_lib.chfl_trajectory_write.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(CHFL_FRAME)]
@@ -731,12 +723,12 @@ def set_interface(c_lib):
     c_lib.chfl_trajectory_set_cell.restype = chfl_status
     c_lib.chfl_trajectory_set_cell.errcheck = _check_return_code
 
-    # Function "chfl_trajectory_nsteps", at trajectory.h:164
-    c_lib.chfl_trajectory_nsteps.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(c_uint64)]
-    c_lib.chfl_trajectory_nsteps.restype = chfl_status
-    c_lib.chfl_trajectory_nsteps.errcheck = _check_return_code
+    # Function "chfl_trajectory_size", at trajectory.h:163
+    c_lib.chfl_trajectory_size.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(c_uint64)]
+    c_lib.chfl_trajectory_size.restype = chfl_status
+    c_lib.chfl_trajectory_size.errcheck = _check_return_code
 
-    # Function "chfl_trajectory_memory_buffer", at trajectory.h:178
+    # Function "chfl_trajectory_memory_buffer", at trajectory.h:177
     c_lib.chfl_trajectory_memory_buffer.argtypes = [POINTER(CHFL_TRAJECTORY), POINTER(c_char_p), POINTER(c_uint64)]
     c_lib.chfl_trajectory_memory_buffer.restype = chfl_status
     c_lib.chfl_trajectory_memory_buffer.errcheck = _check_return_code

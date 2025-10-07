@@ -59,7 +59,7 @@ class TestTrajectory(unittest.TestCase):
     def test_read(self):
         trajectory = Trajectory(get_data_path("water.xyz"))
 
-        self.assertEqual(trajectory.nsteps, 100)
+        self.assertEqual(len(trajectory), 100)
         self.assertEqual(trajectory.path, get_data_path("water.xyz"))
 
         frame = trajectory.read()
@@ -77,7 +77,7 @@ class TestTrajectory(unittest.TestCase):
         self.assertEqual(frame.atoms[1].name, "H")
 
         trajectory.set_cell(UnitCell([30, 30, 30]))
-        frame = trajectory.read_step(41)
+        frame = trajectory.read_at(41)
         self.assertEqual(frame.cell.lengths, (30.0, 30.0, 30.0))
 
         self.assertEqual(
@@ -99,7 +99,7 @@ class TestTrajectory(unittest.TestCase):
             topology.atoms.append(Atom("Cs"))
 
         trajectory.set_topology(topology)
-        frame = trajectory.read_step(10)
+        frame = trajectory.read_at(10)
         self.assertEqual(frame.atoms[10].name, "Cs")
 
         trajectory.set_topology(get_data_path("topology.xyz"), "XYZ")
@@ -142,7 +142,7 @@ O 53 2 -1
 Fe 4 3 2
 """
         trajectory = MemoryTrajectory(data=data, mode="r", format="XYZ")
-        self.assertEqual(trajectory.nsteps, 2)
+        self.assertEqual(len(trajectory), 2)
 
         frame = trajectory.read()
         self.assertEqual(len(frame.atoms), 3)

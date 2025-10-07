@@ -122,11 +122,11 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(frame.atoms[0].name, "Zn")
         self.assertEqual(frame.atoms[1].name, "Ar")
 
-    def test_step(self):
+    def test_index(self):
         frame = Frame()
-        self.assertEqual(frame.step, 0)
-        frame.step = 42
-        self.assertEqual(frame.step, 42)
+        self.assertEqual(frame.index, 0)
+        frame.index = 42
+        self.assertEqual(frame.index, 42)
 
     def test_out_of_bounds(self):
         frame = Frame()
