@@ -20,7 +20,7 @@ class universal_wheel(bdist_wheel):
     # Workaround until https://github.com/pypa/wheel/issues/185 is resolved
     def get_tag(self):
         tag = bdist_wheel.get_tag(self)
-        return ("py2.py3", "none") + tag[2:]
+        return ("py3", "none") + tag[2:]
 
 
 class cmake_configure(build_py):
