@@ -3,6 +3,7 @@
 Check that all the functions defined in the C API are
 effectively used in the chemfiles binding.
 """
+
 import os
 import re
 import sys
@@ -31,7 +32,7 @@ def functions_list():
 
 def read_all_binding_functions():
     binding_functions = set()
-    for (dirpath, _, paths) in os.walk(os.path.join(ROOT, "src", "chemfiles")):
+    for dirpath, _, paths in os.walk(os.path.join(ROOT, "src", "chemfiles")):
         for path in paths:
             if path != "_c_api.py" and path.endswith(".py"):
                 with open(os.path.join(ROOT, dirpath, path)) as fd:

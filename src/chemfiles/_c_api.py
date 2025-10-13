@@ -6,7 +6,7 @@
 # the generation code (https://github.com/chemfiles/bindgen).
 # This file contains Python ctype interface to the C API
 # =========================================================================== #
-
+# fmt: off
 '''
 Foreign function interface declaration for the Python interface to chemfiles
 '''

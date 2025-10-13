@@ -1,7 +1,7 @@
 import copy
 import unittest
 
-from chemfiles import Atom, Frame, Selection, Topology
+from chemfiles import Atom, Frame, Selection
 
 
 def testing_frame():
