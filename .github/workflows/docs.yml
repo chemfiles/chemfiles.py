@@ -20,16 +20,14 @@ jobs:
           python-version: '3.13'
       - name: install dependencies
         run: |
-          pip install --upgrade pip
-          pip install -r doc/requirements.txt
+          pip install tox
       - name: build documentation
         run: |
-          cd doc
-          make html
-          rm -rf _build/html/.doctrees/ _build/html/.buildinfo
-          rm -rf _build/html/_static/bootswatch-2.3.2/ _build/html/_static/bootstrap-2.3.2/
+          tox -e docs
+          rm -rf docs/build/html/.doctrees/ docs/build/html/.buildinfo
+          rm -rf docs/build/html/_static/bootswatch-2.3.2/ docs/build/html/_static/bootstrap-2.3.2/
           shopt -s extglob
-          cd _build/html/_static/bootswatch-* && rm -rf !(flatly) && cd -
+          cd docs/build/html/_static/bootswatch-* && rm -rf !(flatly) && cd -
       - name: put documentation in the website
         run: |
           git clone https://github.com/$GITHUB_REPOSITORY --branch gh-pages gh-pages
@@ -38,10 +36,10 @@ jobs:
           REF_KIND=$(echo $GITHUB_REF | cut -d / -f2)
           if [[ "$REF_KIND" == "tags" ]]; then
               TAG=${GITHUB_REF#refs/tags/}
-              mv doc/_build/html/ gh-pages/$TAG
+              mv docs/build/html/ gh-pages/$TAG
           else
               rm -rf gh-pages/latest
-              mv doc/_build/html/ gh-pages/latest
+              mv docs/build/html/ gh-pages/latest
           fi
       - name: deploy to gh-pages
         if: github.event_name == 'push'
