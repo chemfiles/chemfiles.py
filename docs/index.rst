@@ -2,8 +2,6 @@ Python interface to chemfiles
 =============================
 
 This is the documentation for the Python interface to the `chemfiles`_ library.
-This interface uses Numpy, and is compatible with Python 2.7 and 3.4+, and Numpy
-1.8 to 1.10.
 
 .. _chemfiles: https://github.com/chemfiles/chemfiles
 

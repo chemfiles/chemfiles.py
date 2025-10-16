@@ -27,12 +27,12 @@ class BaseTrajectory(CxxPointer):
 
     def __iter__(self):
         self.__check_opened()
-        for step in range(self.nsteps):
-            yield self.read_step(step)
+        for index in range(len(self)):
+            yield self.read_at(index)
 
     def read(self):
         """
-        Read the next step of this :py:class:`Trajectory` and return the
+        Read the next index of this :py:class:`Trajectory` and return the
         corresponding :py:class:`Frame`.
         """
         self.__check_opened()
@@ -40,14 +40,14 @@ class BaseTrajectory(CxxPointer):
         self.ffi.chfl_trajectory_read(self.mut_ptr, frame.mut_ptr)
         return frame
 
-    def read_step(self, step):
+    def read_at(self, index):
         """
-        Read a specific ``step`` in this :py:class:`Trajectory` and return the
+        Read a specific ``index`` in this :py:class:`Trajectory` and return the
         corresponding :py:class:`Frame`.
         """
         self.__check_opened()
         frame = Frame()
-        self.ffi.chfl_trajectory_read_step(self.mut_ptr, c_uint64(step), frame.mut_ptr)
+        self.ffi.chfl_trajectory_read_at(self.mut_ptr, c_uint64(index), frame.mut_ptr)
         return frame
 
     def write(self, frame):
@@ -89,13 +89,12 @@ class BaseTrajectory(CxxPointer):
         self.__check_opened()
         self.ffi.chfl_trajectory_set_cell(self.mut_ptr, cell.ptr)
 
-    @property
-    def nsteps(self):
-        """Get the current number of steps in this :py:class:`Trajectory`."""
+    def __len__(self):
+        """Get the current number of frames in this :py:class:`Trajectory`."""
         self.__check_opened()
-        nsteps = c_uint64()
-        self.ffi.chfl_trajectory_nsteps(self.mut_ptr, nsteps)
-        return nsteps.value
+        size = c_uint64()
+        self.ffi.chfl_trajectory_size(self.mut_ptr, size)
+        return size.value
 
     @property
     def path(self):

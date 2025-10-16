@@ -1,6 +1,5 @@
 import os
 import re
-import site
 import subprocess
 import sys
 
@@ -9,9 +8,6 @@ from setuptools.command.bdist_egg import bdist_egg
 from setuptools.command.build_ext import build_ext
 from setuptools.command.build_py import build_py
 from wheel.bdist_wheel import bdist_wheel
-
-# workaround https://github.com/pypa/pip/issues/7953
-site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 
 # Read the version from chemfiles/__init__.py without importing chemfiles
 ROOT = os.path.realpath(os.path.dirname(__file__))
@@ -24,7 +20,7 @@ class universal_wheel(bdist_wheel):
     # Workaround until https://github.com/pypa/wheel/issues/185 is resolved
     def get_tag(self):
         tag = bdist_wheel.get_tag(self)
-        return ("py2.py3", "none") + tag[2:]
+        return ("py3", "none") + tag[2:]
 
 
 class cmake_configure(build_py):

@@ -239,19 +239,19 @@ class Frame(CxxPointer):
         self.ffi.chfl_frame_set_topology(self.mut_ptr, topology.ptr)
 
     @property
-    def step(self):
+    def index(self):
         """
-        Get the step of this :py:class:`Frame`, i.e. the frame number in the
+        Get the index of this :py:class:`Frame`, i.e. the frame index in the
         trajectory.
         """
         step = c_uint64()
-        self.ffi.chfl_frame_step(self.ptr, step)
+        self.ffi.chfl_frame_index(self.ptr, step)
         return step.value
 
-    @step.setter
-    def step(self, value):
-        """Set the step for this :py:class:`Frame` to the given ``value``."""
-        self.ffi.chfl_frame_set_step(self.mut_ptr, c_uint64(value))
+    @index.setter
+    def index(self, value):
+        """Set the index for this :py:class:`Frame` to the given ``value``."""
+        self.ffi.chfl_frame_set_index(self.mut_ptr, c_uint64(value))
 
     def guess_bonds(self):
         """
