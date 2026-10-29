@@ -77,7 +77,7 @@ class Residue(CxxPointer):
         residue id ``resid``.
         """
 
-        if resid:
+        if resid is not None:
             ptr = self.ffi.chfl_residue_with_id(name.encode("utf8"), c_int64(resid))
         else:
             ptr = self.ffi.chfl_residue(name.encode("utf8"))

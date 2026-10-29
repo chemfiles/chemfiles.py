@@ -44,6 +44,10 @@ class TestResidue(unittest.TestCase):
         residue = Residue("bar", 45)
         self.assertEqual(residue.id, 45)
 
+        # Zero is a valid residue identifier and must not be treated as absent.
+        residue = Residue("bar", 0)
+        self.assertEqual(residue.id, 0)
+
     def test_atoms(self):
         residue = Residue("")
         residue.atoms.append(3)
