@@ -62,6 +62,6 @@ class Property(CxxPointer):
 def _is_vector3d(value):
     try:
         a = np.array(value, dtype="double")
-        return len(a) >= 3
+        return len(a) == 3
     except Exception:
         return False

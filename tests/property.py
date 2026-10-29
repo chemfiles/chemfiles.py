@@ -32,6 +32,9 @@ class TestProperty(unittest.TestCase):
         prop = Property(np.array([3, 4, 5]))
         self.assertEqual(prop.get(), (3, 4, 5))
 
+        with self.assertRaises(ChemfilesError):
+            _ = Property([1, 2, 3, 4])
+
     def test_bad(self):
         with self.assertRaises(ChemfilesError):
             _ = Property(ArithmeticError)
