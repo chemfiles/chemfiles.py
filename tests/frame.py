@@ -60,6 +60,17 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(list(frame.positions[1]), [-3, -4, 5])
         self.assertEqual(list(frame.velocities[1]), [1, 0, 1])
 
+    def test_add_atom_rejects_invalid_vector_lengths(self):
+        frame = Frame()
+        with self.assertRaises(ValueError):
+            frame.add_atom(Atom("C"), (0, 0))
+        with self.assertRaises(ValueError):
+            frame.add_atom(Atom("C"), (0, 0, 0, 1))
+        with self.assertRaises(ValueError):
+            frame.add_atom(Atom("C"), (0, 0, 0), (1, 2))
+        with self.assertRaises(ValueError):
+            frame.add_atom(Atom("C"), (0, 0, 0), (1, 2, 3, 4))
+
     def test_positions(self):
         frame = Frame()
         frame.resize(4)

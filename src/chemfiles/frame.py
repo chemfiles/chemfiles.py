@@ -89,8 +89,12 @@ class Frame(CxxPointer):
         ``velocity`` can be ``None`` if no velocity is associated with the
         atom.
         """
+        if len(position) != 3:
+            raise ValueError("position must contain exactly 3 coordinates")
         position = chfl_vector3d(position[0], position[1], position[2])
-        if velocity:
+        if velocity is not None:
+            if len(velocity) != 3:
+                raise ValueError("velocity must contain exactly 3 components")
             velocity = chfl_vector3d(velocity[0], velocity[1], velocity[2])
         self.ffi.chfl_frame_add_atom(self.mut_ptr, atom.ptr, position, velocity)
 
