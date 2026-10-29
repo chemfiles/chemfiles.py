@@ -15,7 +15,9 @@ class BaseTrajectory(CxxPointer):
             raise ChemfilesError("Can not use a closed Trajectory")
 
     def __del__(self):
-        if not self.__closed:
+        # A subclass constructor can fail before BaseTrajectory.__init__ runs.
+        # Treat such a partially initialized object as already closed.
+        if not getattr(self, "_BaseTrajectory__closed", True):
             self.close()
 
     def __enter__(self):
