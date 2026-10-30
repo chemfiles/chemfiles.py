@@ -28,7 +28,7 @@ class HTMLHidden(Directive):
     required_arguments = 0
     optional_arguments = 0
     final_argument_whitespace = False
-    option_spec = {
+    option_spec = {  # noqa: RUF012
         "toggle": str,
         "before-not-html": str,
     }

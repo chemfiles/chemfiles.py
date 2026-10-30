@@ -5,7 +5,7 @@ import chemfiles
 from chemfiles import ChemfilesError, Trajectory
 
 
-class RemoveChemfilesWarnings(object):
+class RemoveChemfilesWarnings:
     def __enter__(self):
         chemfiles.set_warnings_callback(lambda u: None)
 
@@ -70,7 +70,7 @@ class TestWarnings(unittest.TestCase):
         def callback(message):
             global LAST_MESSAGE
             LAST_MESSAGE = message
-            raise Exception("test exception in callback")
+            raise RuntimeError("test exception in callback")
 
         chemfiles.set_warnings_callback(callback)
 

@@ -1,4 +1,3 @@
-# -* coding: utf-8 -*
 # Chemfiles, a modern library for chemistry file reading and writing
 # Copyright (C) Guillaume Fraux and contributors -- BSD license
 #
@@ -7,8 +6,8 @@
 # the generation code (https://github.com/chemfiles/bindgen).
 # This file contains Python ctype interface to the C API
 # =========================================================================== #
-
-# flake8: noqa
+# fmt: off
+# ruff: noqa
 '''
 Foreign function interface declaration for the Python interface to chemfiles
 '''

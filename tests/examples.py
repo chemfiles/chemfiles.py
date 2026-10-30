@@ -23,7 +23,7 @@ class TestExamples(unittest.TestCase):
     def test_generate(self):
         path = os.path.join(ROOT, "..", "examples", "generate.py")
         with open(path) as fd:
-            exec(fd.read(), globals())
+            exec(fd.read(), globals())  # noqa: S102
 
     def test_indexes(self):
         # Create an input file
@@ -37,7 +37,7 @@ class TestExamples(unittest.TestCase):
         path = os.path.join(ROOT, "..", "examples", "indexes.py")
         # disable output
         with open(path) as fd:
-            exec(fd.read(), globals(), {"print": lambda _: None})
+            exec(fd.read(), globals(), {"print": lambda _: None})  # noqa: S102
 
     def test_select(self):
         # Create an input file
@@ -51,7 +51,7 @@ class TestExamples(unittest.TestCase):
 
         path = os.path.join(ROOT, "..", "examples", "select.py")
         with open(path) as fd:
-            exec(fd.read(), globals())
+            exec(fd.read(), globals())  # noqa: S102
 
 
 if __name__ == "__main__":

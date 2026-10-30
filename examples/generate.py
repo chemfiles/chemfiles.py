@@ -1,9 +1,9 @@
 # This file is an example for the chemfiles library
 # Any copyright is dedicated to the Public Domain.
 # http://creativecommons.org/publicdomain/zero/1.0/
-#!/usr/bin/env python
 import numpy as np
-from chemfiles import Topology, Frame, Atom, UnitCell, Trajectory
+
+from chemfiles import Atom, Frame, Topology, Trajectory, UnitCell
 
 topology = Topology()
 topology.atoms.append(Atom("H"))

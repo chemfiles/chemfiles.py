@@ -1,6 +1,6 @@
-# -*- coding: utf-8 -*-
-import sys
 import os
+import sys
+
 import sphinx_bootstrap_theme
 
 ROOT = os.path.abspath(os.path.dirname(__file__))

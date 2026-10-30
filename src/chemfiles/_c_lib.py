@@ -8,7 +8,7 @@ except ImportError:
     EXTERNAL_CHEMFILES = False
 
 
-class FindChemfilesLibrary(object):
+class FindChemfilesLibrary:
     def __init__(self):
         self._cache = None
 

@@ -20,13 +20,13 @@ We start by importing the classes we need from chemfiles, here only the
 
 .. literalinclude:: ../examples/indexes.py
    :language: python
-   :lines: 4-5
+   :lines: 4
 
 Then we open a Trajectory and read the first frame:
 
 .. literalinclude:: ../examples/indexes.py
    :language: python
-   :lines: 7-8
+   :lines: 6-7
 
 Iterating through the atoms in the frame, we store the indices of the atoms with
 ``x < 5`` in a list. ``len(frame.atoms)`` gives the number of atoms in the
@@ -35,13 +35,13 @@ numpy array which shape is ``(len(frame), 3)``.
 
 .. literalinclude:: ../examples/indexes.py
    :language: python
-   :lines: 10-13
+   :lines: 9-12
 
 We can then print our results
 
 .. literalinclude:: ../examples/indexes.py
    :language: python
-   :lines: 15-17
+   :lines: 14-16
 
 .. htmlhidden::
     :toggle: Click here to see the whole program
@@ -136,20 +136,20 @@ Here, we will need two of chemfiles classes: :py:class`Trajectory` and
 
 .. literalinclude:: ../examples/select.py
    :language: python
-   :lines: 4-5
+   :lines: 4
 
 We start by opening the two trajectories we will need
 
 .. literalinclude:: ../examples/select.py
    :language: python
-   :lines: 7-8
+   :lines: 6-7
 
 And we create a :py:class:`Selection` object to filter the atoms we want to
 remove.
 
 .. literalinclude:: ../examples/select.py
    :language: python
-   :lines: 10
+   :lines: 9
 
 Then we can iterate over all the frames in the trajectory, and use the selection
 to get the list of atoms to remove. The result of :py:func:`Selection.evaluate`
@@ -157,7 +157,7 @@ is a list containing the atoms matching the selection.
 
 .. literalinclude:: ../examples/select.py
    :language: python
-   :lines: 12-13
+   :lines: 11-12
 
 In order to remove the atoms from the frame, we need to sort the ``to_remove``
 list in descending order: removing the atom at index i will shift the index of
@@ -166,21 +166,21 @@ frame.
 
 .. literalinclude:: ../examples/select.py
    :language: python
-   :lines: 14-15
+   :lines: 13-14
 
 We can then write the cleaned frame to the output file, and start the next
 iteration.
 
 .. literalinclude:: ../examples/select.py
    :language: python
-   :lines: 16
+   :lines: 14
 
 Finally, we close the input and output files to ensure that all the written data
 is flushed to the disk.
 
 .. literalinclude:: ../examples/select.py
    :language: python
-   :lines: 18-19
+   :lines: 17-18
 
 .. htmlhidden::
     :toggle: Click here to see the whole program

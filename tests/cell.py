@@ -39,9 +39,8 @@ class TestUnitCell(unittest.TestCase):
         self.assertEqual(cell.angles, (90.0, 90.0, 90.0))
 
         self.assertEqual(cell.shape, CellShape.Orthorhombic)
-        with remove_warnings:
-            with self.assertRaises(ChemfilesError):
-                cell.angles = [80, 89, 110]
+        with remove_warnings, self.assertRaises(ChemfilesError):
+            cell.angles = [80, 89, 110]
 
         cell.shape = CellShape.Triclinic
         cell.angles = [80, 89, 110]

@@ -75,9 +75,8 @@ class TestTopology(unittest.TestCase):
         self.assertEqual(topology.bonds_order(0, 1), BondOrder.Unknown)
         self.assertEqual(topology.bonds_order(1, 2), BondOrder.Unknown)
 
-        with remove_warnings:
-            with self.assertRaises(ChemfilesError):
-                _ = topology.bonds_order(1, 3)
+        with remove_warnings, self.assertRaises(ChemfilesError):
+            _ = topology.bonds_order(1, 3)
 
         topology.add_bond(2, 3, BondOrder.Aromatic)
         self.assertEqual(topology.bonds_order(2, 3), BondOrder.Aromatic)

@@ -4,7 +4,7 @@ from ._c_lib import _get_c_library
 from .misc import ChemfilesError, _last_error
 
 
-class CxxPointer(object):
+class CxxPointer:
     # Used to prevent adding new attributes to chemfiles objects
     __frozen = False
     # C++ allocated pointer
@@ -90,7 +90,7 @@ def _check_return_code(status, _function, _arguments):
 def _check_handle(handle):
     """Check that C allocated pointers are not NULL"""
     try:
-        handle.contents
+        _ = handle.contents
     except ValueError:
         raise ChemfilesError(_last_error())
 
