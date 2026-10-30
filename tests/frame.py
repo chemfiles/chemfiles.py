@@ -60,6 +60,12 @@ class TestFrame(unittest.TestCase):
         self.assertEqual(list(frame.positions[1]), [-3, -4, 5])
         self.assertEqual(list(frame.velocities[1]), [1, 0, 1])
 
+        # Passing a velocity to an empty frame must initialize and preserve it.
+        frame = Frame()
+        frame.add_atom(Atom("F"), (0, 0, 0), (2, 3, 4))
+        self.assertTrue(frame.has_velocities())
+        self.assertEqual(list(frame.velocities[0]), [2, 3, 4])
+
     def test_positions(self):
         frame = Frame()
         frame.resize(4)

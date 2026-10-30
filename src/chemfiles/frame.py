@@ -90,7 +90,11 @@ class Frame(CxxPointer):
         atom.
         """
         position = chfl_vector3d(position[0], position[1], position[2])
-        if velocity:
+        if velocity is not None:
+            # The C API only stores a velocity when the frame already has a
+            # velocity array.
+            if not self.has_velocities():
+                self.add_velocities()
             velocity = chfl_vector3d(velocity[0], velocity[1], velocity[2])
         self.ffi.chfl_frame_add_atom(self.mut_ptr, atom.ptr, position, velocity)
 
