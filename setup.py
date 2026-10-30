@@ -15,9 +15,9 @@ site.ENABLE_USER_SITE = "--user" in sys.argv[1:]
 
 # Read the version from chemfiles/__init__.py without importing chemfiles
 ROOT = os.path.realpath(os.path.dirname(__file__))
-__version__ = re.search(
-    r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]', open("src/chemfiles/__init__.py").read()
-).group(1)
+
+with open("src/chemfiles/__init__.py") as fd:
+    VERSION = re.search(r'__version__\s*=\s*[\'"]([^\'"]*)[\'"]', fd.read()).group(1)
 
 
 class universal_wheel(bdist_wheel):
@@ -103,7 +103,7 @@ class bdist_egg_disabled(bdist_egg):
 
 
 setup(
-    version=__version__,
+    version=VERSION,
     ext_modules=[
         # only declare the extension, it is built & copied as required by cmake
         # in the build_ext command

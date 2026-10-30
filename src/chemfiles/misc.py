@@ -7,13 +7,9 @@ from ._c_lib import _get_c_library
 class ChemfilesWarning(UserWarning):
     """Warnings from the Chemfiles runtime."""
 
-    pass
-
 
 class ChemfilesError(BaseException):
     """Exception class for errors in chemfiles"""
-
-    pass
 
 
 class FormatMetadata:
@@ -143,7 +139,7 @@ def set_warnings_callback(function):
     def callback(message):
         try:
             function(message.decode("utf8"))
-        except Exception as e:
+        except BaseException as e:  # noqa: BLE001
             message = f"exception raised in warning callback: {e}"
             warnings.warn(message, ChemfilesWarning)
 

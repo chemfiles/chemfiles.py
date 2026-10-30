@@ -8,7 +8,7 @@ from .utils import CxxPointer, _call_with_growing_buffer
 class BaseTrajectory(CxxPointer):
     def __init__(self, ptr):
         self.__closed = False
-        super(BaseTrajectory, self).__init__(ptr, is_const=False)
+        super().__init__(ptr, is_const=False)
 
     def __check_opened(self):
         if self.__closed:
@@ -141,7 +141,7 @@ class Trajectory(BaseTrajectory):
         # Store mode and format for __repr__
         self.__mode = mode
         self.__format = format
-        super(Trajectory, self).__init__(ptr)
+        super().__init__(ptr)
 
     def __repr__(self):
         return f"Trajectory('{self.path}', '{self.__mode}', '{self.__format}')"
@@ -184,7 +184,7 @@ class MemoryTrajectory(BaseTrajectory):
         else:
             raise ChemfilesError(f"invalid mode '{mode}' passed to MemoryTrajectory")
 
-        super(MemoryTrajectory, self).__init__(ptr)
+        super().__init__(ptr)
 
     def __repr__(self):
         return f"MemoryTrajectory({self.__mode}', '{self.__format}')"

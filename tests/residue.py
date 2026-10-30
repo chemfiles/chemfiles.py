@@ -37,9 +37,8 @@ class TestResidue(unittest.TestCase):
 
     def test_id(self):
         residue = Residue("bar")
-        with remove_warnings:
-            with self.assertRaises(ChemfilesError):
-                _ = residue.id
+        with remove_warnings, self.assertRaises(ChemfilesError):
+            _ = residue.id
 
         residue = Residue("bar", 45)
         self.assertEqual(residue.id, 45)

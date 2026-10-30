@@ -1,7 +1,7 @@
 import chemfiles
 
 
-class RemoveChemfilesWarnings(object):
+class RemoveChemfilesWarnings:
     def __enter__(self):
         chemfiles.set_warnings_callback(lambda u: None)
 

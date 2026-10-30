@@ -27,7 +27,7 @@ class Atom(CxxPointer):
         type.
         """
         ptr = self.ffi.chfl_atom(name.encode("utf8"))
-        super(Atom, self).__init__(ptr, is_const=False)
+        super().__init__(ptr, is_const=False)
         if type:
             self.type = type
 
@@ -173,7 +173,10 @@ class Atom(CxxPointer):
     def list_properties(self):
         """Get the name of all properties in this atom."""
         count = self.properties_count()
+        if count == 0:
+            return []
+
         StringArray = c_char_p * count
         names = StringArray()
         self.ffi.chfl_atom_list_properties(self.ptr, names, count)
-        return list(map(lambda n: n.decode("utf8"), names))
+        return [n.decode("utf8") for n in names]

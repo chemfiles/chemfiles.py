@@ -1,7 +1,6 @@
 # This trajectory is an example for the chemfiles library
 # Any copyright is dedicated to the Public Domain.
 # http://creativecommons.org/publicdomain/zero/1.0/
-#!/usr/bin/env python
 from chemfiles import Trajectory
 
 with Trajectory("filename.xyz") as trajectory:

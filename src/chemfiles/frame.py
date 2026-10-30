@@ -11,7 +11,7 @@ from .topology import Topology
 from .utils import CxxPointer
 
 
-class FrameAtoms(object):
+class FrameAtoms:
     """Proxy object to get the atoms in a frame"""
 
     def __init__(self, frame):
@@ -57,7 +57,7 @@ class Frame(CxxPointer):
         Create an empty :py:class:`Frame` that will be resized by the runtime
         as needed.
         """
-        super(Frame, self).__init__(self.ffi.chfl_frame(), is_const=False)
+        super().__init__(self.ffi.chfl_frame(), is_const=False)
 
     def __copy__(self):
         return Frame.from_mutable_ptr(None, self.ffi.chfl_frame_copy(self.ptr))
@@ -348,7 +348,10 @@ class Frame(CxxPointer):
     def list_properties(self):
         """Get the name of all properties in this frame."""
         count = self.properties_count()
+        if count == 0:
+            return []
+
         StringArray = c_char_p * count
         names = StringArray()
         self.ffi.chfl_frame_list_properties(self.ptr, names, count)
-        return list(map(lambda n: n.decode("utf8"), names))
+        return [n.decode("utf8") for n in names]

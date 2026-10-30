@@ -33,7 +33,7 @@ class BondOrder(IntEnum):
     Aromatic = chfl_bond_order.CHFL_BOND_AROMATIC
 
 
-class TopologyAtoms(object):
+class TopologyAtoms:
     """Proxy object to get the atoms in a topology"""
 
     def __init__(self, topology):
@@ -86,7 +86,7 @@ class TopologyAtoms(object):
         self.topology.ffi.chfl_topology_add_atom(self.topology.mut_ptr, atom.ptr)
 
 
-class TopologyResidues(object):
+class TopologyResidues:
     """Proxy object to get the residues in a topology"""
 
     def __init__(self, topology):
@@ -138,7 +138,7 @@ class Topology(CxxPointer):
 
     def __init__(self):
         """Create a new empty :py:class:`Topology`."""
-        super(Topology, self).__init__(self.ffi.chfl_topology(), is_const=False)
+        super().__init__(self.ffi.chfl_topology(), is_const=False)
 
     def __copy__(self):
         return Topology.from_mutable_ptr(None, self.ffi.chfl_topology_copy(self.ptr))

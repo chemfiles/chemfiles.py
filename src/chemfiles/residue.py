@@ -7,7 +7,7 @@ from .property import Property
 from .utils import CxxPointer, _call_with_growing_buffer
 
 
-class ResidueAtoms(object):
+class ResidueAtoms:
     """Proxy object to get the atomic indexes in a residue"""
 
     def __init__(self, residue):
@@ -81,7 +81,7 @@ class Residue(CxxPointer):
             ptr = self.ffi.chfl_residue_with_id(name.encode("utf8"), c_int64(resid))
         else:
             ptr = self.ffi.chfl_residue(name.encode("utf8"))
-        super(Residue, self).__init__(ptr, is_const=False)
+        super().__init__(ptr, is_const=False)
 
     def __copy__(self):
         return Residue.from_mutable_ptr(None, self.ffi.chfl_residue_copy(self.ptr))
@@ -149,7 +149,10 @@ class Residue(CxxPointer):
     def list_properties(self):
         """Get the name of all properties in this residue."""
         count = self.properties_count()
+        if count == 0:
+            return []
+
         StringArray = c_char_p * count
         names = StringArray()
         self.ffi.chfl_residue_list_properties(self.ptr, names, count)
-        return list(map(lambda n: n.decode("utf8"), names))
+        return [n.decode("utf8") for n in names]

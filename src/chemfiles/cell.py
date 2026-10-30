@@ -76,7 +76,7 @@ class UnitCell(CxxPointer):
             matrix[2][2] = lengths[2, 2]
             ptr = self.ffi.chfl_cell_from_matrix(matrix)
 
-        super(UnitCell, self).__init__(ptr, is_const=False)
+        super().__init__(ptr, is_const=False)
 
     def __copy__(self):
         return UnitCell.from_mutable_ptr(None, self.ffi.chfl_cell_copy(self.ptr))
@@ -85,9 +85,7 @@ class UnitCell(CxxPointer):
         return """UnitCell(
     lengths=({:.9g}, {:.9g}, {:.9g}),
     angles=({:.7g}, {:.7g}, {:.7g})
-)""".format(
-            *(self.lengths + self.angles)
-        )
+)""".format(*(self.lengths + self.angles))
 
     @property
     def lengths(self):

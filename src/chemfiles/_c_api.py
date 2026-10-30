@@ -7,6 +7,7 @@
 # This file contains Python ctype interface to the C API
 # =========================================================================== #
 # fmt: off
+# ruff: noqa
 '''
 Foreign function interface declaration for the Python interface to chemfiles
 '''

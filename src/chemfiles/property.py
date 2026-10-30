@@ -32,7 +32,7 @@ class Property(CxxPointer):
                 f"can not create a Property with a value of type '{type(value)}'"
             )
 
-        super(Property, self).__init__(ptr, is_const=False)
+        super().__init__(ptr, is_const=False)
 
     def get(self):
         kind = chfl_property_kind()
@@ -63,5 +63,5 @@ def _is_vector3d(value):
     try:
         a = np.array(value, dtype="double")
         return len(a) >= 3
-    except Exception:
+    except BaseException:  # noqa: BLE001
         return False
