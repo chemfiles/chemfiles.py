@@ -131,6 +131,10 @@ class TestTrajectory(unittest.TestCase):
 
 
 class TestMemoryTrajectory(unittest.TestCase):
+    def test_repr(self):
+        trajectory = MemoryTrajectory(mode="w", format="XYZ")
+        self.assertEqual(repr(trajectory), "MemoryTrajectory('w', 'XYZ')")
+
     def test_read(self):
         data = """3
 

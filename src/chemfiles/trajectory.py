@@ -184,10 +184,12 @@ class MemoryTrajectory(BaseTrajectory):
         else:
             raise ChemfilesError(f"invalid mode '{mode}' passed to MemoryTrajectory")
 
+        self.__mode = mode
+        self.__format = format
         super(MemoryTrajectory, self).__init__(ptr)
 
     def __repr__(self):
-        return f"MemoryTrajectory({self.__mode}', '{self.__format}')"
+        return f"MemoryTrajectory('{self.__mode}', '{self.__format}')"
 
     def buffer(self):
         """
